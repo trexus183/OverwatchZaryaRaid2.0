@@ -1,0 +1,202 @@
+import "master.del";
+
+//  ------------- Gamemode Setup -------------
+rule: "Setup Gamemode"
+Event.OngoingGlobal
+if (IsAssemblingHeroes()) {
+    WorkshopSettingCombo("Settings", "Difficulty Scaling", 0, ["Enabled", "Disabled"], 0);
+    SetMatchTime(0);
+    Wait(1);
+    SetMatchTime(0);
+    DisableCompletion();
+    Wait(1);
+    PauseMatchTime(); 
+    DisableAnnouncer();
+    DisableMusic();
+
+    for (define i = 0; i < 18; i++) {
+        CreateDummyBot(Hero.Ana, Team.Team2, i, Vector(1.57, -5, -11.99), Vector(0, 0, 0));
+        enemies[i] = LastCreatedEntity()[0];
+    }
+    
+    Wait(3);
+    Kill(enemies);
+    Resurrect(enemies);
+    // Heal(EventPlayer(), null, 999);
+    SpawnAI(Vector(-102.8, 2, 44), EnemyTypes.Zarya);
+    SpawnAI(Vector(-102.3, -2, 43.2), EnemyTypes.StandardTurret);
+
+    // Spawn Initial Ads
+    for (define i = 0; i < 2; i++) {
+        SpawnAI(zaryaAdSummonLocs[RandomInteger(0, CountOf(zaryaAdSummonLocs)-1)], EnemyTypes.ExploderOmnic);
+    }
+
+    for (define i = 0; i < 2; i++) {
+        SpawnAI(zaryaAdSummonLocs[RandomInteger(0, CountOf(zaryaAdSummonLocs)-1)], EnemyTypes.LesserOmnic);
+    }
+
+    for (define i = 0; i < 5; i++) {
+        SpawnAI(zaryaAdSummonLocs[RandomInteger(0, CountOf(zaryaAdSummonLocs)-1)], EnemyTypes.LesserBastion);
+    }
+
+    SpawnAI(zaryaAdSummonLocs[RandomInteger(0, CountOf(zaryaAdSummonLocs)-1)], EnemyTypes.StandardTurret);
+
+    for (define i = 0; i < 2; i++) {
+        SpawnAI(zaryaAdSummonLocs[RandomInteger(0, CountOf(zaryaAdSummonLocs)-1)], EnemyTypes.StandardBastion);
+    }
+
+    Teleport(enemies[0], Vector(32.97, -0.36, -68.59));
+}
+
+//  ------------- Player Scripts -------------
+playervar define setupComplete = false;
+playervar define heroPassiveText = "";
+rule: "Setup Player"
+Event.OngoingPlayer Team.Team1 if (!IsDummyBot(EventPlayer()) && HasSpawned(EventPlayer()) && !IsDead(EventPlayer()) && !setupComplete) {
+    setupComplete = true;
+    
+    // Zarya Health Display
+    CreateHudText(EventPlayer(), "", "Zarya Health", "", Location.Right, 2, Color.Purple, Color.Purple, Color.Purple, HudTextRev.String, Spectators.VisibleAlways);
+    CreateHudText(EventPlayer(), "", "", Health(PlayersOnHero(Hero.Zarya)[0]), Location.Right, 3, Color.
+    Purple, Color.Purple, Color.Purple, HudTextRev.String, Spectators.VisibleAlways);
+
+    setHeroPassiveText(EventPlayer());
+    CreateHudText(EventPlayer(), "", "", heroPassiveText, Location.Left, 1, Color.White, Color.White, Color.White, HudTextRev.String, Spectators.VisibleAlways);
+    // add 24 and then the line you want for status text
+    for (define i = 0; i < 27; i++) {
+        CreateHudText(EventPlayer(), null, null, " ", Location.Left, 2,  Color.White, Color.White, Color.White, HudTextRev.String, Spectators.VisibleAlways);
+    }
+    CreateHudText(EventPlayer(), "", "Effects:", "", Location.Left, 3, Color.White, Color.White, Color.White, HudTextRev.String, Spectators.VisibleAlways);
+    CreateHudText(EventPlayer(), "", "", "Energized x10", Location.Left, 4, Color.White, Color.White, Color.White, HudTextRev.String, Spectators.VisibleAlways);
+
+    // Debug Info
+    CreateHudText(EventPlayer(), null, null, "Player Pos" + PositionOf(EventPlayer()), Location.Top, 0,  Color.White, Color.White, Color.White, HudTextRev.String, Spectators.VisibleAlways);
+    CreateHudText(EventPlayer(), null, null, "Player Aim Pos" + RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer())*500), Location.Top, 0,  Color.White, Color.White, Color.White, HudTextRev.String, Spectators.VisibleAlways);
+
+    // CreateEffect(EventPlayer(), Effect.Orb, Color.Purple, UpdateEveryFrame(RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer())*500, AllPlayers(), EventPlayer(), true)), 0.5, EffectRev.PositionAndRadius);
+
+    DisableGameModeHud(EventPlayer());
+    DisableGameModeInworldUI(EventPlayer());
+
+    updateEnemyDamageRecieved();
+}
+
+rule: "Respawn Player"
+Event.OngoingPlayer if (!IsDummyBot(EventPlayer()) && HasSpawned(EventPlayer()) && !IsDead(EventPlayer())) {
+    reinBot = null;
+    Kill(PlayersOnHero(Hero.Reinhardt, Team.Team2), null);
+
+    setHeroPassiveText(EventPlayer());
+
+    if (zaryaCastingUlt) {
+        Teleport(EventPlayer(), Vector(-87.6, -2, 53.4));
+    }
+
+    Teleport(EventPlayer(), Vector(-44.88, -3, 56.67));
+
+    StartFacing(EventPlayer(), Vector(-55.92, -2, 40.67), 999999, Relative.ToWorld, FacingRev.None);
+    Wait(0.016);
+    StopFacing(EventPlayer());
+}
+
+//  ------------- Walls -------------
+globalvar define wallLocs = [
+    // Vector(-59, 0, 41.31), Vector(-60.33, 0, 43.36), Vector(-58, 0, 39.84), // Right B Entrance
+    Vector(-86.5, -4, 75.16), Vector(-83.17, -2, 77.12), // Left Section Walls
+    Vector(-72.28, -1.98, 51.47),
+    Vector(-72.83, -2.98, 69.18),
+    Vector(-76.95, -2.96, 76.85),
+    Vector(-75.71, -3.48, 74.16),
+    Vector(-71.10, -2.95, 72.89),
+    Vector(-73.06, -2.96, 71.74),
+    Vector(-62.48, -2.98, 59.54),
+    Vector(-65.51, -2.98, 57.65),
+    Vector(-63.81, -2.98, 58.57),
+    Vector(-92.18, -3.98, 72.77),
+    Vector(-97.17, -3.98, 69.44),
+    Vector(-110.15, -3.98, 66.38),
+    Vector(-108.66, -3.98, 66.83),
+    Vector(-107.19, -3.98, 67.10),
+    Vector(-105.25, -3.98, 67.00),
+    Vector(-103.38, -3.98, 66.89),
+    Vector(-101.54, -3.98, 66.85),
+    Vector(-46.07, -3.00, 60.11)
+];
+rule: "Create Walls and effects"
+Event.OngoingGlobal {
+    // Right B Entrance
+
+    // Left Section Walls
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-82.13, 0.95, 77.73), Vector(-84.26, -1.91, 76.37));
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-87.96, 1.9, 74.23), Vector(-84.91, -3.93, 75.87));
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-85.19, 5.9, 76.33), Vector(-88.03, -4, 74));
+
+    
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-90.21, -0.96, 72.06), Vector(-92.42, -3.98, 70.53));
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-95.36, -0.97, 68.93), Vector(-97.57, -3.98, 67.41));
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-73.77, 1.07, 51.32), Vector(-71.40, -1.98, 52.88));
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-110.87, -3.95, 65.28), Vector(-100.48, 1.93, 66.77));
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-110.62, 0.88, 65.23), Vector(-100.57, -3.92, 66.70));
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-44.29, 0.14, 60.12), Vector(-46.78, -2.98, 58.69));
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-55.70, -3.13, 54.21), Vector(-59.99, 6.97, 51.12));
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-55.06, 2.87, 53.89), Vector(-60.39, -2.98, 51.17));
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-64.41, 7.87, 50.04), Vector(-67.45, 2.54, 54.88));
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-64.36, 2.52, 50.02), Vector(-67.34, 7.85, 54.92));
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-72.65, 7.86, 67.84), Vector(-74.16, 2.17, 70.11));
+
+
+    for (define i = 0; i < CountOf(stunNodeLocs); i++) {
+        stunNodeColor[i] = Color.Team2;
+    }
+    
+    // Stun nodes
+    CreateEffect(AllPlayers(), Effect.Orb, stunNodeColor[0], stunNodeLocs[0], 1, EffectRev.VisibleToPositionRadiusAndColor);
+    CreateEffect(AllPlayers(), Effect.Orb, stunNodeColor[1], stunNodeLocs[1], 1, EffectRev.VisibleToPositionRadiusAndColor);
+    CreateEffect(AllPlayers(), Effect.Orb, stunNodeColor[2], stunNodeLocs[2], 1, EffectRev.VisibleToPositionRadiusAndColor);
+
+    // Zarya Effects
+    CreateBeamEffect(AllPlayers(), BeamType.BadBeam, zaryaBeamCoords[0], zaryaBeamCoords[1], Color.Team2, EffectRev.VisibleToPositionRadiusAndColor);
+    CreateEffect(AllPlayers(), Effect.ZaryaParticleBeamSound, Color.Team2, Vector(-102.8, 2, 44), zaryaBeamVolume, EffectRev.VisibleToPositionRadiusAndColor);
+
+    CreateEffect(AllPlayers(), Effect.Ring, Color.Team2, PositionOf(PlayersOnHero(Hero.Zarya, Team.Team2)[0])+ Vector(0, -1, 0), 13, EffectRev.VisibleToPositionRadiusAndColor);
+    CreateEffect(AllPlayers(), Effect.Ring, Color.Team2, PositionOf(PlayersOnHero(Hero.Zarya, Team.Team2)[0])+ Vector(0, -3, 0), 13, EffectRev.VisibleToPositionRadiusAndColor);
+
+    // Teleporter (I think)
+    CreateEffect(AllPlayers(), Effect.LightShaft, Color.SkyBlue, teleporterPos + Vector(0, -3, 0), 1.25, EffectRev.VisibleToPositionRadiusAndColor);
+
+    // Capture Point
+    CreateEffect(AllPlayers(), Effect.Ring, Color.LimeGreen, capturePointPos, 4, EffectRev.VisibleToPositionRadiusAndColor);
+    CreateEffect(AllPlayers(), Effect.LightShaft, Color.LimeGreen, capturePointPos + Vector(0, -27, 0), 4, EffectRev.VisibleToPositionRadiusAndColor);
+    CreateEffect(AllPlayers(), Effect.Ring, Color.LimeGreen, capturePointPos, 4*(capturePointProgress/100), EffectRev.VisibleToPositionRadiusAndColor);
+   
+    CreateProgressBarInWorldText(AllPlayers(), capturePointProgress, "Capture Progress", capturePointPos + Vector(0, 4, 0), 1, Clipping.ClipAgainstSurfaces, Color.LimeGreen, Color.LimeGreen, ProgressBarEvaluation.VisibleToAndValues, Spectators.VisibleAlways);
+
+    CreateProgressBarHudText(PlayersWithinRadius(capturePointPos, 4.25, Team.Team1, RadiusLOS.Off), capturePointProgress, "Capture Point Progress", Location.Top, 4, Color.LimeGreen, Color.LimeGreen, ProgressBarEvaluation.VisibleToAndValues, Spectators.VisibleAlways);
+
+    // Button Prompts
+    CreateInWorldText(AllPlayers(), "Press F to Hack " + HeroIconString(Hero.Zarya), Vector(-27.89, 3.25, 84.5), 1.5, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.VisibleAlways);
+    CreateEffect(AllPlayers(), Effect.Sparkles, Color.White, Vector(-27.85, 3.1, 84.46), 0.25, EffectRev.VisibleToPositionRadiusAndColor);
+
+    // Thunder Dome
+    CreateEffect(AllPlayers(), Effect.Sphere, Color.Team2, Vector(-13.7, -3.68, 90.26), 11.5, EffectRev.VisibleToPositionRadiusAndColor);
+
+    CreateInWorldText(AllPlayers(), thunderDomeExitButtonPrompt, Vector(-11.19, -2.43, 98.46), 1.5, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleToAndString, Color.White, Spectators.VisibleAlways);
+    
+    CreateEffect(AllPlayers(), Effect.Sparkles, Color.White, thunderDomeExitButtonLoc, 0.25, EffectRev.VisibleToPositionRadiusAndColor);
+
+    // Rein Clone Effect
+    CreateEffect(AllPlayers(), Effect.EchoCloningEffect, Color.Team2, reinBot, 1, EffectRev.VisibleToPositionRadiusAndColor);
+}
+
+rule: "Wall Collision"
+Event.OngoingPlayer Team.Team1 {
+    for (define i = 0; i < CountOf(wallLocs); i++) {
+        define pushLocation = Vector(XOf(wallLocs[i]), YOf(PositionOf(EventPlayer())), ZOf(wallLocs[i]));
+        if (DistanceBetween(pushLocation, PositionOf(EventPlayer())) < 3) {
+            ApplyImpulse(EventPlayer(), DirectionTowards(pushLocation, EventPlayer()), 3, Relative.ToWorld, ContraryMotion.Cancel);
+        }
+    }
+
+    Wait(0.032);
+    Loop();
+}

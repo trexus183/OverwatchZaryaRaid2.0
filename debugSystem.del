@@ -1,0 +1,78 @@
+import "master.del";
+
+globalvar define debugNodes = [];
+globalvar define selectedDebugNodes = [];
+rule: "Debug Button"
+Event.OngoingPlayer if (IsButtonHeld(EventPlayer(), Button.Crouch) && IsButtonHeld(EventPlayer(), Button.Interact)) {
+    Wait(2);
+    if (IsButtonHeld(EventPlayer(), Button.Crouch) && IsButtonHeld(EventPlayer(), Button.Interact)) {
+        debugModeEnabled = true;
+
+        Kill(enemies, EventPlayer());
+
+        SetSecondaryFireEnabled(EventPlayer(), false);
+        SetAbility2Enabled(EventPlayer(), false);
+
+        DestroyAllInworldText();
+        DestroyAllProgressBarHudText();
+        DestroyAllProgressBarInWorldText();
+        DestroyAllEffects();
+
+        SmallMessage(EventPlayer(), "Debug Mode Active");
+    }
+}
+rule: "Debug Mode - Place Nodes"
+Event.OngoingPlayer if (debugModeEnabled && IsButtonHeld(EventPlayer(), Button.SecondaryFire) && !IsButtonHeld(EventPlayer(), Button.Crouch)) {
+    debugNodes[CountOf(debugNodes)] = PositionOf(EventPlayer()) + Vector(0, 1, 0);
+    
+    CreateEffect(AllPlayers(), Effect.Orb, Color.Black, PositionOf(EventPlayer()) + Vector(0, 1, 0), 0.5, EffectRev.None);
+    CreateInWorldText(AllPlayers(), CountOf(debugNodes)-1, PositionOf(EventPlayer()) + Vector(0, 1, 0), 1.5, Clipping.ClipAgainstSurfaces, InworldTextRev.None, Color.White, Spectators.VisibleAlways);
+}
+
+rule: "Debug Mode - Place Nodes With Ray"
+Event.OngoingPlayer if (debugModeEnabled && IsButtonHeld(EventPlayer(), Button.Ability2) && !IsButtonHeld(EventPlayer(), Button.Crouch)) {
+    debugNodes[CountOf(debugNodes)] = RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer())*500, AllPlayers(), EventPlayer(), true);
+    
+    CreateEffect(AllPlayers(), Effect.Orb, Color.Black, RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer())*500, AllPlayers(), EventPlayer(), true), 0.5, EffectRev.None);
+    CreateInWorldText(AllPlayers(), CountOf(debugNodes)-1, RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer())*500, AllPlayers(), EventPlayer(), true), 1.5, Clipping.ClipAgainstSurfaces, InworldTextRev.None, Color.White, Spectators.VisibleAlways);
+}
+
+
+define resetEffects() {
+    DestroyAllEffects();
+    DestroyAllInworldText();
+
+    for (define i = 0; i < CountOf(debugNodes); i++) {
+        CreateEffect(AllPlayers(), Effect.Orb, Color.Black, debugNodes[i], 0.5, EffectRev.None);
+        CreateInWorldText(AllPlayers(), i, debugNodes[i], 1.5, Clipping.ClipAgainstSurfaces, InworldTextRev.None, Color.White, Spectators.VisibleAlways);
+    }
+
+    return null;
+}
+
+rule: "Debug Mode - Destroy Nodes"
+Event.OngoingPlayer if (debugModeEnabled && IsButtonHeld(EventPlayer(), Button.SecondaryFire) && IsButtonHeld(EventPlayer(), Button.Crouch)) {
+    for (define i = 0; i < CountOf(selectedDebugNodes); i++) {
+        PlayEffect(AllPlayers(), PlayEffect.BadExplosion, Color.Black, selectedDebugNodes[i], 1.5);
+    }
+
+    debugNodes = RemoveFromArray(debugNodes, selectedDebugNodes);
+    
+    selectedDebugNodes = [];
+    resetEffects();
+}
+
+rule: "Debug Mode - Deselect All Nodes"
+Event.OngoingPlayer if (debugModeEnabled && IsFiringPrimary(EventPlayer()) && IsButtonHeld(EventPlayer(), Button.Crouch)) {
+    selectedDebugNodes = [];
+}
+
+rule: "Debug Mode - Show Selected Nodes"
+Event.OngoingGlobal if (debugModeEnabled) {
+    for (define i = 0; i < CountOf(selectedDebugNodes); i++) {
+        PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.White, selectedDebugNodes[i], 1.5);
+    }
+    
+    Wait(0.5);
+    LoopIfConditionIsTrue();
+}

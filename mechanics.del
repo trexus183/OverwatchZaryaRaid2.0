@@ -1,0 +1,257 @@
+import "master.del";
+
+globalvar define stunNodeLocs = [Vector(-104.41, -999, 50.62), Vector(-97.73, -999, 39.64), Vector(-101.07, -999, 45.13)];
+globalvar define stunNodeColor = [];
+globalvar define zaryaBeamCoords = [Vector(0, -999, 0), Vector(0, -999, 0)];
+globalvar define thunderDomeExitButtonLoc = Vector(-11.19, -2.58, 98.46);
+globalvar define thunderDomeExitButtonPrompt = "Exit Locked";
+
+rule: "Player Shot Interactions"
+Event.OngoingPlayer Team.Team1 if (IsFiringPrimary(EventPlayer())) {
+
+    // Pickup health drops
+   for (define i = 0; i <= CountOf(healthPickupLocs); i++) {
+        define playerAimPos = RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer()) * DistanceBetween(EyePosition(EventPlayer()), healthPickupLocs[i]));
+
+        if (DistanceBetween(playerAimPos, healthPickupLocs[i]) < 0.75 && DistanceBetween(playerAimPos, healthPickupLocs[i]) != 0) {
+            SmallMessage(EventPlayer(), "Collected Health");
+
+            PlayEffect(AllPlayers(), PlayEffect.GoodPickupEffect, Color.Yellow, healthPickupLocs[i], 2);
+            PlayEffect(AllPlayers(), PlayEffect.BuffExplosionSound, Color.Yellow, EventPlayer(), 200);
+
+            healthPickupLocs[i] = null;
+            DestroyEffect(healthPickupEffects[i]);
+            healthPickupEffects[i] = null;
+            Heal(EventPlayer(), EventPlayer(), MaxHealth(EventPlayer())*0.2);
+        }
+    }
+
+    // Deactivate stun nodes
+    for (define i = 0; i <= CountOf(stunNodeLocs); i++) {
+        define playerAimPos = RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer()) * DistanceBetween(EyePosition(EventPlayer()), stunNodeLocs[i]));
+
+        if (DistanceBetween(playerAimPos, stunNodeLocs[i]) < 0.75 && DistanceBetween(playerAimPos, stunNodeLocs[i]) != 0 && stunNodeColor[i] == Color.Team2) {
+            PlayEffect(AllPlayers(), PlayEffect.GoodPickupEffect, Color.Team1, stunNodeLocs[i], 2);
+            PlayEffect(AllPlayers(), PlayEffect.MoiraFadeDisappearSound, Color.Team1, stunNodeLocs[i], 200);
+            stunNodeColor[i] = Color.Team1;
+        }        
+
+    }
+
+    for (define i = 0; i <= CountOf(debugNodes); i++) {
+        define playerAimPos = RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer()) * DistanceBetween(EyePosition(EventPlayer()), debugNodes[i]));
+
+        if (DistanceBetween(playerAimPos, debugNodes[i]) < 0.25 && DistanceBetween(playerAimPos, debugNodes[i]) != 0 && !ArrayContains(selectedDebugNodes, debugNodes[i])) {
+            if (ArrayContains(selectedDebugNodes, debugNodes[i])) {
+                RemoveFromArray(selectedDebugNodes, debugNodes[i]);
+            } else {
+                selectedDebugNodes[CountOf(selectedDebugNodes)] = debugNodes[i];
+            }
+        }
+    }
+
+    Wait(0.1);
+    LoopIfConditionIsTrue();
+}
+
+globalvar define capturePointPos = Vector(-84.45, -1.97, 55.25);
+globalvar define capturePointProgress = 0;
+rule: "Capture Point - Cap"
+Event.OngoingPlayer Team.Team1 if (DistanceBetween(EventPlayer(), capturePointPos) <= 4.25) {
+    if (capturePointProgress <= 100) {
+        capturePointProgress += 0.04;
+    } else {
+        stunNodeLocs = [Vector(-104.41, 3.5, 50.62), Vector(-97.73, 3.5, 39.64), Vector(-101.07, 9, 45.13)];
+    }
+
+    if (zaryaAdSummonCooldown > 150) {
+        zaryaAdSummonCooldown = 150;
+    }
+
+
+    Wait(0.016);
+    LoopIfConditionIsTrue();
+}
+
+rule: "Capture Point - Decay"
+Event.OngoingPlayer Team.Team1 if (CountOf(PlayersWithinRadius(capturePointPos, 4.25)) == 0) {
+    if (capturePointProgress >= 0.01) {
+    capturePointProgress -= 0.01;
+    }
+
+    if (!zaryaCastingUlt) {
+        stunNodeLocs = [Vector(-104.41, -999, 50.62), Vector(-97.73, -999, 39.64), Vector(-101.07, -999, 45.13)];
+    }
+        
+    Wait(0.016);
+    LoopIfConditionIsTrue();
+}
+
+globalvar define teleporterPos = Vector(-94.3, -35, 49.24);
+rule: "Stun Node Handler"
+Event.OngoingGlobal if (ArrayContains(stunNodeColor, Color.Team1)) {
+    Wait(2);
+    if (!ArrayContains(stunNodeColor, Color.Team2)) {
+        for (define i = 0; i < CountOf(stunNodeLocs); i++) {
+            PlayEffect(AllPlayers(), PlayEffect.TracerRecallReappearEffect, Color.Team1, stunNodeLocs[i], 2);
+            PlayEffect(AllPlayers(), PlayEffect.DebuffImpactSound, Color.Team2, stunNodeLocs[i], 200);
+        }
+
+        if (RandomInteger(0, 1) == 0) {
+            SpawnAI(Vector(-96.4, -2, 40.13), EnemyTypes.StandardBastion);
+        } else {
+            SpawnAI(Vector(-103.4, -2, 51.7), EnemyTypes.StandardBastion);
+        }
+        
+        if (zaryaCastingUlt) {
+            zaryaCastingUlt = false;
+            zaryaAdSummonCooldown = 600;
+            Wait(1);
+            for (define i = 0; i < CountOf(stunNodeLocs); i++) {
+                PlayEffect(AllPlayers(), PlayEffect.BadPickupEffect, Color.Team2, stunNodeLocs[i], 2);
+                PlayEffect(AllPlayers(), PlayEffect.MoiraFadeReappearSound, Color.Team2, stunNodeLocs[i], 200);
+            }
+            Wait(0.01);
+            stunNodeLocs = [Vector(-104.41, -999, 50.62), Vector(-97.73, -999, 39.64), Vector(-101.07, -999, 45.13)];
+            capturePointPos = Vector(-84.45, -1.97, 55.25);
+            Wait(3);
+            SpawnAI(Vector(-102.3, -2, 43.2), EnemyTypes.StandardTurret);
+        } else {
+            SetStatus(PlayersOnHero(Hero.Zarya, Team.Team2)[0], null, Status.Stunned, 10);
+            ChaseVariableOverTime(teleporterPos, Vector(-94.3, -0.76, 49.24), 1, TimeChaseReevaluation.None);
+            Wait(10);
+            ChaseVariableOverTime(teleporterPos, Vector(-94.3, -35, 49.24), 1, TimeChaseReevaluation.None);
+        }
+    }
+
+    for (define i = 0; i < CountOf(stunNodeLocs); i++) {
+        stunNodeColor[i] = Team.Team2;
+    }
+
+    for (define i = 0; i < CountOf(stunNodeLocs); i++) {
+        PlayEffect(AllPlayers(), PlayEffect.BadPickupEffect, Color.Team2, stunNodeLocs[i], 2);
+        PlayEffect(AllPlayers(), PlayEffect.MoiraFadeReappearSound, Color.Team2, stunNodeLocs[i], 200);
+    }
+}
+
+rule: "Teleporter"
+Event.OngoingPlayer Team.Team1 if (DistanceBetween(EventPlayer(), teleporterPos) < 1.25) {
+    SmallMessage(EventPlayer(), "Teleporter warming up");
+
+    PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 1, 0), 5);
+    PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearSound, Color.SkyBlue, teleporterPos, 200);
+    Wait(1);
+    
+    if (DistanceBetween(EventPlayer(), teleporterPos) > 1.25) {
+        SmallMessage(EventPlayer(), "Teleporter link broken");
+        return;
+    }
+
+    PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 1, 0), 5);
+    PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearSound, Color.SkyBlue, teleporterPos, 200);
+    Wait(1);
+
+    if (DistanceBetween(EventPlayer(), teleporterPos) > 1.25) {
+        SmallMessage(EventPlayer(), "Teleporter link broken");
+        return;
+    }
+
+    PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 1, 0), 5);
+    PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearSound, Color.SkyBlue, teleporterPos, 200);
+    Wait(1);
+
+    if (DistanceBetween(EventPlayer(), teleporterPos) < 1.25) {
+        thunderDomeExitButtonLoc = Vector(0, -999, 0);
+        thunderDomeExitButtonPrompt = "Exit Locked";
+
+        PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 1, 0), 5);
+        PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearEffect, Color.Team1, PositionOf(EventPlayer()), 2);
+        PlayEffect(AllPlayers(), PlayEffect.BuffImpactSound, Color.SkyBlue, PositionOf(EventPlayer()), 200);
+       
+        Teleport(EventPlayer(), Vector(-7.77, -3.84, 96.12));
+       
+        Wait(0.16);
+        PlayEffect(EventPlayer(), PlayEffect.BuffImpactSound, Color.SkyBlue, PositionOf(EventPlayer()), 200);
+        PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 1, 0), 5);
+        SmallMessage(EventPlayer(), "Teleported");
+
+        Teleport(PlayersOnHero(Hero.Zarya, Team.Team2)[0], Vector(-12, 1.27, 80));
+        StartFacing(PlayersOnHero(Hero.Zarya, Team.Team2)[0], DirectionTowards(EyePosition(PlayersOnHero(Hero.Zarya, Team.Team2)[0]), Vector(-19.37, -3.84, 85.05)), 1000, Relative.ToWorld, FacingRev.DirectionAndTurnRate);
+        Wait(5);
+        PressButton(PlayersOnHero(Hero.Zarya, Team.Team2)[0], Button.SecondaryFire);
+        Wait(0.1);
+        SpawnAI(Vector(-19.37, -3.84, 85.05), EnemyTypes.Rein);
+    } else {
+        SmallMessage(EventPlayer(), "Teleporter link broken");
+    }
+}
+
+rule: "Thunder Dome Walls - Damage"
+Event.OngoingPlayer if (DistanceBetween(EventPlayer(), Vector(-13.7, -3.68, 90.26)) <= 13 && DistanceBetween(EventPlayer(), Vector(-13.7, -3.68, 90.26)) >= 10 && !HasStatus(EventPlayer(), Status.Burning)) {
+    StartDamageOverTime(EventPlayer(), null, 1, 20);
+    SetStatus(EventPlayer(), null, Status.Burning, 1);
+}
+
+rule: "Thunder Dome Walls - Impulse"
+Event.OngoingPlayer if (DistanceBetween(EventPlayer(), Vector(-13.7, -3.68, 90.26)) <= 13 && DistanceBetween(EventPlayer(), Vector(-13.7, -3.68, 90.26)) >= 10) {
+    ApplyImpulse(EventPlayer(), DirectionTowards(EventPlayer(), Vector(-13.7, -3.68, 90.26)), 2, Relative.ToWorld, ContraryMotion.Cancel);
+
+    Wait(0.016);
+    LoopIfConditionIsTrue();
+}
+
+rule: "Thunder Dome Exit Terminal Trigger"
+Event.OngoingPlayer Team.Team1 if (DistanceBetween(EventPlayer(), thunderDomeExitButtonLoc) < 6  && IsButtonHeld(EventPlayer(), Button.Interact)) {
+    SpawnAI(Vector(-30.5, 2, 76.6), EnemyTypes.ExploderOmnic);
+    SpawnAI(Vector(-33.1, 2, 82.4), EnemyTypes.StandardBastion);
+    SpawnAI(Vector(-33.71, 2, 71.89), EnemyTypes.LesserBastion);
+    SpawnAI(Vector(-31.24, 1, 62.18), EnemyTypes.LesserBastion);
+
+    Teleport(EventPlayer(), Vector(-23.45, -2, 61.96));
+
+    Wait(0.016);
+    PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 1, 0), 5);
+    PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearEffect, Color.Team1, PositionOf(EventPlayer()), 2);
+    PlayEffect(AllPlayers(), PlayEffect.BuffImpactSound, Color.SkyBlue, PositionOf(EventPlayer()), 200);
+}
+
+rule: "Hack Room Enemy Trigger"
+Event.OngoingPlayer Team.Team1 if (DistanceBetween(EventPlayer(), Vector(-30.97, 2, 86.78)) < 6) {
+    SpawnAI(Vector(-26.4, 2.3, 90), EnemyTypes.StandardBomber);
+}
+
+rule: "Hack Terminal Trigger"
+Event.OngoingPlayer Team.Team1 if (DistanceBetween(EventPlayer(), Vector(-27.85, 3.1, 84.46)) < 6 && IsButtonHeld(EventPlayer(), Button.Interact)) {
+    stunNodeLocs = [Vector(-104.41, -999, 50.62), Vector(-97.73, -999, 39.64), Vector(-101.07, -999, 45.13)];
+    capturePointPos = Vector(-84.45, -999, 55.25);
+
+    ClearStatus(PlayersOnHero(Hero.Zarya, Team.Team2)[0], Status.PhasedOut);
+    SmallMessage(AllPlayers(), "The Zarya Echo is vulnerable");
+    
+    for (define i = 0; i < 3; i++) {
+        SpawnAI(zaryaAdSummonLocs[RandomInteger(0, CountOf(zaryaAdSummonLocs)-1)], EnemyTypes.LesserBastion);
+    }
+
+    Teleport(EventPlayer(), Vector(-64.67, -1.13, 29.05));
+    Teleport(PlayersOnHero(Hero.Zarya, Team.Team2)[0], Vector(-94.3, 2, 49.24));
+
+    Wait(0.016);
+    PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 1, 0), 5);
+    PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearEffect, Color.Team1, PositionOf(EventPlayer()), 2);
+    PlayEffect(AllPlayers(), PlayEffect.BuffImpactSound, Color.SkyBlue, PositionOf(EventPlayer()), 200);
+
+    Wait(30);
+
+    SetStatus(PlayersOnHero(Hero.Zarya, Team.Team2)[0], EventPlayer(), Status.PhasedOut, 999999);
+    SmallMessage(AllPlayers(), "Zarya Echo's protections return");
+    
+    zaryaCastingUlt = true;
+    SpawnAI(Vector(-102.8, -2, 44), EnemyTypes.ExploderOmnic);
+
+
+    Teleport(PlayersOnHero(Hero.Zarya, Team.Team2)[0], Vector(-102.8, 2, 44));
+    Wait(0.1);
+    PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(PlayersOnHero(Hero.Zarya, Team.Team2)[0]) + Vector(0, 1, 0), 15);
+    PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearEffect, Color.Team2, PositionOf(PlayersOnHero(Hero.Zarya, Team.Team2)[0]), 2);
+    PlayEffect(AllPlayers(), PlayEffect.BuffImpactSound, Color.SkyBlue, PositionOf(PlayersOnHero(Hero.Zarya, Team.Team2)[0]), 200);
+}
