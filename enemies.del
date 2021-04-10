@@ -42,6 +42,7 @@ define SpawnAI(Vector spawnLoc, EnemyTypes enemyType) {
     SetJumpVerticalSpeed(targetBot, 100);
     SetMoveSpeed(targetBot, 100);
     StopScalingPlayer(targetBot);
+    StopDamageOverTime(targetBot);
     SetProjectileGravity(targetBot, 0);
     SetProjectileSpeed(targetBot, 300);
     SetMaxAmmo(targetBot, 1, 1);
@@ -68,7 +69,7 @@ define SpawnAI(Vector spawnLoc, EnemyTypes enemyType) {
         SetDamageDealt(targetBot, 5);
         SetMaxHealth(targetBot, 50);
         SetAbility1Enabled(targetBot, false);
-        StartScalingPlayer(targetBot, 0.85, false);
+        StartScalingPlayer(targetBot, 1, false);
 
     } else if (enemyType == EnemyTypes.GreaterBastion) {
         SmallMessage(AllPlayers(), "Spawning StandardBastion");
@@ -76,6 +77,7 @@ define SpawnAI(Vector spawnLoc, EnemyTypes enemyType) {
         StartForcingDummyBotName(targetBot, "Greater Scout");
         SetDamageDealt(targetBot, 15);
         SetMaxHealth(targetBot, 75);
+        StartScalingPlayer(targetBot, 1.25, false);
         SetAbility1Enabled(targetBot, false);
 
     } else if (enemyType == EnemyTypes.LesserTurret) {
@@ -84,7 +86,7 @@ define SpawnAI(Vector spawnLoc, EnemyTypes enemyType) {
         StartForcingDummyBotName(targetBot, "Lesser Turret");
         SetDamageDealt(targetBot, 20);
         SetMaxHealth(targetBot, 30);
-        StartScalingPlayer(targetBot, 1.2, false);
+        StartScalingPlayer(targetBot, 1.25, false);
 
     } else if (enemyType == EnemyTypes.StandardTurret) {
         SmallMessage(AllPlayers(), "Spawning StandardTurret");
@@ -190,12 +192,14 @@ Event.OnPlayerJoin Team.Team1 {
 globalvar define healthPickupLocs = [];
 globalvar define healthPickupEffects = [];
 rule: "Enemy Death Handler"
-Event.OnDeath if (IsDummyBot(EventPlayer()) && HeroOf(EventPlayer()) != Hero.Ana) {
+Event.OnDeath Team.Team2 if (HeroOf(EventPlayer()) != Hero.Ana) {
     PlayEffect(AllPlayers(), PlayEffect.BadExplosion, Color.Team2, EyePosition(EventPlayer()), 2);
     Wait(0.1);
+
     if (debugModeEnabled) {
         Abort();
     }
+
     define pickupIndex = CountOf(healthPickupLocs);
     healthPickupLocs[pickupIndex] = PositionOf(EventPlayer());
     CreateEffect(AllPlayers(), Effect.Orb, Color.Yellow, healthPickupLocs[pickupIndex], 1, EffectRev.PositionAndRadius);
@@ -298,8 +302,11 @@ Event.OngoingPlayer if (IsDummyBot(EventPlayer()) && HeroOf(EventPlayer()) == He
             StartHoldingButton(EventPlayer(), Button.PrimaryFire);
         }
     } else {
-        StopHoldingButton(EventPlayer(), Button.PrimaryFire);
-        PressButton(EventPlayer(), Button.Ability1);
+        if (IsButtonHeld(EventPlayer(), Button.PrimaryFire)) {
+            StopHoldingButton(EventPlayer(), Button.PrimaryFire);
+            PressButton(EventPlayer(), Button.Ability1);
+        }
+
         targetPlayer = null;
     }
 

@@ -14,7 +14,7 @@ if (IsAssemblingHeroes()) {
     DisableAnnouncer();
     DisableMusic();
 
-    for (define i = 0; i < 18; i++) {
+    for (define i = 0; i < 23; i++) {
         CreateDummyBot(Hero.Ana, Team.Team2, i, Vector(1.57, -5, -11.99), Vector(0, 0, 0));
         enemies[i] = LastCreatedEntity()[0];
     }
@@ -70,8 +70,9 @@ Event.OngoingPlayer Team.Team1 if (!IsDummyBot(EventPlayer()) && HasSpawned(Even
     CreateHudText(EventPlayer(), "", "", "Energized x10", Location.Left, 4, Color.White, Color.White, Color.White, HudTextRev.String, Spectators.VisibleAlways);
 
     // Debug Info
-    CreateHudText(EventPlayer(), null, null, "Player Pos" + PositionOf(EventPlayer()), Location.Top, 0,  Color.White, Color.White, Color.White, HudTextRev.String, Spectators.VisibleAlways);
-    CreateHudText(EventPlayer(), null, null, "Player Aim Pos" + RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer())*500), Location.Top, 0,  Color.White, Color.White, Color.White, HudTextRev.String, Spectators.VisibleAlways);
+    CreateHudText(EventPlayer(), null, null, "Player Pos: " + PositionOf(EventPlayer()), Location.Top, 0,  Color.White, Color.White, Color.White, HudTextRev.String, Spectators.VisibleAlways);
+    CreateHudText(EventPlayer(), null, null, "Player Aim Pos: " + RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer())*500), Location.Top, 1,  Color.White, Color.White, Color.White, HudTextRev.String, Spectators.VisibleAlways);
+    CreateHudText(EventPlayer(), null, null, "Player Height: " + DistanceBetween(PositionOf(EventPlayer()), EyePosition(EventPlayer())), Location.Top, 2,  Color.White, Color.White, Color.White, HudTextRev.String, Spectators.VisibleAlways);
 
     // CreateEffect(EventPlayer(), Effect.Orb, Color.Purple, UpdateEveryFrame(RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer())*500, AllPlayers(), EventPlayer(), true)), 0.5, EffectRev.PositionAndRadius);
 
@@ -200,3 +201,24 @@ Event.OngoingPlayer Team.Team1 {
     Wait(0.032);
     Loop();
 }
+
+// playervar define damageText = [];
+// rule: "Create Damage Text"
+// Event.OnDamageDealt Team.Team1 {
+//     if (EventWasCriticalHit()) {
+//         CreateInWorldText(EventPlayer(), EventDamage(), PositionOf(Victim()) + Vector(RandomReal(-1, 1), RandomReal(-1, 1), RandomReal(-1, 1)), 1, Clipping.DoNotClip, InworldTextRev.None, Color.Yellow, Spectators.VisibleAlways);
+//     } else {
+//         CreateInWorldText(EventPlayer(), EventDamage(), PositionOf(Victim()) + Vector(RandomReal(-1, 1), RandomReal(-1, 1), RandomReal(-1, 1)), 1, Clipping.DoNotClip, InworldTextRev.None, Color.White, Spectators.VisibleAlways);
+//     }
+
+//     InsertValueInArray(damageText, 0, LastTextID());
+// }
+
+// rule: "Destroy Damage Text"
+// Event.OngoingPlayer Team.Team1 if (CountOf(damageText) > 0) {
+//     Wait(2);
+//     DestroyInWorldText(damageText[CountOf(damageText)]);
+//     RemoveFromArrayAtIndex(damageText, CountOf(damageText));
+//     LogToInspector("Destroying Text");
+//     LoopIfConditionIsTrue();
+// }
