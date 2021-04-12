@@ -50,7 +50,8 @@ if (IsAssemblingHeroes()) {
 
 //  ------------- Player Scripts -------------
 playervar define setupComplete = false;
-playervar define heroPassiveText = "";
+playervar define heroPassivePerkText = "";
+playervar define heroDebrisText = "";
 rule: "Setup Player"
 Event.OngoingPlayer Team.Team1 if (!IsDummyBot(EventPlayer()) && HasSpawned(EventPlayer()) && !IsDead(EventPlayer()) && !setupComplete) {
     setupComplete = true;
@@ -61,9 +62,11 @@ Event.OngoingPlayer Team.Team1 if (!IsDummyBot(EventPlayer()) && HasSpawned(Even
     Purple, Color.Purple, Color.Purple, HudTextRev.String, Spectators.VisibleAlways);
 
     setHeroPassiveText(EventPlayer());
-    CreateHudText(EventPlayer(), "", "", heroPassiveText, Location.Left, 1, Color.White, Color.White, Color.White, HudTextRev.String, Spectators.VisibleAlways);
+    CreateHudText(EventPlayer(), "", "", heroPassivePerkText, Location.Left, 1, Color.White, Color.White, Color.White, HudTextRev.String, Spectators.VisibleAlways);
+    CreateHudText(EventPlayer(), "", "", heroDebrisText, Location.Left, 1, Color.White, Color.White, Color.White, HudTextRev.String, Spectators.VisibleAlways);
+
     // add 24 and then the line you want for status text
-    for (define i = 0; i < 27; i++) {
+    for (define i = 0; i < 26; i++) {
         CreateHudText(EventPlayer(), null, null, " ", Location.Left, 2,  Color.White, Color.White, Color.White, HudTextRev.String, Spectators.VisibleAlways);
     }
     CreateHudText(EventPlayer(), "", "Effects:", "", Location.Left, 3, Color.White, Color.White, Color.White, HudTextRev.String, Spectators.VisibleAlways);
@@ -72,7 +75,7 @@ Event.OngoingPlayer Team.Team1 if (!IsDummyBot(EventPlayer()) && HasSpawned(Even
     // Debug Info
     CreateHudText(EventPlayer(), null, null, "Player Pos: " + PositionOf(EventPlayer()), Location.Top, 0,  Color.White, Color.White, Color.White, HudTextRev.String, Spectators.VisibleAlways);
     CreateHudText(EventPlayer(), null, null, "Player Aim Pos: " + RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer())*500), Location.Top, 1,  Color.White, Color.White, Color.White, HudTextRev.String, Spectators.VisibleAlways);
-    CreateHudText(EventPlayer(), null, null, "Player Height: " + DistanceBetween(PositionOf(EventPlayer()), EyePosition(EventPlayer())), Location.Top, 2,  Color.White, Color.White, Color.White, HudTextRev.String, Spectators.VisibleAlways);
+    CreateHudText(EventPlayer(), null, null, "Debug: " + Weapon(EventPlayer()), Location.Top, 2,  Color.White, Color.White, Color.White, HudTextRev.String, Spectators.VisibleAlways);
 
     // CreateEffect(EventPlayer(), Effect.Orb, Color.Purple, UpdateEveryFrame(RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer())*500, AllPlayers(), EventPlayer(), true)), 0.5, EffectRev.PositionAndRadius);
 
@@ -144,6 +147,10 @@ Event.OngoingGlobal {
     CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-64.41, 7.87, 50.04), Vector(-67.45, 2.54, 54.88));
     CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-64.36, 2.52, 50.02), Vector(-67.34, 7.85, 54.92));
     CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-72.65, 7.86, 67.84), Vector(-74.16, 2.17, 70.11));
+
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-72.95, 2.49, 52.94), Vector(-70.94, 12.45, 49.16));
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-71.94, 2.52, 51.10), Vector(-70.92, 7.43, 49.18));
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-71.46, 2.63, 49.95), Vector(-71.06, 5.41, 48.59));
 
 
     for (define i = 0; i < CountOf(stunNodeLocs); i++) {

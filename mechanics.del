@@ -9,20 +9,21 @@ globalvar define thunderDomeExitButtonPrompt = "Exit Locked";
 rule: "Player Shot Interactions"
 Event.OngoingPlayer Team.Team1 if (IsFiringPrimary(EventPlayer())) {
 
-    // Pickup health drops
+    // Pickup debris drops
    for (define i = 0; i <= CountOf(healthPickupLocs); i++) {
         define playerAimPos = RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer()) * DistanceBetween(EyePosition(EventPlayer()), healthPickupLocs[i]));
 
         if (DistanceBetween(playerAimPos, healthPickupLocs[i]) < 0.75 && DistanceBetween(playerAimPos, healthPickupLocs[i]) != 0) {
             SmallMessage(EventPlayer(), "Collected Health");
 
-            PlayEffect(AllPlayers(), PlayEffect.GoodPickupEffect, Color.Yellow, healthPickupLocs[i], 2);
-            PlayEffect(AllPlayers(), PlayEffect.BuffExplosionSound, Color.Yellow, EventPlayer(), 200);
+            PlayEffect(AllPlayers(), PlayEffect.GoodPickupEffect, Color.Black, healthPickupLocs[i], 2);
+            PlayEffect(AllPlayers(), PlayEffect.BuffExplosionSound, Color.Black, EventPlayer(), 200);
 
             healthPickupLocs[i] = null;
             DestroyEffect(healthPickupEffects[i]);
             healthPickupEffects[i] = null;
-            Heal(EventPlayer(), EventPlayer(), MaxHealth(EventPlayer())*0.2);
+            
+            collectDebris(EventPlayer());
         }
     }
 

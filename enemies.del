@@ -35,6 +35,7 @@ define SpawnAI(Vector spawnLoc, EnemyTypes enemyType) {
         reinBot = null;
     }
 
+    ClearStatus(targetBot, Status.Burning);
     Kill(targetBot);
     Resurrect(targetBot);
     StopForcingHero(targetBot);
@@ -42,7 +43,7 @@ define SpawnAI(Vector spawnLoc, EnemyTypes enemyType) {
     SetJumpVerticalSpeed(targetBot, 100);
     SetMoveSpeed(targetBot, 100);
     StopScalingPlayer(targetBot);
-    StopDamageOverTime(targetBot);
+    StopAllDamageOverTime(targetBot);
     SetProjectileGravity(targetBot, 0);
     SetProjectileSpeed(targetBot, 300);
     SetMaxAmmo(targetBot, 1, 1);
@@ -58,7 +59,7 @@ define SpawnAI(Vector spawnLoc, EnemyTypes enemyType) {
         ForcePlayerHero(targetBot, Hero.Bastion);
         StartForcingDummyBotName(targetBot, "Lesser Scout");
         SetDamageDealt(targetBot, 3);
-        SetMaxHealth(targetBot, 25);
+        SetMaxHealth(targetBot, 45);
         SetAbility1Enabled(targetBot, false);
         StartScalingPlayer(targetBot, 0.75, false);
 
@@ -67,7 +68,7 @@ define SpawnAI(Vector spawnLoc, EnemyTypes enemyType) {
         ForcePlayerHero(targetBot, Hero.Bastion);
         StartForcingDummyBotName(targetBot, "Scout Bastion");
         SetDamageDealt(targetBot, 5);
-        SetMaxHealth(targetBot, 50);
+        SetMaxHealth(targetBot, 75);
         SetAbility1Enabled(targetBot, false);
         StartScalingPlayer(targetBot, 1, false);
 
@@ -76,7 +77,6 @@ define SpawnAI(Vector spawnLoc, EnemyTypes enemyType) {
         ForcePlayerHero(targetBot, Hero.Bastion);
         StartForcingDummyBotName(targetBot, "Greater Scout");
         SetDamageDealt(targetBot, 15);
-        SetMaxHealth(targetBot, 75);
         StartScalingPlayer(targetBot, 1.25, false);
         SetAbility1Enabled(targetBot, false);
 
@@ -85,7 +85,7 @@ define SpawnAI(Vector spawnLoc, EnemyTypes enemyType) {
         ForcePlayerHero(targetBot, Hero.Bastion);
         StartForcingDummyBotName(targetBot, "Lesser Turret");
         SetDamageDealt(targetBot, 20);
-        SetMaxHealth(targetBot, 30);
+        SetMaxHealth(targetBot, 40);
         StartScalingPlayer(targetBot, 1.25, false);
 
     } else if (enemyType == EnemyTypes.StandardTurret) {
@@ -143,7 +143,7 @@ define SpawnAI(Vector spawnLoc, EnemyTypes enemyType) {
     } else if (enemyType == EnemyTypes.Rein) {
         SmallMessage(AllPlayers(), "Spawning Rein");
         SetMaxHealth(targetBot, 250);
-        SetDamageDealt(targetBot, 75);
+        SetDamageDealt(targetBot, 50);
         ForcePlayerHero(targetBot, Hero.Reinhardt);
         StartForcingDummyBotName(targetBot, "Rein Echo");
         StartScalingPlayer(targetBot, 1.25, false);
@@ -202,7 +202,7 @@ Event.OnDeath Team.Team2 if (HeroOf(EventPlayer()) != Hero.Ana) {
 
     define pickupIndex = CountOf(healthPickupLocs);
     healthPickupLocs[pickupIndex] = PositionOf(EventPlayer());
-    CreateEffect(AllPlayers(), Effect.Orb, Color.Yellow, healthPickupLocs[pickupIndex], 1, EffectRev.PositionAndRadius);
+    CreateEffect(AllPlayers(), Effect.Orb, Color.Black, healthPickupLocs[pickupIndex], 0.5, EffectRev.PositionAndRadius);
     Wait(0.1);
     healthPickupEffects[pickupIndex] = LastCreatedEntity();
     Teleport(EventPlayer(), Vector(120.4, 0, -4.57));
@@ -210,7 +210,7 @@ Event.OnDeath Team.Team2 if (HeroOf(EventPlayer()) != Hero.Ana) {
     ForcePlayerHero(EventPlayer(), Hero.Ana);
     Resurrect(EventPlayer());
     Wait(15);
-    PlayEffect(AllPlayers(), PlayEffect.GoodExplosion, Color.Yellow, healthPickupLocs[pickupIndex], 1);
+    PlayEffect(AllPlayers(), PlayEffect.GoodExplosion, Color.Black, healthPickupLocs[pickupIndex], 1);
     healthPickupLocs[pickupIndex] = null;
     DestroyEffect(healthPickupEffects[pickupIndex]);
     healthPickupEffects[pickupIndex] = null;
@@ -268,13 +268,6 @@ Event.OngoingPlayer if (IsDummyBot(EventPlayer()) && HeroOf(EventPlayer()) != He
     }
 
     Wait(0.1);
-    LoopIfConditionIsTrue();
-}
-
-rule: "Enemy Hack Handler"
-Event.OngoingPlayer if (IsDummyBot(EventPlayer()) && HasStatus(EventPlayer(), Status.Hacked)) {
-    SetStatus(EventPlayer(), null, Status.KnockedDown, 5.5);
-    Wait(5.5);
     LoopIfConditionIsTrue();
 }
 
