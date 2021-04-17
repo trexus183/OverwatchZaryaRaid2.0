@@ -2,131 +2,131 @@ import "master.del";
 
 define setHeroPassiveText(Player player) {
     if (HeroOf(player) == Hero.Ana) {
-        heroPassivePerkText = "Biotic grenade stuns enemies for 4 seconds"; // Implemented
-        heroDebrisText = "Collecting debris heals 40 health";
+        heroPassivePerkText = "Biotic grenade stuns enemies for 4 seconds";
+        heroDebrisText = "Final blows heal 25% of your missing health and add 3 shots to your biotic rifle";
 
     } else if (HeroOf(player) == Hero.Ashe) {
-        heroPassivePerkText = "You deal 20% additional damage to targets who are burning critical hits ignite enemies"; // Implemented
-        heroDebrisText = "Collecting debris heals 40 health and adds 4 ammo to your Viper rifle, up to a max of 12";
+        heroPassivePerkText = "Your Viper Rifle deals 20% additional damage to targets who are burning, critical kills create dynamite explosions";
+        heroDebrisText = "Final blows heal 25% of your missing health and add 2 ammo to your Viper rifle, up to a max of 12";
 
     } else if (HeroOf(player) == Hero.Baptiste) {
-        heroPassivePerkText = "Immortality Field cannot be destroyed by enemies, regen burst damages and displaces nearby enemies";
-        heroDebrisText = "Collecting debris heals 40 health";
+        heroPassivePerkText = "Immortality Field cannot be destroyed by enemies, regenerative burst damages and displaces nearby enemies";
+        heroDebrisText = "Final blows heal 25% of your missing health";
     
     } else if (HeroOf(player) == Hero.Bastion) {
-        heroPassivePerkText = "Move significantly faster while repairing yourself";
-        heroDebrisText = "Collecting debris adds 25 ammo to your weapon";
+        heroPassivePerkText = "No Passive Implemented Yet, Sorry";
+        heroDebrisText = "Final blows generate 15 recon ammo and 100 turret ammo";
     
     } else if (HeroOf(player) == Hero.Brigitte) {
-        heroPassivePerkText = "Rocket Flail hits pull enemies and reduce whipshot's cooldown, whipshot stuns enemies"; // Implemented
-        heroDebrisText = "Collecting debris heals 20 health";
+        heroPassivePerkText = "Rocket Flail hits pull enemies and reduce whipshot's cooldown, whipshot stuns enemies";
+        heroDebrisText = "Final blows heal 15% of your missing health";
     
     } else if (HeroOf(player) == Hero.Doomfist) {
-        heroPassivePerkText = "Damaging an enemy with your abilities or melee refills your handcannon"; // Implemented
-        heroDebrisText = "Collecting debris heals 40 health and refills your handcannon";
+        heroPassivePerkText = "Damaging an enemy with your abilities or melee refills your handcannon";
+        heroDebrisText = "Final blows heal 25% of your missing health and refills your handcannon";
     
     } else if (HeroOf(player) == Hero.Dva) {
-        heroPassivePerkText = "Damaging enemies reduces your boosters' cooldown"; // Implemented
-        heroDebrisText = "Collecting debris heals 40 health and refreshes micro-missles";
+        heroPassivePerkText = "Damaging enemies reduces your boosters' cooldown";
+        heroDebrisText = "Final blows heal 25% of your missing health and refreshes micro-missiles";
     
     } else if (HeroOf(player) == Hero.Echo) {
-        heroPassivePerkText = "Taking flight stuns nearby enemies, eliminations refresh sticky bombs"; // Implemented
-        heroDebrisText = "Collecting debris heals 40 health";
+        heroPassivePerkText = "Taking flight stuns nearby enemies, eliminations refresh sticky bombs";
+        heroDebrisText = "Final blows heal 25% of your missing health";
     
     } else if (HeroOf(player) == Hero.Genji) {
-        heroPassivePerkText = "Sword hits stun enemies, sword final blows detonate targets, deflect deals 500% more damage"; // Implemented
-        heroDebrisText = "Collecting debris heals 40 health";
+        heroPassivePerkText = "Sword hits stun enemies, sword final blows detonate targets, deflect deals 500% more damage";
+        heroDebrisText = "Final blows heal 25% of your missing health";
     }  else if (HeroOf(player) == Hero.Hanzo) {
-        heroPassivePerkText = "Sonic arrow stuns enemies, critical kills refresh your sonic arrow"; // Implemented
-        heroDebrisText = "Collecting debris heals 40 health";
+        heroPassivePerkText = "Sonic arrow stuns enemies, critical kills refresh your sonic arrow";
+        heroDebrisText = "Final blows heal 25% of your missing health";
     
     } else if (HeroOf(player) == Hero.Junkrat) {
-        heroPassivePerkText = "Deal significantly more knockback to enemies"; // Implemented
-        heroDebrisText = "Collecting debris heals 40 health";
+        heroPassivePerkText = "Concussion mine applies random status effects";
+        heroDebrisText = "Final blows heal 25% of your missing health, refill your frag launcher, and add charges of concussion mine, up to 3 charges";
     
     } else if (HeroOf(player) == Hero.Lucio) {
-        heroPassivePerkText = "Soundwave deals 800% bonus damage and knocks enemies farther back"; // Implemented
-        heroDebrisText = "Collecting debris heals 40 health";
+        heroPassivePerkText = "Soundwave deals 800% bonus damage and knocks enemies farther back";
+        heroDebrisText = "Final blows heal 25% of your missing health";
     
     } else if (HeroOf(player) == Hero.Mccree) {
-        heroPassivePerkText = "Killing an enemy with a critical blow refreshes your combat roll, combat roll restores 25 health";
-        heroDebrisText = "Collecting debris heals 40 health";
+        heroPassivePerkText = "Killing an enemy with a critical blow refreshes your combat roll, combat roll restores 20 health";
+        heroDebrisText = "Final blows heal 20% of your missing health";
     
     } else if (HeroOf(player) == Hero.Mei) {
-        heroPassivePerkText = "Icicles breifly freeze enemies"; // Implemented
-        heroDebrisText = "Collecting debris heals 40 health";
+        heroPassivePerkText = "Icicles briefly freeze enemies";
+        heroDebrisText = "Final blows heal 25% of your missing health";
     
     } else if (HeroOf(player) == Hero.Mercy) {
-        heroPassivePerkText = "Guardian Angel can be activated without a targeted teamate to give a small directional boost"; // Implemented
-        heroDebrisText = "Collecting debris heals 40 health";
+        heroPassivePerkText = "Guardian Angel can be activated without a targeted teammate to give a small directional boost";
+        heroDebrisText = "Final blows heal 25% of your missing health";
     
     } else if (HeroOf(player) == Hero.Moira) {
-        heroPassivePerkText = "Biotic orb, melee, and ultimate final blows detonate targets"; // Implemented
-        heroDebrisText = "Collecting debris heals 40 health";
+        heroPassivePerkText = "Biotic orb, melee, and ultimate final blows detonate targets";
+        heroDebrisText = "Final blows heal 25% of your missing health";
     
     } else if (HeroOf(player) == Hero.Orisa) {
-        heroPassivePerkText = "Fortifying refills your fusion driver";
-        heroDebrisText = "Collecting debris heals 40 health";
+        heroPassivePerkText = "Using fortify overloads 150 rounds into your fusion driver";
+        heroDebrisText = "Final blows heal 25% of your missing health";
     
     } else if (HeroOf(player) == Hero.Pharah) {
         heroPassivePerkText = "Take 50% less damage while airborne, eliminations refund a rocket";
-        heroDebrisText = "Collecting debris heals 40 health, refunds a rocket, and recharges your hover jets";
+        heroDebrisText = "Final blows heal 25% of your missing health, refunds a rocket, and recharges your hover jets";
     
     } else if (HeroOf(player) == Hero.Reaper) {
-        heroPassivePerkText = "Meleeing in the direction of an enemy pulls them towards you"; // Implemented
-        heroDebrisText = "Collecting debris heals 25 health and returns 1 shotgun shot";
+        heroPassivePerkText = "Meleeing in the direction of an enemy pulls them towards you";
+        heroDebrisText = "Final blows heal 10% of your missing health, and returns 1 shotgun shot";
     
     } else if (HeroOf(player) == Hero.Reinhardt) {
-        heroPassivePerkText = "Rocket hammer hits lower firestrike's cooldown, Charge knocks down enemies, charge final blows reset charge and heal 50 health";
-        heroDebrisText = "Collecting debris heals 40 health";
+        heroPassivePerkText = "Rocket hammer hits lower firestrike's cooldown, Charge knocks down enemies, charge final blows reduce the cooldown of your next charge";
+        heroDebrisText = "Final blows heal 20% of your missing health";
     
     } else if (HeroOf(player) == Hero.Roadhog) {
-        heroPassivePerkText = "Landing hook greatly reduces its cooldown and refunds 1 ammo, final blows slightly reduce hook's cooldown"; // Implemented
-        heroDebrisText = "Collecting debris heals 30 health adds 2 ammo to your scrap gun";
+        heroPassivePerkText = "Landing hook greatly reduces its cooldown and refunds 1 ammo";
+        heroDebrisText = "Final blows heal 10% of your missing health and slightly reduce hook's cooldown, and refund 1 ammo";
     
     } else if (HeroOf(player) == Hero.Sigma) {
-        heroPassivePerkText = "Launching hypersphere pulls enemies towards your crosshair, hyperspheres stun enemies"; // Implemented
-        heroDebrisText = "Collecting debris heals 40 health";
+        heroPassivePerkText = "Launching hyperspheres pulls enemies towards your crosshair, hyperspheres stun enemies";
+        heroDebrisText = "Final blows heal 25% of your missing health";
     
     } else if (HeroOf(player) == Hero.Soldier76) {
-        heroPassivePerkText = "Sprinting into enemies knocks them backwards and briefly stuns them"; // Implemented
-        heroDebrisText = "Collecting debris heals 10 health";
+        heroPassivePerkText = "Sprinting into enemies knocks them backwards and briefly stuns them";
+        heroDebrisText = "Final blows heal 10% of your missing health";
     
     } else if (HeroOf(player) == Hero.Sombra) {
-        heroPassivePerkText = "Hacked enemies are disabled"; // Implemented
-        heroDebrisText = "Collecting debris heals 40 health";
+        heroPassivePerkText = "Hacked enemies are disabled";
+        heroDebrisText = "Final blows heal 25% of your missing health";
     
     } else if (HeroOf(player) == Hero.Symmetra) {
-        heroPassivePerkText = "Turrets cannot be damaged by enemies"; // Implemented
-        heroDebrisText = "Collecting debris heals 40 health";
+        heroPassivePerkText = "Turrets cannot be damaged by enemies";
+        heroDebrisText = "Final blows heal 20% of your missing health";
     
     } else if (HeroOf(player) == Hero.Torbjorn) {
         heroPassivePerkText = "Your turret cannot be damaged, deal 200% damage while your hammer is equipped and you are overloaded";
-        heroDebrisText = "Collecting debris heals 40 health";
+        heroDebrisText = "Final blows heal 25% of your missing health";
     
     } else if (HeroOf(player) == Hero.Tracer) {
-        heroPassivePerkText = "Blinking stuns nearby enemies and reloads pulse pistols"; // Implemented
-        heroDebrisText = "Collecting debris heals 40 health";
+        heroPassivePerkText = "Blinking stuns nearby enemies and reloads pulse pistols";
+        heroDebrisText = "Final blows heal 25% of your missing health";
     
     } else if (HeroOf(player) == Hero.Widowmaker) {
-        heroPassivePerkText = "Eliminating enemies refills your magazine headshots briefly stun enemies";
-        heroDebrisText = "Collecting debris heals 40 health";
+        heroPassivePerkText = "Eliminations refill your magazine, scoped critical hits briefly stun enemies";
+        heroDebrisText = "Final blows heal 25% of your missing health";
     
     } else if (HeroOf(player) == Hero.Winston) {
         heroPassivePerkText = "Being surrounded by enemies increases your damages by 30% per enemy";
-        heroDebrisText = "Collecting debris heals 40 health";
+        heroDebrisText = "Final blows heal 20% of your missing health";
     
     } else if (HeroOf(player) == Hero.WreckingBall) {
-        heroPassivePerkText = "Eliminating enemies refreshes piledriver";
-        heroDebrisText = "Collecting debris heals 40 health";
+        heroPassivePerkText = "Eliminations refresh piledriver";
+        heroDebrisText = "Final blows heal 25% of your missing health";
     
     } else if (HeroOf(player) == Hero.Zarya) {
         heroPassivePerkText = "Taking damage reduces the cooldown of personal barrier";
-        heroDebrisText = "Collecting debris heals 40 health";
+        heroDebrisText = "Final blows heal 25% of your missing health";
     
     } else if (HeroOf(player) == Hero.Zenyatta) {
-        heroPassivePerkText = "While using trancendence nearby enemies catch on fire and take significant damge over time";
-        heroDebrisText = "Collecting debris heals 40 health";
+        heroPassivePerkText = "While using transcendence nearby enemies catch on fire and take significant damage over time";
+        heroDebrisText = "Final blows heal 25% of your missing health";
     }
 
     return null;
@@ -134,113 +134,120 @@ define setHeroPassiveText(Player player) {
 
 define collectDebris(Player player) {
     if (HeroOf(player) == Hero.Ana) {
-        Heal(EventPlayer(), EventPlayer(), 40);
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.25);
         SetAmmo(EventPlayer(), 0, Ammo(EventPlayer(), 0) + 3);
 
     } else if (HeroOf(player) == Hero.Ashe) {
-        Heal(EventPlayer(), EventPlayer(), 40);
-        if (Ammo(EventPlayer(), 0) + 4 <= 12) {
-            SetAmmo(EventPlayer(), 0, Ammo(EventPlayer(), 0) + 4);
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.25);
+        if (Ammo(EventPlayer(), 0) + 2 <= 12) {
+            SetAmmo(EventPlayer(), 0, Ammo(EventPlayer(), 0) + 2);
         } else {
             SetAmmo(EventPlayer(), 0, 12);
         }
 
     } else if (HeroOf(player) == Hero.Baptiste) {
-        Heal(EventPlayer(), EventPlayer(), 40);
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.25);
 
     } else if (HeroOf(player) == Hero.Bastion) {
-        SetAmmo(EventPlayer(), 0, Ammo(EventPlayer(), 0) + 25);
+        SetAmmo(EventPlayer(), 0, Ammo(EventPlayer(), 0) + 15);
+        SetAmmo(EventPlayer(), 1, Ammo(EventPlayer(), 1) + 100);
 
     } else if (HeroOf(player) == Hero.Brigitte) {
-        Heal(EventPlayer(), EventPlayer(), 20);
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.25);
 
     } else if (HeroOf(player) == Hero.Doomfist) {
-        Heal(EventPlayer(), EventPlayer(), 40);
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.25);
         SetAmmo(EventPlayer(), 0, 4);
 
     } else if (HeroOf(player) == Hero.Dva) {
-        Heal(EventPlayer(), EventPlayer(), 40);
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.25);
         SetAbilityCooldown(EventPlayer(), Button.Ability2, 0);
 
     } else if (HeroOf(player) == Hero.Echo) {
-        Heal(EventPlayer(), EventPlayer(), 40);
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.25);
 
     } else if (HeroOf(player) == Hero.Genji) {
-        Heal(EventPlayer(), EventPlayer(), 40);
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.25);
 
     }  else if (HeroOf(player) == Hero.Hanzo) {
-        Heal(EventPlayer(), EventPlayer(), 40);
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.25);
 
     } else if (HeroOf(player) == Hero.Junkrat) {
-        Heal(EventPlayer(), EventPlayer(), 40);
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.25);
+        SetAmmo(EventPlayer(), 0, 5);
+        if (AbilityCharge(EventPlayer(), Button.Ability1) <= 2) {
+            SetAbilityCharge(EventPlayer(), Button.Ability1, AbilityCharge(EventPlayer(), Button.Ability1)+1);
+        }
 
     } else if (HeroOf(player) == Hero.Lucio) {
-        Heal(EventPlayer(), EventPlayer(), 40);
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.25);
 
     } else if (HeroOf(player) == Hero.Mccree) {
-        Heal(EventPlayer(), EventPlayer(), 40);
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.20);
 
     } else if (HeroOf(player) == Hero.Mei) {
-        Heal(EventPlayer(), EventPlayer(), 40);
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.25);
 
     } else if (HeroOf(player) == Hero.Mercy) {
-        Heal(EventPlayer(), EventPlayer(), 40);
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.25);
 
     } else if (HeroOf(player) == Hero.Moira) {
-        Heal(EventPlayer(), EventPlayer(), 40);
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.25);
 
     } else if (HeroOf(player) == Hero.Orisa) {
-        Heal(EventPlayer(), EventPlayer(), 40);
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.25);
 
     } else if (HeroOf(player) == Hero.Pharah) {
-        Heal(EventPlayer(), EventPlayer(), 40);
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.25);
         SetAmmo(EventPlayer(), 0, Ammo(EventPlayer(), 0)+1);
         SetAbilityResource(EventPlayer(), Button.Jump, 100);
 
     } else if (HeroOf(player) == Hero.Reaper) {
-        Heal(EventPlayer(), EventPlayer(), 36); // Only heals 70% - 25.2 health
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.1);
         SetAmmo(EventPlayer(), 0, Ammo(EventPlayer(), 0) + 1);
 
     } else if (HeroOf(player) == Hero.Reinhardt) {
-        Heal(EventPlayer(), EventPlayer(), 50);
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.20);
 
     } else if (HeroOf(player) == Hero.Roadhog) {
-        SetAmmo(EventPlayer(), 0, Ammo(EventPlayer(), 0) + 2);
-        Heal(EventPlayer(), EventPlayer(), 30);
-
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.1);
+        SetAbilityCooldown(EventPlayer(), Button.Ability1, AbilityCooldown(EventPlayer(), Button.Ability1)-2);
+        if (Ammo(EventPlayer(), 0) < 5) {
+            SetAmmo(EventPlayer(), 0, Ammo(EventPlayer(), 0) + 1);
+        }
 
     } else if (HeroOf(player) == Hero.Sigma) {
-        Heal(EventPlayer(), EventPlayer(), 40);
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.25);
 
     } else if (HeroOf(player) == Hero.Soldier76) {
-        Heal(EventPlayer(), EventPlayer(), 10);
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.1);
 
     } else if (HeroOf(player) == Hero.Sombra) {
-        Heal(EventPlayer(), EventPlayer(), 40);
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.25);
 
     } else if (HeroOf(player) == Hero.Symmetra) {
-        Heal(EventPlayer(), EventPlayer(), 40);
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.20);
 
     } else if (HeroOf(player) == Hero.Torbjorn) {
-        Heal(EventPlayer(), EventPlayer(), 40);
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.25);
 
     } else if (HeroOf(player) == Hero.Tracer) {
-        Heal(EventPlayer(), EventPlayer(), 40);
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.25);
 
     } else if (HeroOf(player) == Hero.Widowmaker) {
-        Heal(EventPlayer(), EventPlayer(), 40);
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.25);
 
     } else if (HeroOf(player) == Hero.Winston) {
-        Heal(EventPlayer(), EventPlayer(), 40);
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.2);
 
     } else if (HeroOf(player) == Hero.WreckingBall) {
-        Heal(EventPlayer(), EventPlayer(), 40);
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.25);
 
     } else if (HeroOf(player) == Hero.Zarya) {
-        Heal(EventPlayer(), EventPlayer(), 40);
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.25);
 
     } else if (HeroOf(player) == Hero.Zenyatta) {
-        Heal(EventPlayer(), EventPlayer(), 40);
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.25);
 
     }
 
@@ -283,9 +290,27 @@ Event.OnDamageDealt Team.Team1 {
     } else if (HeroOf(EventPlayer()) == Hero.Hanzo && EventAbility() == Button.Ability1) {
         SetStatus(Victim(), EventPlayer(), Status.Stunned, 2);
  
+    } else if (HeroOf(EventPlayer()) == Hero.Junkrat) {
+        if (EventAbility() == Button.Ability1) {
+            define randomEffectId = RandomInteger(0, 4);
+
+            if (randomEffectId == 0) {
+                Wait(0.016);
+                SetStatus(PlayersWithinRadius(PositionOf(Victim()), 1.5, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.Asleep, RandomReal(1, 3));
+            } else if (randomEffectId == 1) {
+                SetStatus(PlayersWithinRadius(PositionOf(Victim()), 1.5, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.Burning, 4);
+                StartDamageOverTime(PlayersWithinRadius(PositionOf(Victim()), 1.5, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), 4, 10);
+            } else if (randomEffectId == 2) {
+                SetStatus(PlayersWithinRadius(PositionOf(Victim()), 1.5, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.Frozen, RandomReal(1, 3));
+            } else if (randomEffectId == 3) {
+                SetStatus(PlayersWithinRadius(PositionOf(Victim()), 1.5, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.Hacked, RandomReal(1, 3));
+            } else if (randomEffectId == 4) {
+                SetStatus(PlayersWithinRadius(PositionOf(Victim()), 1.5, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.KnockedDown, RandomReal(1, 3));
+            }
+        }
+
     } else if (HeroOf(EventPlayer()) == Hero.Lucio && EventAbility() == Button.SecondaryFire) {
         Damage(Victim(), EventPlayer(), EventDamage()*8);
-    
    
     } else if (HeroOf(EventPlayer()) == Hero.Mei && EventAbility() == Button.SecondaryFire) {
         SetStatus(Victim(), EventPlayer(), Status.Frozen, 0.5);
@@ -294,7 +319,7 @@ Event.OnDamageDealt Team.Team1 {
         if (EventAbility() == Button.PrimaryFire) {
             SetAbilityCooldown(EventPlayer(), Button.Ability2, AbilityCooldown(EventPlayer(), Button.Ability2)-2);
         } else if (EventAbility() == Button.Ability1) {
-            SetStatus(Victim(), EventPlayer(), Status.KnockedDown, 2);
+            SetStatus(Victim(), EventPlayer(), Status.KnockedDown, 1.5);
         }
 
     } else if (HeroOf(EventPlayer()) == Hero.Roadhog && EventAbility() == Button.Ability1) {
@@ -317,26 +342,29 @@ Event.OnDamageDealt Team.Team1 {
     } else if (HeroOf(EventPlayer()) == Hero.Torbjorn && IsUsingAbility2(EventPlayer()) && Weapon(EventPlayer()) == 2) {
         SetStatus(Victim(), EventPlayer(), Status.Stunned, 0.5);
         Damage(Victim(), EventPlayer(), EventDamage());
+    
+    } else if (HeroOf(EventPlayer()) == Hero.Widowmaker && EventWasCriticalHit() && IsFiringSecondary(EventPlayer())) {
+        SetStatus(Victim(), EventPlayer(), Status.Stunned, 2);
     }
+
+    Wait(0.016);
 }
 
-rule: "Hero Abilities - Recieved Damage"
-Event.OnDamageDealt Team.Team1 {
-    if (HeroOf(EventPlayer()) == Hero.Pharah && !IsOnGround(EventPlayer())) {
-        Heal(EventPlayer(), null, EventDamage()*0.5);
+rule: "Hero Abilities - Took Damage"
+Event.OnDamageTaken Team.Team1 {
+    if (HeroOf(EventPlayer()) == Hero.Zarya) {
+        SetAbilityCooldown(EventPlayer(), Button.Ability1, AbilityCooldown(EventPlayer(), Button.Ability1)-0.5);
 
-    }
-}
-
-rule: "Hero Abilities - Dealt Healing"
-Event.OnHealingDealt Team.Team1 {
-    if (HeroOf(EventPlayer()) == Hero.Reaper && Healer() == EventPlayer()) {
-        Damage(EventPlayer(), null, EventHealing()*0.3);
+    } else if (HeroOf(EventPlayer()) == Hero.Pharah && !IsOnGround(EventPlayer())) {
+        Heal(EventPlayer(), null, EventDamage()/2);
     
     }
 }
+
 rule: "Hero Abilities - Dealt Final Blow"
 Event.OnFinalBlow Team.Team1 {
+    collectDebris(EventPlayer());
+
     if (HeroOf(EventPlayer()) == Hero.Ashe && EventWasCriticalHit() && EventAbility() == Button.PrimaryFire) {
         PlayEffect(AllPlayers(), PlayEffect.AsheDynamiteExplosionEffect, Color.Orange, PositionOf(Victim()), 10);
         PlayEffect(AllPlayers(), PlayEffect.AsheDynamiteExplosionSound, Color.Orange, PositionOf(Victim()), 200);
@@ -345,7 +373,7 @@ Event.OnFinalBlow Team.Team1 {
         SetStatus(PlayersWithinRadius(PositionOf(Victim()), 10, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.Burning, 7);
         StartDamageOverTime(PlayersWithinRadius(PositionOf(Victim()), 10, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), 7, 5);
 
-    } else if (HeroOf(EventPlayer()) == Hero.Mccree && EventWasCriticalHit()) {
+    } else if (HeroOf(EventPlayer()) == Hero.Mccree && (EventWasCriticalHit() || EventAbility() == Button.SecondaryFire)) {
         SetAbilityCooldown(EventPlayer(), Button.Ability1, 0);
 
     } else if (HeroOf(EventPlayer()) == Hero.Genji && (EventAbility() == Button.Ability1 || EventAbility() == Button.Melee || EventAbility() == Button.Ultimate)) {
@@ -376,20 +404,16 @@ Event.OnFinalBlow Team.Team1 {
         ApplyImpulse(PlayersWithinRadius(PositionOf(Victim()), 10, Team.Team2, RadiusLOS.Surfaces), Vector(0, 1, 0), 5, Relative.ToWorld, ContraryMotion.Cancel);
 
         Damage(PlayersWithinRadius(PositionOf(Victim()), 10, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), 100);
-
-    } else if (HeroOf(EventPlayer()) == Hero.Roadhog) {
-        SetAbilityCooldown(EventPlayer(), Button.Ability1, AbilityCooldown(EventPlayer(), Button.Ability1)-2);
     
     } else if (HeroOf(EventPlayer()) == Hero.Reinhardt) {
         if (EventAbility() == Button.Ability1) {
-            SetAbilityCooldown(EventPlayer(), Button.Ability1, 0);
-            Heal(EventPlayer(), EventPlayer(), 50);
+            SetAbilityCooldown(EventPlayer(), Button.Ability1, AbilityCooldown(EventPlayer(), Button.Ability1) - 6);
         }
     }
 }
 
 rule: "Hero Abilities - Scored Elimination"
-Event.OnFinalBlow Team.Team1 {
+Event.OnElimination Team.Team1 {
     if (HeroOf(EventPlayer()) == Hero.Echo) {
         SetAbilityCooldown(EventPlayer(), Button.SecondaryFire, 0);
 
@@ -398,83 +422,122 @@ Event.OnFinalBlow Team.Team1 {
 
     } else if (HeroOf(EventPlayer()) == Hero.WreckingBall) {
         SetAbilityCooldown(EventPlayer(), Button.Crouch, 0);
+    
+    } else if (HeroOf(EventPlayer()) == Hero.Widowmaker) {
+        SetAmmo(EventPlayer(), 0, 35);
     }
 }
 
 rule: "Hero Abilities - Used Ability 1"
-Event.OngoingPlayer Team.Team1 if (IsUsingAbility1(EventPlayer())) {
-    if (HeroOf(EventPlayer()) == Hero.Baptiste) {
-        Damage(PlayersWithinRadius(PositionOf(EventPlayer()), 8, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), 125);
-        ApplyImpulse(PlayersWithinRadius(PositionOf(EventPlayer()), 8, Team.Team2, RadiusLOS.Surfaces), Vector(0, 0.25, -1), 20, Relative.ToPlayer, ContraryMotion.Cancel);
+Event.OngoingPlayer Team.Team1 {
+    if (IsUsingAbility1(EventPlayer())) {
+        if (HeroOf(EventPlayer()) == Hero.Baptiste) {
+            Damage(PlayersWithinRadius(PositionOf(EventPlayer()), 8, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), 125);
+            ApplyImpulse(PlayersWithinRadius(PositionOf(EventPlayer()), 8, Team.Team2, RadiusLOS.Surfaces), Vector(0, 0.25, -1), 20, Relative.ToPlayer, ContraryMotion.Cancel);
 
-        PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.Yellow, PositionOf(EventPlayer()) + Vector(0, 0.75, 0), 8);
+            PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.Yellow, PositionOf(EventPlayer()) + Vector(0, 0.75, 0), 8);
 
-    } else if (HeroOf(EventPlayer()) == Hero.Echo) {
-        SetStatus(PlayersWithinRadius(PositionOf(EventPlayer()), 12, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.Stunned, 2);
+        } else if (HeroOf(EventPlayer()) == Hero.Echo) {
+            SetStatus(PlayersWithinRadius(PositionOf(EventPlayer()), 12, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.Stunned, 2);
 
-        PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 0.75, 0), 12);
-        PlayEffect(AllPlayers(), PlayEffect.RingExplosionSound, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 0.75, 0), 200);
+            PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 0.75, 0), 12);
+            PlayEffect(AllPlayers(), PlayEffect.RingExplosionSound, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 0.75, 0), 200);
 
     } else if (HeroOf(EventPlayer()) == Hero.Mccree) {
-        Heal(EventPlayer(), EventPlayer(), 25);
+        Heal(EventPlayer(), EventPlayer(), 20);
 
-    } else if (HeroOf(EventPlayer()) == Hero.Mercy) {
-        ApplyImpulse(EventPlayer(), FacingDirectionOf(EventPlayer()) + Vector(0, 0.25, 0), 17, Relative.ToWorld, ContraryMotion.Cancel);
+        } else if (HeroOf(EventPlayer()) == Hero.Mercy) {
+            ApplyImpulse(EventPlayer(), FacingDirectionOf(EventPlayer()) + Vector(0, 0.25, 0), 17, Relative.ToWorld, ContraryMotion.Cancel);
 
-        SetAbilityCooldown(EventPlayer(), Button.Ability1, 2);
-    } else if (HeroOf(EventPlayer()) == Hero.Soldier76) {
-        ApplyImpulse(PlayersWithinRadius(PositionOf(EventPlayer()), 1.5, Team.Team2, RadiusLOS.Surfaces), FacingDirectionOf(EventPlayer()) + Vector(0, 0.25, 0), 15, Relative.ToWorld, ContraryMotion.Cancel);
+            SetAbilityCooldown(EventPlayer(), Button.Ability1, 2);
+            Wait(2);
 
-        SetStatus(PlayersWithinRadius(PositionOf(EventPlayer()), 1.5, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.Stunned, 0.25);
+        } else if (HeroOf(EventPlayer()) == Hero.Orisa) {
+            SetAmmo(EventPlayer(), 0, Ammo(EventPlayer(), 0) + 150);
+            Wait(5);
 
-        Wait(0.016);
-        LoopIfConditionIsTrue();
-  
-    } else if (HeroOf(EventPlayer()) == Hero.Tracer) {
-        SetAmmo(EventPlayer(), 0, 40);
+        } else if (HeroOf(EventPlayer()) == Hero.Soldier76) {
+            ApplyImpulse(PlayersWithinRadius(PositionOf(EventPlayer()), 1.5, Team.Team2, RadiusLOS.Surfaces), FacingDirectionOf(EventPlayer()) + Vector(0, 0.25, 0), 15, Relative.ToWorld, ContraryMotion.Cancel);
 
-        SetStatus(PlayersWithinRadius(PositionOf(EventPlayer()), 15, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.Stunned, 1);
+            SetStatus(PlayersWithinRadius(PositionOf(EventPlayer()), 1.5, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.Stunned, 0.25);
+    
+        } else if (HeroOf(EventPlayer()) == Hero.Tracer) {
+            SetAmmo(EventPlayer(), 0, 40);
 
-        Wait(0.016);
+            SetStatus(PlayersWithinRadius(PositionOf(EventPlayer()), 15, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.Stunned, 1);
 
-        SetStatus(PlayersWithinRadius(PositionOf(EventPlayer()), 15, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.Stunned, 1);
-        PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 0.75, 0), 12);
-        PlayEffect(AllPlayers(), PlayEffect.RingExplosionSound, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 0.75, 0), 200);
+            Wait(0.016);
+
+            SetStatus(PlayersWithinRadius(PositionOf(EventPlayer()), 15, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.Stunned, 1);
+            PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 0.75, 0), 12);
+            PlayEffect(AllPlayers(), PlayEffect.RingExplosionSound, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 0.75, 0), 200);
+        }
     }
+    Wait(0.1);
+    Loop();
 }
 
 rule: "Hero Abilities - Used Melee"
-Event.OngoingPlayer Team.Team1 if (IsMeleeing(EventPlayer())) {
-    if (HeroOf(EventPlayer()) == Hero.Reaper) {
-        if (IsInViewAngle(EventPlayer(), PlayerClosestToReticle(EventPlayer()), 45) && IsInLineOfSight(EventPlayer(), PlayerClosestToReticle(EventPlayer())) && !HasStatus(PlayerClosestToReticle(EventPlayer()), Status.PhasedOut)) {
-            define reaperPullTarget = PlayerClosestToReticle(EventPlayer());
-            ApplyImpulse(reaperPullTarget, DirectionTowards(reaperPullTarget, EventPlayer()) + Vector(0, 0.25, 0), 17, Relative.ToWorld, ContraryMotion.Cancel);
+Event.OngoingPlayer Team.Team1 {
+    if (IsMeleeing(EventPlayer())) {
+        if (HeroOf(EventPlayer()) == Hero.Reaper) {
+            if (IsInViewAngle(EventPlayer(), PlayerClosestToReticle(EventPlayer()), 45) && IsInLineOfSight(EventPlayer(), PlayerClosestToReticle(EventPlayer())) && !HasStatus(PlayerClosestToReticle(EventPlayer()), Status.PhasedOut)) {
+                define reaperPullTarget = PlayerClosestToReticle(EventPlayer());
+                ApplyImpulse(reaperPullTarget, DirectionTowards(reaperPullTarget, EventPlayer()) + Vector(0, 0.25, 0), 17, Relative.ToWorld, ContraryMotion.Cancel);
 
-            CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, EyePosition(EventPlayer()) + Vector(0, -0.5, 0), EyePosition(reaperPullTarget) + Vector(0, -0.5, 0), Color.Black, EffectRev.PositionAndRadius);
-            define reaperBeam = LastCreatedEntity();
-            Wait(0.5);
-            DestroyEffect(reaperBeam);
+                CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, EyePosition(EventPlayer()) + Vector(0, -0.5, 0), EyePosition(reaperPullTarget) + Vector(0, -0.5, 0), Color.Black, EffectRev.PositionAndRadius);
+                define reaperBeam = LastCreatedEntity();
+                Wait(0.5);
+                DestroyEffect(reaperBeam);
+            }
         }
     }
+    Wait(0.1);
+    Loop();
 }
 
-rule: "Hero Abilities - Used Primary Fire"
-Event.OngoingPlayer Team.Team1 if (IsFiringPrimary(EventPlayer())) {
-    if (HeroOf(EventPlayer()) == Hero.Sigma) {
-        define sigmaPullLoc = RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer()) * DistanceBetween(EyePosition(EventPlayer()), PlayerClosestToReticle(EventPlayer(), Team.Team2)));
-        define sigmaPullTargets = PlayersWithinRadius(sigmaPullLoc, 7, Team.Team2, RadiusLOS.Surfaces);
+rule: "Hero Abilities - Fired Primary"
+Event.OngoingPlayer Team.Team1 {
+    if (IsFiringPrimary(EventPlayer())) {
+        if (HeroOf(EventPlayer()) == Hero.Sigma) {
+            define sigmaPullLoc = RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer()) * DistanceBetween(EyePosition(EventPlayer()), PlayerClosestToReticle(EventPlayer(), Team.Team2)));
+            define sigmaPullTargets = PlayersWithinRadius(sigmaPullLoc, 7, Team.Team2, RadiusLOS.Surfaces);
 
-        for (define i = 0; i < CountOf(sigmaPullTargets); i++) {
-            ApplyImpulse(sigmaPullTargets[i], DirectionTowards(sigmaPullTargets[i], sigmaPullLoc), 7, Relative.ToWorld, ContraryMotion.Cancel);
+            for (define i = 0; i < CountOf(sigmaPullTargets); i++) {
+                ApplyImpulse(sigmaPullTargets[i], DirectionTowards(sigmaPullTargets[i], sigmaPullLoc), 7, Relative.ToWorld, ContraryMotion.Cancel);
 
-            PlayEffect(AllPlayers(), PlayEffect.BadExplosion, Color.Blue, sigmaPullTargets[i], 0.5);
+                PlayEffect(AllPlayers(), PlayEffect.BadExplosion, Color.Blue, sigmaPullTargets[i], 0.5);
+            }
         }
     }
+    Wait(0.1);
+    Loop();
+}
+
+rule: "Hero Abilities - Used Ultimate"
+Event.OngoingPlayer Team.Team1 {
+    if (IsUsingUltimate(EventPlayer())) {
+        if (HeroOf(EventPlayer()) == Hero.Dva) {
+            if (MaxHealth(EventPlayer()) < 500) {
+                Wait(1.75);
+                SetUltimateCharge(EventPlayer(), 0);
+            }
+
+        } else if (HeroOf(EventPlayer()) == Hero.Zenyatta) {
+            SetStatus(PlayersWithinRadius(PositionOf(EventPlayer()), 15, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.Burning, 10);
+            StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()), 15, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), 10, 25);
+        }   
+    }
+    Wait(0.1);
+    Loop();
 }
 
 rule: "Hero Abilities - Hacked enemy"
-Event.OngoingPlayer if (IsDummyBot(EventPlayer()) && HasStatus(EventPlayer(), Status.Hacked)) {
-    SetStatus(EventPlayer(), null, Status.KnockedDown, 5.5);
-    Wait(5.5);
-    LoopIfConditionIsTrue();
+Event.OngoingPlayer Team.Team2 {
+    if (HasStatus(EventPlayer(), Status.Hacked)) {
+        SetStatus(EventPlayer(), null, Status.KnockedDown, 5.5);
+        Wait(5.5);
+    }
+    Wait(0.1);
+    Loop();
 }

@@ -8,7 +8,7 @@ Event.OngoingPlayer if (IsButtonHeld(EventPlayer(), Button.Crouch) && IsButtonHe
     if (IsButtonHeld(EventPlayer(), Button.Crouch) && IsButtonHeld(EventPlayer(), Button.Interact)) {
         debugModeEnabled = true;
 
-        Kill(enemies, EventPlayer());
+        Kill(AllPlayers(Team.Team2), EventPlayer());
 
         SetSecondaryFireEnabled(EventPlayer(), false);
         SetAbility2Enabled(EventPlayer(), false);
@@ -26,7 +26,7 @@ Event.OngoingPlayer if (debugModeEnabled && IsButtonHeld(EventPlayer(), Button.S
     debugNodes[CountOf(debugNodes)] = PositionOf(EventPlayer()) + Vector(0, 1, 0);
     
     CreateEffect(AllPlayers(), Effect.Orb, Color.Black, PositionOf(EventPlayer()) + Vector(0, 1, 0), 0.5, EffectRev.None);
-    CreateInWorldText(AllPlayers(), CountOf(debugNodes)-1, PositionOf(EventPlayer()) + Vector(0, 1, 0), 1.5, Clipping.ClipAgainstSurfaces, InworldTextRev.None, Color.White, Spectators.VisibleAlways);
+    CreateInWorldText(AllPlayers(), CountOf(debugNodes)-1, PositionOf(EventPlayer()) + Vector(0, 1, 0), 1.5, Clipping.ClipAgainstSurfaces, InworldTextRev.None, Color.White, Spectators.DefaultVisibility);
 }
 
 rule: "Debug Mode - Place Nodes With Ray"
@@ -34,7 +34,7 @@ Event.OngoingPlayer if (debugModeEnabled && IsButtonHeld(EventPlayer(), Button.A
     debugNodes[CountOf(debugNodes)] = RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer())*500, AllPlayers(), EventPlayer(), true);
     
     CreateEffect(AllPlayers(), Effect.Orb, Color.Black, RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer())*500, AllPlayers(), EventPlayer(), true), 0.5, EffectRev.None);
-    CreateInWorldText(AllPlayers(), CountOf(debugNodes)-1, RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer())*500, AllPlayers(), EventPlayer(), true), 1.5, Clipping.ClipAgainstSurfaces, InworldTextRev.None, Color.White, Spectators.VisibleAlways);
+    CreateInWorldText(AllPlayers(), CountOf(debugNodes)-1, RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer())*500, AllPlayers(), EventPlayer(), true), 1.5, Clipping.ClipAgainstSurfaces, InworldTextRev.None, Color.White, Spectators.DefaultVisibility);
 }
 
 
@@ -44,7 +44,7 @@ define resetEffects() {
 
     for (define i = 0; i < CountOf(debugNodes); i++) {
         CreateEffect(AllPlayers(), Effect.Orb, Color.Black, debugNodes[i], 0.5, EffectRev.None);
-        CreateInWorldText(AllPlayers(), i, debugNodes[i], 1.5, Clipping.ClipAgainstSurfaces, InworldTextRev.None, Color.White, Spectators.VisibleAlways);
+        CreateInWorldText(AllPlayers(), i, debugNodes[i], 1.5, Clipping.ClipAgainstSurfaces, InworldTextRev.None, Color.White, Spectators.DefaultVisibility);
     }
 
     return null;
