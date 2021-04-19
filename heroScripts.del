@@ -443,6 +443,8 @@ Event.OngoingPlayer Team.Team1 {
             PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 0.75, 0), 12);
             PlayEffect(AllPlayers(), PlayEffect.RingExplosionSound, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 0.75, 0), 200);
 
+            Wait(4);
+
     } else if (HeroOf(EventPlayer()) == Hero.Mccree) {
         Heal(EventPlayer(), EventPlayer(), 20);
 

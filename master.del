@@ -1,8 +1,8 @@
 // Workshop Codes:
 // Alpha: 0PRKG
 
-import "debugSystem.del";
-import "enemies.del";
 import "gamemodeScripts.del";
-import "heroScripts.del";
 import "mechanics.del";
+import "heroScripts.del";
+import "enemies.del";
+import "debugSystem.del";

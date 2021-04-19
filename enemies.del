@@ -16,6 +16,7 @@ enum EnemyTypes {
 playervar define type = null;
 globalvar define reinBot = null;
 globalvar define spawnIndex = 0;
+
 define SpawnAI(Vector spawnLoc, EnemyTypes enemyType) {
     if (debugModeEnabled) {
         Abort();
@@ -194,14 +195,9 @@ Event.OnPlayerJoin Team.Team1 {
     Loop();
 }
 
-// rule: "Setup Health Text"
-// Event.OngoingPlayer Team.Team2 {
-//     CreateInWorldText(AllPlayers(), Health(EventPlayer()) + ' / ' + MaxHealth(EventPlayer()), EyePosition(EventPlayer()) + Vector(0, 0.25, 0), 1, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleToPositionStringAndColor, Color.Black, Spectators.DefaultVisibility);
-// }
-
 globalvar define healthPickupLocs = [];
 globalvar define healthPickupEffects = [];
-rule: "Enemy Death Handler"
+rule: "Enemy AI - Death Handler"
 Event.OnDeath Team.Team2 if (HeroOf(EventPlayer()) != Hero.Ana) {
     PlayEffect(AllPlayers(), PlayEffect.BadExplosion, Color.Team2, EyePosition(EventPlayer()), 1.5);
     if (EventWasCriticalHit()) {
@@ -213,39 +209,14 @@ Event.OnDeath Team.Team2 if (HeroOf(EventPlayer()) != Hero.Ana) {
         Abort();
     }
 
-    if (RandomReal(0, 1) <= 0.5) {
-        define pickupIndex = CountOf(healthPickupLocs);
-        healthPickupLocs[pickupIndex] = PositionOf(EventPlayer());
-        CreateEffect(AllPlayers(), Effect.Orb, Color.Black, healthPickupLocs[pickupIndex], 0.5, EffectRev.PositionAndRadius);
-        Wait(0.1);
-        healthPickupEffects[pickupIndex] = LastCreatedEntity();
-    }
-
     Wait(1);
 
     DestroyDummyBot(EventPlayer());
-
-    // ForcePlayerHero(EventPlayer(), Hero.Ana);
-    // StopForcingThrottle(EventPlayer());
-    // StopThrottleInDirection(EventPlayer());
-    // StopHoldingButton(EventPlayer(), Button.PrimaryFire);
-    // StopHoldingButton(EventPlayer(), Button.SecondaryFire);
-    // StopFacing(EventPlayer());
-    // DisableMovementCollisionWithEnvironment(EventPlayer());
-    // DisableMovementCollisionWithPlayers(EventPlayer());
-    // SetGravity(EventPlayer(), 0);
-    // ClearStatus(EventPlayer(), Status.Burning);
-    // StopAllDamageOverTime(EventPlayer());
 }
-
-// rule: "Force Anas Into Spawn-Room"
-// Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Ana && !IsInSpawnRoom(EventPlayer())) {
-//     Teleport(EventPlayer(), Vector(-4.8, -7, -11.8));
-// }
 
 playervar define targetPlayer = null;
 playervar define pathDestination = null;
-rule: "Enemy Targeting AI"
+rule: "Enemy AI - Target Selection"
 Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) != Hero.Ana) {
     if (targetPlayer == null) {
         define players = RandomizedArray(AllPlayers(Team.Team1));
@@ -265,7 +236,7 @@ Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) != Hero.Ana) {
     LoopIfConditionIsTrue();
 }
 
-rule: "Enemy Path Finding AI"
+rule: "Enemy AI - Path Finding"
 Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) != Hero.Zarya && HeroOf(EventPlayer()) != Hero.Ana) {
     if (pathDestination == null || (DistanceBetween(EventPlayer(), pathDestination) < 1.5 && targetPlayer == null)) {
         define currentPathNodeId = IndexOfArrayValue(pathNodes, pathDestination);
@@ -298,7 +269,7 @@ Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) != Hero.Zarya && HeroOf
     LoopIfConditionIsTrue();
 }
 
-rule: "Bastion Enemy AI"
+rule: "Enemy AI - Bastion"
 Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Bastion) {
     if (targetPlayer != null && IsInLineOfSight(EventPlayer(), targetPlayer, BarrierLOS.NoBarriersBlock)) {
         // AI for Bombers
@@ -353,7 +324,7 @@ Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Bastion) {
 }
 
 
-rule: "Zen Enemy AI"
+rule: "Enemy AI - Zen"
 Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Zenyatta) {
     if (targetPlayer != null && IsInLineOfSight(EventPlayer(), targetPlayer, BarrierLOS.NoBarriersBlock) && IsAlive(EventPlayer())) {
         StartFacing(EventPlayer(), DirectionTowards(EyePosition(EventPlayer()), EyePosition(targetPlayer)), 1000, Relative.ToWorld, FacingRev.DirectionAndTurnRate);
@@ -426,16 +397,7 @@ Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Zenyatta) {
     Wait(aiTickDelaySetting);
     LoopIfConditionIsTrue();
 }
-rule: "Zen Death Handler During Zarya Ult"
-Event.OnDeath Team.Team2 if (HeroOf(EventPlayer()) == Hero.Zenyatta && zaryaCastingUlt) {
-    stunNodeLocs = [Vector(-104.41, 9, 50.62), Vector(-97.73, 9, 39.64), Vector(-101.07, 9, 45.13)];
 
-    if (RandomInteger(0, 1) == 0) {
-        SpawnAI(Vector(-96.4, -2, 40.13), EnemyTypes.LesserBastion);
-    } else {
-        SpawnAI(Vector(-103.4, -2, 51.7), EnemyTypes.LesserBastion);
-    }
-}
 
 globalvar define zaryaBomberSummonCooldownSetting = WorkshopSettingReal("Difficulty Settings", "Boss Summon Cooldown - Bomber (Seconds)", 1, 0, 60, 0);
 globalvar define zaryaAdSummonCooldownSetting = WorkshopSettingReal("Difficulty Settings", "Boss Summon Cooldown - Ads (Seconds)", 1.5, 0, 10, 0);
@@ -495,9 +457,26 @@ globalvar define pathNodes = [
     Vector(-97.01, -2.98, 66.18),
     Vector(-89.86, -2.98, 69.28),
 
-    // Spawn guard area (16 - 17)
+    // Spawn Guard Area (16 - 17)
     Vector(-63.69, -1.48, 42.41),
-    Vector(-61.27, -1.48, 39.46)
+    Vector(-61.27, -1.48, 39.46),
+
+    // Fuel Truck Area 18 - 26
+    Vector(-58.82, -3.00, 56.70),
+    Vector(-57.71, -4.16, 65.63),
+    Vector(-57.21, -4.16, 74.73),
+    Vector(-49.82, -4.16, 63.50),
+    Vector(-41.36, -4.16, 71.47),
+    Vector(-46.30, -3.96, 78.26),
+    Vector(-49.65, -3.88, 83.51),
+    Vector(-51.79, -4.16, 70.36),
+    Vector(-62.94, -4.16, 71.55),
+
+    // Fuel Truck Area 27 - 30
+    Vector(-32.75, 2.02, 83.35),
+    Vector(-33.21, 2.02, 77.75),
+    Vector(-32.64, 2.02, 68.62),
+    Vector(-31.73, -0.82, 58.48)
 ];
 
 globalvar define pathNodeConnections = [
@@ -521,11 +500,28 @@ globalvar define pathNodeConnections = [
 
     // Spawn guard area (16 - 17)
     [17],
-    [16]
+    [16],
+
+    // Spawn guard area (18 - 26)
+    [19, 20],
+    [18, 20, 21, 26],
+    [19, 24, 25, 26],
+    [19, 20, 22, 26],
+    [21, 23],
+    [22, 24],
+    [20, 23, 26],
+    [29, 20, 26],
+    [29, 20, 25],
+
+    // Fuel Truck Area 27 - 30
+    [28],
+    [27, 29],
+    [28, 30],
+    [29]
 ];
 
 globalvar define zaryaCastingUlt = false;
-rule: "Zarya Enemy AI"
+rule: "Enemy AI - Zarya"
 Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Zarya) {
     if (debugModeEnabled) {
         Abort();
@@ -640,12 +636,9 @@ Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Zarya) {
     LoopIfConditionIsTrue();
 }
 
-rule: "Victory Trigger"
-Event.OnDeath Team.Team2 if (IsDummyBot(EventPlayer()) && HeroOf(EventPlayer()) == Hero.Zarya && !debugModeEnabled) {
-    DeclareTeamVictory(Team.Team1);
-}
 
-rule: "Rein Enemy AI"
+
+rule: "Enemy AI - Rein"
 Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Reinhardt) {
     if (!IsButtonHeld(EventPlayer(), Button.PrimaryFire) && DistanceBetween(targetPlayer, EventPlayer()) < 7) {
         StartHoldingButton(EventPlayer(), Button.PrimaryFire);
@@ -672,13 +665,8 @@ Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Reinhardt) {
     LoopIfConditionIsTrue();
 }
 
-rule: "Rein Enemy Boop"
+rule: "Enemy AI - Rein Impulse On Hit"
 Event.OnDamageDealt Team.Team2 if (HeroOf(EventPlayer()) == Hero.Reinhardt) {
     ApplyImpulse(Victim(), Vector(0, 0.25, -1), 25, Relative.ToPlayer, ContraryMotion.Cancel);
 }
 
-rule: "Rein Death Handler"
-Event.OnDeath Team.Team2 if (HeroOf(EventPlayer()) == Hero.Reinhardt) {
-    thunderDomeExitButtonLoc = Vector(-11.19, -2.58, 98.46);
-    thunderDomeExitButtonPrompt = "Press F to Exit";
-}

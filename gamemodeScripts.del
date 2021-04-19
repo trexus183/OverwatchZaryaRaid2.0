@@ -1,7 +1,26 @@
 import "master.del";
 
 //  ------------- Gamemode Setup -------------
-rule: "Spawn Initial Enemies"
+rule: "Gamemode - Init"
+Event.OngoingGlobal
+if (IsAssemblingHeroes()) {
+    CreateHudText(AllPlayers(), null, null, " ", Location.Top, 1,  Color.White, Color.White, Color.White, HudTextRev.VisibleToAndString, Spectators.VisibleAlways);
+    CreateHudText(AllPlayers(), null, null, " ", Location.Top, 1,  Color.White, Color.White, Color.White, HudTextRev.VisibleToAndString, Spectators.VisibleAlways);
+    CreateHudText(AllPlayers(), null, "Server Load: " + ServerLoadAverage() + "/255", null, Location.Top, 2,  Color.Red, Color.Red, Color.Red, HudTextRev.VisibleToAndString, Spectators.VisibleAlways);
+    WorkshopSettingCombo("Settings", "Difficulty Scaling", 0, ["Enabled", "Disabled"], 0);
+    SetMatchTime(0);
+    Wait(1);
+    SetMatchTime(0);
+    DisableCompletion();
+    Wait(1);
+    PauseMatchTime(); 
+    DisableAnnouncer();
+    DisableMusic();
+
+    Wait(3);
+}
+
+rule: "Gamemode - Spawn Initial Enemies"
 Event.OngoingGlobal
 if (IsAssemblingHeroes()) {
     Wait(6);
@@ -28,36 +47,10 @@ if (IsAssemblingHeroes()) {
     }
 }
 
-rule: "Setup Gamemode"
-Event.OngoingGlobal
-if (IsAssemblingHeroes()) {
-    CreateHudText(AllPlayers(), null, null, " ", Location.Top, 1,  Color.White, Color.White, Color.White, HudTextRev.VisibleToAndString, Spectators.VisibleAlways);
-    CreateHudText(AllPlayers(), null, null, " ", Location.Top, 1,  Color.White, Color.White, Color.White, HudTextRev.VisibleToAndString, Spectators.VisibleAlways);
-    CreateHudText(AllPlayers(), null, "Server Load: " + ServerLoadAverage() + "/255", null, Location.Top, 2,  Color.Red, Color.Red, Color.Red, HudTextRev.VisibleToAndString, Spectators.VisibleAlways);
-    WorkshopSettingCombo("Settings", "Difficulty Scaling", 0, ["Enabled", "Disabled"], 0);
-    SetMatchTime(0);
-    Wait(1);
-    SetMatchTime(0);
-    DisableCompletion();
-    Wait(1);
-    PauseMatchTime(); 
-    DisableAnnouncer();
-    DisableMusic();
-
-    // for (define i = 0; i < 23; i++) {
-    //     CreateDummyBot(Hero.Ana, Team.Team2, i, Vector(-4.8, -7, -11.8), Vector(0, 0, 0));
-    //     enemies[i] = LastCreatedEntity();
-    // }
-    
-    Wait(3);
-    // Kill(enemies);
-    // Resurrect(enemies);
-}
-
 //  ------------- Player Scripts -------------
 playervar define heroPassivePerkText = "";
 playervar define heroDebrisText = "";
-rule: "Setup Player"
+rule: "Gamemode - Setup Player Hud"
 Event.OngoingPlayer Team.Team1 {
     // Zarya Health Display
     CreateHudText(EventPlayer(), "", "Zarya Health", "", Location.Right, 2, Color.Purple, Color.Purple, Color.Purple, HudTextRev.VisibleToAndString, Spectators.DefaultVisibility);
@@ -77,7 +70,7 @@ Event.OngoingPlayer Team.Team1 {
     DisableGameModeInworldUI(EventPlayer());
 }
 
-rule: "Respawn Player"
+rule: "Gamemode - Respawn Player"
 Event.OngoingPlayer if (!IsDummyBot(EventPlayer()) && HasSpawned(EventPlayer()) && !IsDead(EventPlayer())) {
     reinBot = null;
     Kill(PlayersOnHero(Hero.Reinhardt, Team.Team2), null);
@@ -95,7 +88,7 @@ Event.OngoingPlayer if (!IsDummyBot(EventPlayer()) && HasSpawned(EventPlayer()) 
     StopFacing(EventPlayer());
 }
 
-rule: "Return to Fight"
+rule: "Gamemode - Player Exits Spawn Room"
 Event.OngoingPlayer Team.Team1 if (IsInSpawnRoom(EventPlayer())) {
     WaitUntil(!IsInSpawnRoom(EventPlayer()), 9999999);
 
@@ -115,16 +108,14 @@ Event.OngoingPlayer Team.Team1 if (IsInSpawnRoom(EventPlayer())) {
 //  ------------- Walls -------------
 globalvar define wallLocs = [
     // Vector(-59, 0, 41.31), Vector(-60.33, 0, 43.36), Vector(-58, 0, 39.84), // Right B Entrance
-    Vector(-86.5, -4, 75.16), Vector(-83.17, -2, 77.12), // Left Section Walls
+    Vector(-86.5, -4, 75.16), 
+    Vector(-83.17, -2, 77.12), // Left Section Walls
     Vector(-72.28, -1.98, 51.47),
     Vector(-72.83, -2.98, 69.18),
     Vector(-76.95, -2.96, 76.85),
     Vector(-75.71, -3.48, 74.16),
     Vector(-71.10, -2.95, 72.89),
     Vector(-73.06, -2.96, 71.74),
-    Vector(-62.48, -2.98, 59.54),
-    Vector(-65.51, -2.98, 57.65),
-    Vector(-63.81, -2.98, 58.57),
     Vector(-92.18, -3.98, 72.77),
     Vector(-97.17, -3.98, 69.44),
     Vector(-110.15, -3.98, 66.38),
@@ -134,6 +125,30 @@ globalvar define wallLocs = [
     Vector(-103.38, -3.98, 66.89),
     Vector(-101.54, -3.98, 66.85),
     Vector(-46.07, -3.00, 60.11),
+    Vector(-65.40, 2.52, 50.42),
+    Vector(-66.47, 2.52, 52.10),
+    Vector(-67.59, 2.52, 53.79),
+    Vector(-79.72, 2.02, 81.5),
+    Vector(-27.45, -3.33, 67.67),
+    Vector(-26.22, -3.30, 77.17),
+    Vector(-102.39, -1.99, 22.18),
+    Vector(-101.39, -1.98, 20.34),
+    Vector(-100.37, -1.98, 18.64),
+    Vector(-104.66, -1.98, 45.22),
+    Vector(-103.62, -1.98, 43.50),
+    Vector(-102.55, -1.98, 41.88),
+    Vector(-127.84, -0.98, 37.04),
+    Vector(-106.74, 2.02, 50.77),
+    Vector(-111.01, 2.02, 65.20),
+    Vector(-92.84, -2.48, 23.84),
+
+    // Portal Backing Walls    
+    Vector(-93.83, -2.48, 25.37),
+    Vector(-94.73, -2.48, 26.79),
+    Vector(-110.42, -1.86, 48.84),
+    Vector(-111.86, -1.86, 47.94),
+    Vector(-113.15, -1.86, 47.20),
+    Vector(-114.28, -1.86, 46.58),
 
     // Tutorial walls
     Vector(-35.32, 0, 46.31),
@@ -150,9 +165,7 @@ globalvar define wallLocs = [
     Vector(-38.73, 2.02, 94.51),
     Vector(-31.66, -4.05, 102.69),
     Vector(-24.75, -4.05, 87.21),
-    Vector(-40.91, -3.16, 74.15),
     Vector(-24.90, -4.04, 89.33),
-    Vector(-40.91, -3.16, 74.15),
     Vector(-40.91, -3.16, 74.15),
     Vector(-24.71, -4.04, 91.82),
     Vector(-40.91, -3.16, 74.15),
@@ -162,7 +175,7 @@ globalvar define wallLocs = [
     Vector(-40.91, -3.16, 74.15),
     Vector(-19.88, -2.16, 61.47)
 ];
-rule: "Create Walls and effects"
+rule: "Gamemode - Create Walls and effects"
 Event.OngoingGlobal {
     // Right B Entrance
 
@@ -170,7 +183,6 @@ Event.OngoingGlobal {
     CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-82.13, 0.95, 77.73), Vector(-84.26, -1.91, 76.37));
     CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-87.96, 1.9, 74.23), Vector(-84.91, -3.93, 75.87));
     CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-85.19, 5.9, 76.33), Vector(-88.03, -4, 74));
-
     
     CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-90.21, -0.96, 72.06), Vector(-92.42, -3.98, 70.53));
     CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-95.36, -0.97, 68.93), Vector(-97.57, -3.98, 67.41));
@@ -187,6 +199,27 @@ Event.OngoingGlobal {
     CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-72.95, 2.49, 52.94), Vector(-70.94, 12.45, 49.16));
     CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-71.94, 2.52, 51.10), Vector(-70.92, 7.43, 49.18));
     CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-71.46, 2.63, 49.95), Vector(-71.06, 5.41, 48.59));
+
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-75.58, -3.84, 72.36), Vector(-69.69, 1.02, 73.38));
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-74.03, 1.74, 70.36), Vector(-69.72, -2.93, 73.36));
+
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-79.77, 5.91, 83.13), Vector(-78.25, 2.21, 80.73));
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-75.86, 7.84, 72.89), Vector(-78.37, 2.13, 76.91));
+
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-29.02, -3.38, 66.18), Vector(-29.81, 0.75, 78.36));
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-29.32, -3.35, 80.49), Vector(-29.73, 0.75, 68.56));
+
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-109.33, 5.15, 65.08), Vector(-111.69, 2.02, 63.61));
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-108.54, 5.14, 50.73), Vector(-106.18, 2.02, 52.25));
+
+    // Back of boss room 
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-105.43, 1.08, 45.54), Vector(-102.65, -1.94, 41.00));
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-102.65, 1.05, 41.06), Vector(-105.43, -1.94, 45.63));
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-129.91, 1.93, 38.12), Vector(-127.51, -0.98, 39.43));
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-102.31, 1.81, 22.89), Vector(-99.59, -1.82, 18.33));
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-99.60, 1.81, 18.37), Vector(-102.16, -1.85, 23.28));
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-127.81, 1.95, 34.66), Vector(-125.64, -0.94, 36.06));
+
 
     // Mansion Walls
     CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-33.78, -2.97, 44.97), Vector(-36.98, -0.02, 44.88));
@@ -226,13 +259,31 @@ Event.OngoingGlobal {
     CreateEffect(AllPlayers(), Effect.LightShaft, Color.SkyBlue, teleporterPos + Vector(0, -3, 0), 1.25, EffectRev.VisibleToPositionRadiusAndColor);
 
     // Capture Point
-    CreateEffect(AllPlayers(), Effect.Ring, Color.LimeGreen, capturePointPos, 7, EffectRev.VisibleToPositionRadiusAndColor);
-    CreateEffect(AllPlayers(), Effect.LightShaft, Color.LimeGreen, capturePointPos + Vector(0, -27, 0), 7, EffectRev.VisibleToPositionRadiusAndColor);
-    CreateEffect(AllPlayers(), Effect.Ring, Color.LimeGreen, capturePointPos, 7*(capturePointProgress/100), EffectRev.VisibleToPositionRadiusAndColor);
-   
-    CreateProgressBarInWorldText(AllPlayers(), capturePointProgress, "Capture Progress", capturePointPos + Vector(0, 4, 0), 1, Clipping.ClipAgainstSurfaces, Color.LimeGreen, Color.LimeGreen, ProgressBarEvaluation.VisibleToAndValues, Spectators.DefaultVisibility);
+    CreateProgressBarInWorldText(AllPlayers(), capturePointProgress, "Power", capturePointPos + Vector(0, 4, 0), 1, Clipping.ClipAgainstSurfaces, Color.SkyBlue, Color.SkyBlue, ProgressBarEvaluation.VisibleToAndValues, Spectators.DefaultVisibility);
+    CreateProgressBarHudText(PlayersWithinRadius(capturePointPos, 9.25, Team.Team1, RadiusLOS.Off), capturePointProgress, "Power", Location.Top, 4, Color.SkyBlue, Color.SkyBlue, ProgressBarEvaluation.VisibleToAndValues, Spectators.DefaultVisibility);
 
-    CreateProgressBarHudText(PlayersWithinRadius(capturePointPos, 7.25, Team.Team1, RadiusLOS.Off), capturePointProgress, "Capture Point Progress", Location.Top, 4, Color.LimeGreen, Color.LimeGreen, ProgressBarEvaluation.VisibleToAndValues, Spectators.DefaultVisibility);
+    CreateEffect(AllPlayers(), Effect.Ring, Color.SkyBlue, capturePointPos, 9, EffectRev.VisibleToPositionRadiusAndColor);
+    CreateEffect(AllPlayers(), Effect.LightShaft, Color.SkyBlue, capturePointPos + Vector(0, -27, 0), 9, EffectRev.VisibleToPositionRadiusAndColor);
+    CreateEffect(AllPlayers(), Effect.Ring, Color.SkyBlue, capturePointPos, 9 * (capturePointProgress/100), EffectRev.VisibleToPositionRadiusAndColor);
+
+    // Fuel Truck
+    CreateInWorldText(AllPlayers(), "Fuel Truck", fuelTruckPos + Vector(0, 3.75, 0), 1.5, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.Orange, Spectators.DefaultVisibility);
+    CreateEffect(AllPlayers(), Effect.Ring, Color.Orange, fuelTruckPos, 3, EffectRev.VisibleToPositionRadiusAndColor);
+
+    // Cooler Portals (Entry, Exit)
+    CreateEffect(AllPlayers(), Effect.GoodAura, Color.Team1, coolerEntryPortal, 1.5, EffectRev.VisibleToPositionRadiusAndColor);
+    CreateEffect(AllPlayers(), Effect.BadAura, Color.Team1, coolerEntryPortal, 1.5, EffectRev.VisibleToPositionRadiusAndColor);
+
+    CreateEffect(AllPlayers(), Effect.GoodAura, Color.Team1, coolerExitPortal, 1.5, EffectRev.VisibleToPositionRadiusAndColor);
+    CreateEffect(AllPlayers(), Effect.BadAura, Color.Team1, coolerExitPortal, 1.5, EffectRev.VisibleToPositionRadiusAndColor);
+
+    // Cooler
+    CreateProgressBarInWorldText(AllPlayers(), coolerPower, "Cooling Power", coolerPos + Vector(0, 3, 0), 0.75, Clipping.ClipAgainstSurfaces, Color.White, Color.White, ProgressBarEvaluation.VisibleToAndValues, Spectators.DefaultVisibility);
+    CreateProgressBarHudText(PlayersWithinRadius(coolerPos, 4.25, Team.Team1, RadiusLOS.Off), coolerPower, "Cooler Power", Location.Top, 4, Color.White, Color.White, ProgressBarEvaluation.VisibleToAndValues, Spectators.DefaultVisibility);
+    
+    CreateEffect(AllPlayers(), Effect.Ring, Color.White, coolerPos, 4, EffectRev.VisibleToPositionRadiusAndColor);
+    CreateEffect(AllPlayers(), Effect.Cloud, Color.White, coolerPos, 4, EffectRev.VisibleToPositionRadiusAndColor);
+    CreateEffect(AllPlayers(), Effect.Cloud, Color.SkyBlue, coolerPos, 4, EffectRev.VisibleToPositionRadiusAndColor);
 
     // Button Prompts
     CreateInWorldText(AllPlayers(), "Hold F to Hack " + HeroIconString(Hero.Zarya), Vector(-27.89, 3.25, 84.5), 1.5, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);

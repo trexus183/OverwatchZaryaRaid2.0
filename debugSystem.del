@@ -2,7 +2,7 @@ import "master.del";
 
 globalvar define debugNodes = [];
 globalvar define selectedDebugNodes = [];
-rule: "Debug Button"
+rule: "Debug Mode - Activation Button"
 Event.OngoingPlayer if (IsButtonHeld(EventPlayer(), Button.Crouch) && IsButtonHeld(EventPlayer(), Button.Interact)) {
     Wait(2);
     if (IsButtonHeld(EventPlayer(), Button.Crouch) && IsButtonHeld(EventPlayer(), Button.Interact)) {
