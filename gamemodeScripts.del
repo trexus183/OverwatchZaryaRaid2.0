@@ -20,7 +20,7 @@ if (IsAssemblingHeroes()) {
     Wait(3);
 }
 
-rule: "Gamemode - Spawn Initial Enemies"
+rule: "Gamemode - Spawn Initial Enemies - Part I"
 Event.OngoingGlobal
 if (IsAssemblingHeroes()) {
     Wait(6);
@@ -35,6 +35,12 @@ if (IsAssemblingHeroes()) {
     for (define i = 0; i < 1; i++) {
         SpawnAI(zaryaAdSummonLocs[RandomInteger(0, CountOf(zaryaAdSummonLocs)-1)], EnemyTypes.LesserOmnic);
     }
+}
+
+rule: "Gamemode - Spawn Initial Enemies - Part II"
+Event.OngoingGlobal
+if (IsAssemblingHeroes()) {
+    Wait(6);
 
     for (define i = 0; i < 3; i++) {
         SpawnAI(zaryaAdSummonLocs[RandomInteger(0, CountOf(zaryaAdSummonLocs)-1)], EnemyTypes.LesserBastion);
@@ -45,26 +51,30 @@ if (IsAssemblingHeroes()) {
     for (define i = 0; i < 1; i++) {
         SpawnAI(zaryaAdSummonLocs[RandomInteger(0, CountOf(zaryaAdSummonLocs)-1)], EnemyTypes.StandardBastion);
     }
+    
+    SpawnAI(Vector(-56.82, -3.16, 71.79), EnemyTypes.Rein);
 }
 
 //  ------------- Player Scripts -------------
 playervar define heroPassivePerkText = "";
 playervar define heroDebrisText = "";
+playervar define heroUltChargeText = "";
 rule: "Gamemode - Setup Player Hud"
 Event.OngoingPlayer Team.Team1 {
-    // Zarya Health Display
-    CreateHudText(EventPlayer(), "", "Zarya Health", "", Location.Right, 2, Color.Purple, Color.Purple, Color.Purple, HudTextRev.VisibleToAndString, Spectators.DefaultVisibility);
-    CreateHudText(EventPlayer(), "", "", Health(PlayersOnHero(Hero.Zarya)[0]), Location.Right, 3, Color.
-    Purple, Color.Purple, Color.Purple, HudTextRev.VisibleToAndString, Spectators.DefaultVisibility);
-
+    // Ability Descriptions
     CreateHudText(EventPlayer(), "", "Abilities:", "", Location.Left, 1, Color.White, Color.White, Color.White, HudTextRev.VisibleToAndString, Spectators.DefaultVisibility);
     setHeroPassiveText(EventPlayer());
     CreateHudText(EventPlayer(), "", "", heroPassivePerkText, Location.Left, 2, Color.White, Color.White, Color.White, HudTextRev.VisibleToAndString, Spectators.DefaultVisibility);
-    CreateHudText(EventPlayer(), "", "", heroDebrisText, Location.Left, 2, Color.White, Color.White, Color.White, HudTextRev.VisibleToAndString, Spectators.DefaultVisibility);
+    CreateHudText(EventPlayer(), "", "", heroDebrisText, Location.Left, 3, Color.White, Color.White, Color.White, HudTextRev.VisibleToAndString, Spectators.DefaultVisibility);
 
-    // Debug Info
+    // New Line
+    CreateHudText(EventPlayer(), "", "", " ", Location.Left, 7, Color.
+    Orange, Color.Orange, Color.Orange, HudTextRev.VisibleToAndString, Spectators.DefaultVisibility);
 
-    // CreateEffect(EventPlayer(), Effect.Orb, Color.Purple, UpdateEveryFrame(RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer())*500, AllPlayers(), EventPlayer(), true)), 0.5, EffectRev.PositionAndRadius);
+    // Zarya Health Display
+    CreateHudText(EventPlayer(), "", "Zarya Health", "", Location.Left, 8, Color.Purple, Color.Purple, Color.Purple, HudTextRev.VisibleToAndString, Spectators.DefaultVisibility);
+    CreateHudText(EventPlayer(), "", "", Health(PlayersOnHero(Hero.Zarya)[0]), Location.Left, 9, Color.
+    Purple, Color.Purple, Color.Purple, HudTextRev.VisibleToAndString, Spectators.DefaultVisibility);
 
     DisableGameModeHud(EventPlayer());
     DisableGameModeInworldUI(EventPlayer());
@@ -72,20 +82,20 @@ Event.OngoingPlayer Team.Team1 {
 
 rule: "Gamemode - Respawn Player"
 Event.OngoingPlayer if (!IsDummyBot(EventPlayer()) && HasSpawned(EventPlayer()) && !IsDead(EventPlayer())) {
-    reinBot = null;
-    Kill(PlayersOnHero(Hero.Reinhardt, Team.Team2), null);
+    // reinBot = null;
+    // Kill(PlayersOnHero(Hero.Reinhardt, Team.Team2), null);
 
     setHeroPassiveText(EventPlayer());
-
-    // if (zaryaCastingUlt) {
-    //     Teleport(EventPlayer(), Vector(-87.6, -2, 53.4));
-    // } else {
-    //     Teleport(EventPlayer(), Vector(-44.88, -3, 56.67));
-    // }
 
     StartFacing(EventPlayer(), Vector(-55.92, -2, 40.67), 999999, Relative.ToWorld, FacingRev.None);
     Wait(0.016);
     StopFacing(EventPlayer());
+
+    if (CountOf(playerConstructionEffects) != 0) {
+        DestroyEffect(playerConstructionEffects);
+        playerConstructionLoc = Vector(0, -999, 0);
+        playerConstructionEffects = [];
+    }
 }
 
 rule: "Gamemode - Player Exits Spawn Room"
@@ -220,6 +230,9 @@ Event.OngoingGlobal {
     CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-99.60, 1.81, 18.37), Vector(-102.16, -1.85, 23.28));
     CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-127.81, 1.95, 34.66), Vector(-125.64, -0.94, 36.06));
 
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-114.82, 1.86, 46.93), Vector(-110.17, -1.79, 50.00));
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-115.03, -1.79, 47.09), Vector(-110.15, 1.82, 49.86));
+
 
     // Mansion Walls
     CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-33.78, -2.97, 44.97), Vector(-36.98, -0.02, 44.88));
@@ -260,22 +273,21 @@ Event.OngoingGlobal {
 
     // Capture Point
     CreateProgressBarInWorldText(AllPlayers(), capturePointProgress, "Power", capturePointPos + Vector(0, 4, 0), 1, Clipping.ClipAgainstSurfaces, Color.SkyBlue, Color.SkyBlue, ProgressBarEvaluation.VisibleToAndValues, Spectators.DefaultVisibility);
-    CreateProgressBarHudText(PlayersWithinRadius(capturePointPos, 9.25, Team.Team1, RadiusLOS.Off), capturePointProgress, "Power", Location.Top, 4, Color.SkyBlue, Color.SkyBlue, ProgressBarEvaluation.VisibleToAndValues, Spectators.DefaultVisibility);
+    CreateProgressBarHudText(PlayersWithinRadius(capturePointPos, 10.25, Team.Team1, RadiusLOS.Off), capturePointProgress, "Power", Location.Top, 4, Color.SkyBlue, Color.SkyBlue, ProgressBarEvaluation.VisibleToAndValues, Spectators.DefaultVisibility);
 
-    CreateEffect(AllPlayers(), Effect.Ring, Color.SkyBlue, capturePointPos, 9, EffectRev.VisibleToPositionRadiusAndColor);
-    CreateEffect(AllPlayers(), Effect.LightShaft, Color.SkyBlue, capturePointPos + Vector(0, -27, 0), 9, EffectRev.VisibleToPositionRadiusAndColor);
-    CreateEffect(AllPlayers(), Effect.Ring, Color.SkyBlue, capturePointPos, 9 * (capturePointProgress/100), EffectRev.VisibleToPositionRadiusAndColor);
+    CreateEffect(AllPlayers(), Effect.Ring, Color.SkyBlue, capturePointPos, 10, EffectRev.VisibleToPositionRadiusAndColor);
+    CreateEffect(AllPlayers(), Effect.LightShaft, Color.SkyBlue, capturePointPos + Vector(0, -27, 0), 10, EffectRev.VisibleToPositionRadiusAndColor);
+    CreateEffect(AllPlayers(), Effect.Ring, Color.SkyBlue, capturePointPos, 10 * (capturePointProgress/100), EffectRev.VisibleToPositionRadiusAndColor);
 
-    // Fuel Truck
-    CreateInWorldText(AllPlayers(), "Fuel Truck", fuelTruckPos + Vector(0, 3.75, 0), 1.5, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.Orange, Spectators.DefaultVisibility);
-    CreateEffect(AllPlayers(), Effect.Ring, Color.Orange, fuelTruckPos, 3, EffectRev.VisibleToPositionRadiusAndColor);
+    // Cooler Portals (Entry, Exit, Decoy Exit)
+    CreateEffect(AllPlayers(), Effect.GoodAura, Color.Team2, coolerEntryPortal, 1.5, EffectRev.VisibleToPositionRadiusAndColor);
+    CreateEffect(AllPlayers(), Effect.BadAura, Color.Team2, coolerEntryPortal, 1.5, EffectRev.VisibleToPositionRadiusAndColor);
 
-    // Cooler Portals (Entry, Exit)
-    CreateEffect(AllPlayers(), Effect.GoodAura, Color.Team1, coolerEntryPortal, 1.5, EffectRev.VisibleToPositionRadiusAndColor);
-    CreateEffect(AllPlayers(), Effect.BadAura, Color.Team1, coolerEntryPortal, 1.5, EffectRev.VisibleToPositionRadiusAndColor);
+    CreateEffect(AllPlayers(), Effect.GoodAura, Color.Team2, coolerExitPortal, 1.5, EffectRev.VisibleToPositionRadiusAndColor);
+    CreateEffect(AllPlayers(), Effect.BadAura, Color.Team2, coolerExitPortal, 1.5, EffectRev.VisibleToPositionRadiusAndColor);
 
-    CreateEffect(AllPlayers(), Effect.GoodAura, Color.Team1, coolerExitPortal, 1.5, EffectRev.VisibleToPositionRadiusAndColor);
-    CreateEffect(AllPlayers(), Effect.BadAura, Color.Team1, coolerExitPortal, 1.5, EffectRev.VisibleToPositionRadiusAndColor);
+    // CreateEffect(AllPlayers(), Effect.GoodAura, Color.SkyBlue, coolerExitPortal + Vector(0, 4, 0), 0.5, EffectRev.VisibleToPositionRadiusAndColor);
+    // CreateEffect(AllPlayers(), Effect.BadAura, Color.SkyBlue, coolerExitPortal + Vector(0, 4, 0), 0.5, EffectRev.VisibleToPositionRadiusAndColor);
 
     // Cooler
     CreateProgressBarInWorldText(AllPlayers(), coolerPower, "Cooling Power", coolerPos + Vector(0, 3, 0), 0.75, Clipping.ClipAgainstSurfaces, Color.White, Color.White, ProgressBarEvaluation.VisibleToAndValues, Spectators.DefaultVisibility);

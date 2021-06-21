@@ -22,39 +22,21 @@ Event.OnDeath Team.Team2 if (IsDummyBot(EventPlayer()) && HeroOf(EventPlayer()) 
     DeclareTeamVictory(Team.Team1);
 }
 
-rule: "Encounter - Rein Death Handler"
+rule: "Encounter - Thunderdome Rein Death Handler"
 Event.OnDeath Team.Team2 if (HeroOf(EventPlayer()) == Hero.Reinhardt) {
     thunderDomeExitButtonLoc = Vector(-11.19, -2.58, 98.46);
     thunderDomeExitButtonPrompt = "Press F to Exit";
 }
 
+rule: "Encounter - Fuel Truck Rein Death Handler"
+Event.OnDeath Team.Team2 if (HeroOf(EventPlayer()) == Hero.Reinhardt) {
+    Wait(45);
+    SpawnAI(Vector(-56.82, -3.16, 71.79), EnemyTypes.Rein);
+}
+
+
 rule: "Encounter - Player Shot Interactions"
 Event.OngoingPlayer Team.Team1 if (IsFiringPrimary(EventPlayer()) || IsFiringSecondary(EventPlayer())) {
-    // Pickup debris drops
-//    for (define i = 0; i <= CountOf(healthPickupLocs); i++) {
-//         define playerAimPos = RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer()) * DistanceBetween(EyePosition(EventPlayer()), healthPickupLocs[i]));
-
-//         if (DistanceBetween(playerAimPos, healthPickupLocs[i]) < 0.75 && DistanceBetween(playerAimPos, healthPickupLocs[i]) != 0) {
-//             SmallMessage(EventPlayer(), "Collected Debris");
-
-//             PlayEffect(AllPlayers(), PlayEffect.GoodPickupEffect, Color.Gray, healthPickupLocs[i], 2);
-//             PlayEffect(AllPlayers(), PlayEffect.BuffExplosionSound, Color.Gray, EventPlayer(), 200);
-
-//             healthPickupLocs[i] = null;
-//             DestroyEffect(healthPickupEffects[i]);
-//             healthPickupEffects[i] = null;
-
-//             RemoveFromArrayAtIndex(healthPickupLocs, i);
-//             RemoveFromArrayAtIndex(healthPickupEffects, i);
-            
-            // collectDebris(EventPlayer());
-            
-//             Wait(0.1);
-//             LoopIfConditionIsTrue();
-//             Abort();
-//         }
-//     }
-
     // Deactivate stun nodes
     for (define i = 0; i <= CountOf(stunNodeLocs); i++) {
         define playerAimPos = RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer()) * DistanceBetween(EyePosition(EventPlayer()), stunNodeLocs[i]));
@@ -86,20 +68,32 @@ Event.OngoingPlayer Team.Team1 if (IsFiringPrimary(EventPlayer()) || IsFiringSec
 }
 
 globalvar define coolerEntryPortal = Vector(-91.4, -1, 26.45);
-globalvar define coolerExitPortal = Vector(-113.22, -0.5, 49.48);
+globalvar define coolerExitPortal = Vector(-109.36, -0.5, 55.25);//Vector(-113.22, -0.5, 49.48);
 globalvar define coolerPos = Vector(-135.26, -1.98, 40.74);
 globalvar define coolerPower = 0;
-globalvar define fuelTruckPos = Vector(-45.78, -3.98, 76.81);
-playervar define fuelCarried = 0;
 globalvar define teleporterPos = Vector(-94.3, -35, 49.24);
 globalvar define capturePointPos = Vector(-94.3, -0.76, 49.24);//Vector(-88.89, -1.98, 52.48);
 globalvar define capturePointProgress = 0;
 
+globalvar define capPointLoopCount = 0;
 rule: "Encounter - Capture Point"
 Event.OngoingGlobal {
-    if (CountOf(PlayersWithinRadius(capturePointPos, 9.25, Team.Team1, RadiusLOS.Off)) > 0) { // Build
+    define playersFuelingTeleporterCount = 0;
+    define playersNearTeleporter = PlayersWithinRadius(capturePointPos, 10.25, Team.Team1, RadiusLOS.Off);
+
+    if (capPointLoopCount > 6) {
+        capPointLoopCount = 0;
+    } else {
+        capPointLoopCount++;
+    }
+
+    for (define i = 0; i < CountOf(playersNearTeleporter); i++) {
+        playersFuelingTeleporterCount++;
+    }
+
+    if (playersFuelingTeleporterCount > 0) { // Build
         if (capturePointProgress <= 100) {
-            capturePointProgress += 0.25;
+            capturePointProgress += (0.25/CountOf(AllPlayers(Team.Team1))) * playersFuelingTeleporterCount;
         } else {
             stunNodeLocs = [Vector(-104.41, 3.5, 50.62), Vector(-97.73, 3.5, 39.64), Vector(-101.07, 9, 45.13)];
         }
@@ -107,12 +101,7 @@ Event.OngoingGlobal {
         if (zaryaAdSummonCooldown > zaryaAdSummonCooldownSetting*0.75) {
             zaryaAdSummonCooldown = zaryaAdSummonCooldownSetting*0.75;
         }
-    } else { // Decay
-        if (capturePointProgress >= 0) {
-            capturePointProgress -= 0.25;
-        }
-
-
+    } else { // No players fueling
         if (!zaryaCastingUlt) {
             stunNodeLocs = [Vector(-104.41, -999, 50.62), Vector(-97.73, -999, 39.64), Vector(-101.07, -999, 45.13)];
         }
@@ -173,13 +162,25 @@ Event.OngoingGlobal {
 
 rule: "Encounter - Cooler Portal"
 Event.OngoingPlayer {
-    if (DistanceBetween(EventPlayer(), coolerEntryPortal) < 2) {
+    if (DistanceBetween(EventPlayer(), coolerEntryPortal) < 3) {
         Teleport(EventPlayer(), coolerExitPortal + Vector(0, -1, 0));
-        WaitUntil(DistanceBetween(EventPlayer(), coolerExitPortal) > 2, 999);
+        
+        PlayEffect(AllPlayers(), PlayEffect.EchoStickyBombExplosionEffect, Color.Team2, coolerEntryPortal, 5);
+        PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearSound, Color.Team2, coolerEntryPortal, 200);
+        PlayEffect(AllPlayers(), PlayEffect.EchoStickyBombExplosionEffect, Color.Team2, coolerExitPortal, 5);
+        PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearSound, Color.Team2, coolerExitPortal, 200);
 
-    } else if (DistanceBetween(EventPlayer(), coolerExitPortal) < 2) {
+        WaitUntil(DistanceBetween(EventPlayer(), coolerExitPortal) > 3, 999);
+
+    } else if (DistanceBetween(EventPlayer(), coolerExitPortal) < 3) {
         Teleport(EventPlayer(), coolerEntryPortal + Vector(0, -1, 0));
-        WaitUntil(DistanceBetween(EventPlayer(), coolerEntryPortal) > 2, 999);
+        
+        PlayEffect(AllPlayers(), PlayEffect.EchoStickyBombExplosionEffect, Color.Team2, coolerEntryPortal, 5);
+        PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearSound, Color.Team2, coolerEntryPortal, 200);
+        PlayEffect(AllPlayers(), PlayEffect.EchoStickyBombExplosionEffect, Color.Team2, coolerExitPortal, 5);
+        PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearSound, Color.Team2, coolerExitPortal, 200);
+
+        WaitUntil(DistanceBetween(EventPlayer(), coolerEntryPortal) > 3, 999);
     }
 
     Wait(0.25);
