@@ -52,11 +52,11 @@ if (IsAssemblingHeroes()) {
         SpawnAI(zaryaAdSummonLocs[RandomInteger(0, CountOf(zaryaAdSummonLocs)-1)], EnemyTypes.StandardBastion);
     }
     
-    SpawnAI(Vector(-56.82, -3.16, 71.79), EnemyTypes.Rein);
+    SpawnAI(Vector(-56.82, -3.16, 71.79), EnemyTypes.StandardBomber);
 }
 
 //  ------------- Player Scripts -------------
-playervar define heroPassivePerkText = "";
+playervar define heroPerkText = "";
 playervar define heroDebrisText = "";
 playervar define heroUltChargeText = "";
 rule: "Gamemode - Setup Player Hud"
@@ -64,7 +64,7 @@ Event.OngoingPlayer Team.Team1 {
     // Ability Descriptions
     CreateHudText(EventPlayer(), "", "Abilities:", "", Location.Left, 1, Color.White, Color.White, Color.White, HudTextRev.VisibleToAndString, Spectators.DefaultVisibility);
     setHeroPassiveText(EventPlayer());
-    CreateHudText(EventPlayer(), "", "", heroPassivePerkText, Location.Left, 2, Color.White, Color.White, Color.White, HudTextRev.VisibleToAndString, Spectators.DefaultVisibility);
+    CreateHudText(EventPlayer(), "", "", heroPerkText, Location.Left, 2, Color.White, Color.White, Color.White, HudTextRev.VisibleToAndString, Spectators.DefaultVisibility);
     CreateHudText(EventPlayer(), "", "", heroDebrisText, Location.Left, 3, Color.White, Color.White, Color.White, HudTextRev.VisibleToAndString, Spectators.DefaultVisibility);
 
     // New Line
@@ -82,9 +82,6 @@ Event.OngoingPlayer Team.Team1 {
 
 rule: "Gamemode - Respawn Player"
 Event.OngoingPlayer if (!IsDummyBot(EventPlayer()) && HasSpawned(EventPlayer()) && !IsDead(EventPlayer())) {
-    // reinBot = null;
-    // Kill(PlayersOnHero(Hero.Reinhardt, Team.Team2), null);
-
     setHeroPassiveText(EventPlayer());
 
     StartFacing(EventPlayer(), Vector(-55.92, -2, 40.67), 999999, Relative.ToWorld, FacingRev.None);
@@ -134,7 +131,6 @@ globalvar define wallLocs = [
     Vector(-105.25, -3.98, 67.00),
     Vector(-103.38, -3.98, 66.89),
     Vector(-101.54, -3.98, 66.85),
-    Vector(-46.07, -3.00, 60.11),
     Vector(-65.40, 2.52, 50.42),
     Vector(-66.47, 2.52, 52.10),
     Vector(-67.59, 2.52, 53.79),
@@ -151,6 +147,11 @@ globalvar define wallLocs = [
     Vector(-106.74, 2.02, 50.77),
     Vector(-111.01, 2.02, 65.20),
     Vector(-92.84, -2.48, 23.84),
+    Vector(-55.69, -3, 52.46),
+    Vector(-56.99, -3, 50.96),
+    Vector(-55.69, -3, 52.46),
+    Vector(-58.56, -3, 48.69),
+    Vector(-50.96, -3, 48.57),
 
     // Portal Backing Walls    
     Vector(-93.83, -2.48, 25.37),
@@ -199,7 +200,6 @@ Event.OngoingGlobal {
     CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-73.77, 1.07, 51.32), Vector(-71.40, -1.98, 52.88));
     CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-110.87, -3.95, 65.28), Vector(-100.48, 1.93, 66.77));
     CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-110.62, 0.88, 65.23), Vector(-100.57, -3.92, 66.70));
-    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-44.29, 0.14, 60.12), Vector(-46.78, -2.98, 58.69));
     CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-55.70, -3.13, 54.21), Vector(-59.99, 6.97, 51.12));
     CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-55.06, 2.87, 53.89), Vector(-60.39, -2.98, 51.17));
     CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-64.41, 7.87, 50.04), Vector(-67.45, 2.54, 54.88));
@@ -221,6 +221,8 @@ Event.OngoingGlobal {
 
     CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-109.33, 5.15, 65.08), Vector(-111.69, 2.02, 63.61));
     CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-108.54, 5.14, 50.73), Vector(-106.18, 2.02, 52.25));
+
+    CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-51.77, 0, 49.68), Vector(-50.32, -3, 47.48));
 
     // Back of boss room 
     CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-105.43, 1.08, 45.54), Vector(-102.65, -1.94, 41.00));
@@ -257,23 +259,20 @@ Event.OngoingGlobal {
     }
     
     // Stun nodes
-    CreateEffect(AllPlayers(), Effect.Orb, stunNodeColor[0], stunNodeLocs[0], 1, EffectRev.VisibleToPositionRadiusAndColor);
-    CreateEffect(AllPlayers(), Effect.Orb, stunNodeColor[1], stunNodeLocs[1], 1, EffectRev.VisibleToPositionRadiusAndColor);
-    CreateEffect(AllPlayers(), Effect.Orb, stunNodeColor[2], stunNodeLocs[2], 1, EffectRev.VisibleToPositionRadiusAndColor);
+    CreateEffect(stunNodeVisibility, Effect.Orb, stunNodeColor[0], stunNodeLocs[0], 1, EffectRev.VisibleToPositionRadiusAndColor);
+    CreateEffect(stunNodeVisibility, Effect.Orb, stunNodeColor[1], stunNodeLocs[1], 1, EffectRev.VisibleToPositionRadiusAndColor);
+    CreateEffect(stunNodeVisibility, Effect.Orb, stunNodeColor[2], stunNodeLocs[2], 1, EffectRev.VisibleToPositionRadiusAndColor);
 
-    // Zarya Effects
-    CreateBeamEffect(AllPlayers(), BeamType.BadBeam, zaryaBeamCoords[0], zaryaBeamCoords[1], Color.Team2, EffectRev.VisibleToPositionRadiusAndColor);
-    CreateEffect(AllPlayers(), Effect.ZaryaParticleBeamSound, Color.Team2, Vector(-102.8, 2, 44), zaryaBeamVolume, EffectRev.VisibleToPositionRadiusAndColor);
-
-    CreateEffect(AllPlayers(), Effect.Ring, Color.Team2, PositionOf(PlayersOnHero(Hero.Zarya, Team.Team2)[0])+ Vector(0, -1, 0), zaryaBeamRangeSetting, EffectRev.VisibleToPositionRadiusAndColor);
-    CreateEffect(AllPlayers(), Effect.Ring, Color.Team2, PositionOf(PlayersOnHero(Hero.Zarya, Team.Team2)[0])+ Vector(0, -3, 0), zaryaBeamRangeSetting, EffectRev.VisibleToPositionRadiusAndColor);
+    CreateIcon(stunNodeVisibility, stunNodeLocs[0] + Vector(0, 0.5, 0), Icon.ArrowDown, IconRev.VisibleToPositionAndColor, stunNodeColor[0], true);
+    CreateIcon(stunNodeVisibility, stunNodeLocs[1] + Vector(0, 0.5, 0), Icon.ArrowDown, IconRev.VisibleToPositionAndColor, stunNodeColor[1], true);
+    CreateIcon(stunNodeVisibility, stunNodeLocs[1] + Vector(0, 0.5, 0), Icon.ArrowDown, IconRev.VisibleToPositionAndColor, stunNodeColor[1], true);
 
     // Teleporter (I think)
     CreateEffect(AllPlayers(), Effect.LightShaft, Color.SkyBlue, teleporterPos + Vector(0, -3, 0), 1.25, EffectRev.VisibleToPositionRadiusAndColor);
 
     // Capture Point
-    CreateProgressBarInWorldText(AllPlayers(), capturePointProgress, "Power", capturePointPos + Vector(0, 4, 0), 1, Clipping.ClipAgainstSurfaces, Color.SkyBlue, Color.SkyBlue, ProgressBarEvaluation.VisibleToAndValues, Spectators.DefaultVisibility);
-    CreateProgressBarHudText(PlayersWithinRadius(capturePointPos, 10.25, Team.Team1, RadiusLOS.Off), capturePointProgress, "Power", Location.Top, 4, Color.SkyBlue, Color.SkyBlue, ProgressBarEvaluation.VisibleToAndValues, Spectators.DefaultVisibility);
+    CreateProgressBarInWorldText(AllPlayers(), capturePointProgress, "Power", capturePointPos + Vector(0, 4, 0), 1, Clipping.ClipAgainstSurfaces, Color.SkyBlue, Color.SkyBlue, ProgressBarWorldEvaluation.VisibleToAndValues, Spectators.DefaultVisibility);
+    CreateProgressBarHudText(PlayersWithinRadius(capturePointPos, 10.25, Team.Team1, RadiusLOS.Off), capturePointProgress, "Power", Location.Top, 4, Color.SkyBlue, Color.SkyBlue, ProgressBarHudEvaluation.VisibleToAndValues, Spectators.DefaultVisibility);
 
     CreateEffect(AllPlayers(), Effect.Ring, Color.SkyBlue, capturePointPos, 10, EffectRev.VisibleToPositionRadiusAndColor);
     CreateEffect(AllPlayers(), Effect.LightShaft, Color.SkyBlue, capturePointPos + Vector(0, -27, 0), 10, EffectRev.VisibleToPositionRadiusAndColor);
@@ -290,8 +289,8 @@ Event.OngoingGlobal {
     // CreateEffect(AllPlayers(), Effect.BadAura, Color.SkyBlue, coolerExitPortal + Vector(0, 4, 0), 0.5, EffectRev.VisibleToPositionRadiusAndColor);
 
     // Cooler
-    CreateProgressBarInWorldText(AllPlayers(), coolerPower, "Cooling Power", coolerPos + Vector(0, 3, 0), 0.75, Clipping.ClipAgainstSurfaces, Color.White, Color.White, ProgressBarEvaluation.VisibleToAndValues, Spectators.DefaultVisibility);
-    CreateProgressBarHudText(PlayersWithinRadius(coolerPos, 4.25, Team.Team1, RadiusLOS.Off), coolerPower, "Cooler Power", Location.Top, 4, Color.White, Color.White, ProgressBarEvaluation.VisibleToAndValues, Spectators.DefaultVisibility);
+    CreateProgressBarInWorldText(AllPlayers(), coolerPower, "Cooling Power", coolerPos + Vector(0, 3, 0), 0.75, Clipping.ClipAgainstSurfaces, Color.White, Color.White, ProgressBarWorldEvaluation.VisibleToAndValues, Spectators.DefaultVisibility);
+    CreateProgressBarHudText(PlayersWithinRadius(coolerPos, 4.25, Team.Team1, RadiusLOS.Off), coolerPower, "Cooler Power", Location.Top, 4, Color.White, Color.White, ProgressBarHudEvaluation.VisibleToAndValues, Spectators.DefaultVisibility);
     
     CreateEffect(AllPlayers(), Effect.Ring, Color.White, coolerPos, 4, EffectRev.VisibleToPositionRadiusAndColor);
     CreateEffect(AllPlayers(), Effect.Cloud, Color.White, coolerPos, 4, EffectRev.VisibleToPositionRadiusAndColor);
@@ -308,53 +307,50 @@ Event.OngoingGlobal {
     
     CreateEffect(AllPlayers(), Effect.Sparkles, Color.White, thunderDomeExitButtonLoc, 0.25, EffectRev.VisibleToPositionRadiusAndColor);
 
-    // Rein Clone Effect
-    CreateEffect(AllPlayers(), Effect.EchoCloningEffect, Color.Team2, reinBot, 1, EffectRev.VisibleToPositionRadiusAndColor);
-
     // Spawn Room Text
     CreateInWorldText(AllPlayers(), "Please message me with your thoughts!", Vector(-122.7, 1, 31), 1.5, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
     CreateInWorldText(AllPlayers(), "My Discord is Trexus#9575", Vector(-122.7, 0.5, 31), 1.5, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
     CreateInWorldText(AllPlayers(), "Also check out my game 'Mirastell' on steam!", Vector(-122.7, 0, 31), 1.5, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
 
     // Tutorial
-    CreateInWorldText(AllPlayers(), "Hold F to enter Tutorial", Vector(-110.7, -0.5, 33.47), 1, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
-    CreateEffect(AllPlayers(), Effect.Sparkles, Color.White, Vector(-110.7, -1, 33.47), 0.25, EffectRev.VisibleToPositionRadiusAndColor);
+    // CreateInWorldText(AllPlayers(), "Hold F to enter Tutorial", Vector(-110.7, -0.5, 33.47), 1, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
+    // CreateEffect(AllPlayers(), Effect.Sparkles, Color.White, Vector(-110.7, -1, 33.47), 0.25, EffectRev.VisibleToPositionRadiusAndColor);
 
-    CreateInWorldText(AllPlayers(), "Hold F to exit Tutorial", Vector(-36.3, 3.5, 27.46), 1.5, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
-    CreateEffect(AllPlayers(), Effect.Sparkles, Color.White, Vector(-36.3, 3, 27.46), 0.25, EffectRev.VisibleToPositionRadiusAndColor);
+    // CreateInWorldText(AllPlayers(), "Hold F to exit Tutorial", Vector(-36.3, 3.5, 27.46), 1.5, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
+    // CreateEffect(AllPlayers(), Effect.Sparkles, Color.White, Vector(-36.3, 3, 27.46), 0.25, EffectRev.VisibleToPositionRadiusAndColor);
 
-    CreateInWorldText(AllPlayers(), "Welcome to the Tutorial", Vector(-22.43, 3.5, 38.5), 2, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
-    CreateInWorldText(AllPlayers(), "Please share your thoughts on the mode - Message me on Discord @ Trexus#9575", Vector(-22.43, 3.0, 38.5), 1.5, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
-    CreateInWorldText(AllPlayers(), "Proceed through the mansion, or use the terminal in the next room to exit", Vector(-22.43, 2.5, 38.5), 1.5, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
+    // CreateInWorldText(AllPlayers(), "Welcome to the Tutorial", Vector(-22.43, 3.5, 38.5), 2, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
+    // CreateInWorldText(AllPlayers(), "Please share your thoughts on the mode - Message me on Discord @ Trexus#9575", Vector(-22.43, 3.0, 38.5), 1.5, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
+    // CreateInWorldText(AllPlayers(), "Proceed through the mansion, or use the terminal in the next room to exit", Vector(-22.43, 2.5, 38.5), 1.5, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
 
-    CreateInWorldText(AllPlayers(), "This black orb is called debris", Vector(-40.51, 4, 35.9), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
-    CreateInWorldText(AllPlayers(), "Enemies have a 50% chance of dropping debris when they die", Vector(-40.51, 3.5, 35.9), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
-    CreateInWorldText(AllPlayers(), "Primary or Secondary Fire towards debris to collect them", Vector(-40.51, 3, 35.9), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
+    // CreateInWorldText(AllPlayers(), "This black orb is interactable", Vector(-40.51, 4, 35.9), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
+    // CreateInWorldText(AllPlayers(), "Interacting with orbs is sometimes important during the encounter", Vector(-40.51, 3.5, 35.9), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
+    // CreateInWorldText(AllPlayers(), "Primary or Secondary Fire towards orbs to interact with them", Vector(-40.51, 3, 35.9), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
 
-    CreateInWorldText(AllPlayers(), "In this mode, all heros have powerful new abilities", Vector(-51.37, 3.5, 26.22), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
-    CreateInWorldText(AllPlayers(), "They also receive different benefits from collecting debris", Vector(-51.37, 3.25, 26.22), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
-    CreateInWorldText(AllPlayers(), "The text in the top left tells you about these perks", Vector(-51.37, 3, 26.22), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
-    CreateInWorldText(AllPlayers(), "Try out all your favorite heros!", Vector(-51.37, 2.5, 26.22), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
+    // CreateInWorldText(AllPlayers(), "In this mode, all heros have powerful new abilities", Vector(-51.37, 3.5, 26.22), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
+    // CreateInWorldText(AllPlayers(), "They also receive different benefits from collecting debris", Vector(-51.37, 3.25, 26.22), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
+    // CreateInWorldText(AllPlayers(), "The text in the top left tells you about these perks", Vector(-51.37, 3, 26.22), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
+    // CreateInWorldText(AllPlayers(), "Try out all your favorite heros!", Vector(-51.37, 2.5, 26.22), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
 
-    CreateInWorldText(AllPlayers(), "This mode is planned to be similar to a raid boss fight found in Destiny or WoW", Vector(-39.91, -0.5, 22.99), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
-    CreateInWorldText(AllPlayers(), "In this version, only basic mechanical ideas are present", Vector(-39.91, -1, 22.99), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
-    CreateInWorldText(AllPlayers(), "For now, I'm really only testing combat feel and hero balance", Vector(-39.91, -1.5, 22.99), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
-    CreateInWorldText(AllPlayers(), "In the future, more interesting and polished mechanics will be implemented", Vector(-39.91, -2, 22.99), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
+    // CreateInWorldText(AllPlayers(), "This mode is planned to be similar to a raid boss fight found in Destiny or WoW", Vector(-39.91, -0.5, 22.99), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
+    // CreateInWorldText(AllPlayers(), "In this version, only basic mechanical ideas are present", Vector(-39.91, -1, 22.99), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
+    // CreateInWorldText(AllPlayers(), "For now, I'm really only testing combat feel and hero balance", Vector(-39.91, -1.5, 22.99), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
+    // CreateInWorldText(AllPlayers(), "In the future, more interesting and polished mechanics will be implemented", Vector(-39.91, -2, 22.99), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
 
-    CreateInWorldText(AllPlayers(), "Bars like this will block your movement", Vector(-29.33, -2, 27.41), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
-    CreateInWorldText(AllPlayers(), "If you really want to glitch through them, you probably can", Vector(-29.33, -2.5, 27.41), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
-    CreateInWorldText(AllPlayers(), "Plz don't though lol", Vector(-29.33, -3, 27.41), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
+    // CreateInWorldText(AllPlayers(), "Bars like this will block your movement", Vector(-29.33, -2, 27.41), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
+    // CreateInWorldText(AllPlayers(), "If you really want to glitch through them, you probably can", Vector(-29.33, -2.5, 27.41), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
+    // CreateInWorldText(AllPlayers(), "Plz don't though lol", Vector(-29.33, -3, 27.41), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
 
-    CreateInWorldText(AllPlayers(), "This mode features several custom enemy units", Vector(-30.68, -2.5, 12.8), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
-    CreateInWorldText(AllPlayers(), "This area will allow you to practice fighting them", Vector(-30.68, -3, 12.8), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
-    CreateInWorldText(AllPlayers(), "Interact with the tree to spawn a random enemy", Vector(-30.68, -3.5, 12.8), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
-    CreateEffect(AllPlayers(), Effect.Sparkles, Color.White, Vector(-35.9, -3.5, 14.11), 0.25, EffectRev.VisibleToPositionRadiusAndColor);
+    // CreateInWorldText(AllPlayers(), "This mode features several custom enemy units", Vector(-30.68, -2.5, 12.8), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
+    // CreateInWorldText(AllPlayers(), "This area will allow you to practice fighting them", Vector(-30.68, -3, 12.8), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
+    // CreateInWorldText(AllPlayers(), "Interact with the tree to spawn a random enemy", Vector(-30.68, -3.5, 12.8), 1.25, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
+    // CreateEffect(AllPlayers(), Effect.Sparkles, Color.White, Vector(-35.9, -3.5, 14.11), 0.25, EffectRev.VisibleToPositionRadiusAndColor);
 
-    CreateInWorldText(AllPlayers(), "Credits", Vector(-39.26, -2, 33.31), 2, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
-    CreateInWorldText(AllPlayers(), "This mode was built using Deltin's Overwatch Script to Workshop", Vector(-40.1, -1, 43.48), 1, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
-    CreateInWorldText(AllPlayers(), "Find it on github", Vector(-40.1, -1.5, 43.48), 1, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
-    CreateInWorldText(AllPlayers(), "Thank you to him, and the Elo Hell Workshop Discord for their help", Vector(-40.1, -2, 43.48), 1, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
-    CreateInWorldText(AllPlayers(), "This wouldn't have been possible without them", Vector(-40.1, -2.5, 43.48), 1, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
+    // CreateInWorldText(AllPlayers(), "Credits", Vector(-39.26, -2, 33.31), 2, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
+    // CreateInWorldText(AllPlayers(), "This mode was built using Deltin's Overwatch Script to Workshop", Vector(-40.1, -1, 43.48), 1, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
+    // CreateInWorldText(AllPlayers(), "Find it on github", Vector(-40.1, -1.5, 43.48), 1, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
+    // CreateInWorldText(AllPlayers(), "Thank you to him, and the Elo Hell Workshop Discord for their help", Vector(-40.1, -2, 43.48), 1, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
+    // CreateInWorldText(AllPlayers(), "This wouldn't have been possible without them", Vector(-40.1, -2.5, 43.48), 1, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
 }
 
 playervar define collidingWallPos = null;

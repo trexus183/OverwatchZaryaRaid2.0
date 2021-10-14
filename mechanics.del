@@ -1,14 +1,15 @@
 import "master.del";
 
 globalvar define stunNodeLocs = [Vector(-104.41, -999, 50.62), Vector(-97.73, -999, 39.64), Vector(-101.07, -999, 45.13)];
+globalvar define stunNodeVisibility = null;
 globalvar define stunNodeColor = [];
-globalvar define zaryaBeamCoords = [Vector(0, -999, 0), Vector(0, -999, 0)];
 globalvar define thunderDomeExitButtonLoc = Vector(-11.19, -2.58, 98.46);
 globalvar define thunderDomeExitButtonPrompt = "Exit Locked";
 
 rule: "Encounter - Zen Death Handler During Zarya Ult"
 Event.OnDeath Team.Team2 if (HeroOf(EventPlayer()) == Hero.Zenyatta && zaryaCastingUlt) {
     stunNodeLocs = [Vector(-104.41, 9, 50.62), Vector(-97.73, 9, 39.64), Vector(-101.07, 9, 45.13)];
+    stunNodeVisibility = AllPlayers();
 
     if (RandomInteger(0, 1) == 0) {
         SpawnAI(Vector(-96.4, -2, 40.13), EnemyTypes.LesserBastion);
@@ -23,7 +24,7 @@ Event.OnDeath Team.Team2 if (IsDummyBot(EventPlayer()) && HeroOf(EventPlayer()) 
 }
 
 rule: "Encounter - Thunderdome Rein Death Handler"
-Event.OnDeath Team.Team2 if (HeroOf(EventPlayer()) == Hero.Reinhardt) {
+Event.OnDeath Team.Team2 if (HeroOf(EventPlayer()) == Hero.Reinhardt && DistanceBetween(EventPlayer(), Vector(-13.7, -3.68, 90.26)) < 20) {
     thunderDomeExitButtonLoc = Vector(-11.19, -2.58, 98.46);
     thunderDomeExitButtonPrompt = "Press F to Exit";
 }
@@ -96,6 +97,7 @@ Event.OngoingGlobal {
             capturePointProgress += (0.25/CountOf(AllPlayers(Team.Team1))) * playersFuelingTeleporterCount;
         } else {
             stunNodeLocs = [Vector(-104.41, 3.5, 50.62), Vector(-97.73, 3.5, 39.64), Vector(-101.07, 9, 45.13)];
+            stunNodeVisibility = AllPlayers();
         }
 
         if (zaryaAdSummonCooldown > zaryaAdSummonCooldownSetting*0.75) {
@@ -104,6 +106,7 @@ Event.OngoingGlobal {
     } else { // No players fueling
         if (!zaryaCastingUlt) {
             stunNodeLocs = [Vector(-104.41, -999, 50.62), Vector(-97.73, -999, 39.64), Vector(-101.07, -999, 45.13)];
+            stunNodeVisibility = null;
         }
     }
         
@@ -137,6 +140,7 @@ Event.OngoingGlobal {
                 }
                 Wait(0.01);
                 stunNodeLocs = [Vector(-104.41, -999, 50.62), Vector(-97.73, -999, 39.64), Vector(-101.07, -999, 45.13)];
+                stunNodeVisibility = null;
                 Wait(3);
                 SpawnAI(Vector(-102.3, -2, 43.2), EnemyTypes.StandardTurret);
             } else {
@@ -194,7 +198,7 @@ Event.OngoingPlayer Team.Team1 {
 
         PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 1, 0), 5);
         PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearSound, Color.SkyBlue, teleporterPos, 200);
-        Wait(1);
+        Wait(0.1);
         
         if (DistanceBetween(EventPlayer(), teleporterPos) > 1.25) {
             SmallMessage(EventPlayer(), "Teleporter link broken");
@@ -203,7 +207,7 @@ Event.OngoingPlayer Team.Team1 {
 
         PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 1, 0), 5);
         PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearSound, Color.SkyBlue, teleporterPos, 200);
-        Wait(1);
+        Wait(0.1);
 
         if (DistanceBetween(EventPlayer(), teleporterPos) > 1.25) {
             SmallMessage(EventPlayer(), "Teleporter link broken");
@@ -212,7 +216,7 @@ Event.OngoingPlayer Team.Team1 {
 
         PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 1, 0), 5);
         PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearSound, Color.SkyBlue, teleporterPos, 200);
-        Wait(1);
+        Wait(0.1);
 
         if (DistanceBetween(EventPlayer(), teleporterPos) < 1.25) {
             thunderDomeExitButtonLoc = Vector(0, -999, 0);
@@ -231,9 +235,17 @@ Event.OngoingPlayer Team.Team1 {
 
             Teleport(PlayersOnHero(Hero.Zarya, Team.Team2)[0], Vector(-12, 1.27, 80));
             StartFacing(PlayersOnHero(Hero.Zarya, Team.Team2)[0], DirectionTowards(EyePosition(PlayersOnHero(Hero.Zarya, Team.Team2)[0]), Vector(-19.37, -3.84, 85.05)), 1000, Relative.ToWorld, FacingRev.DirectionAndTurnRate);
-            Wait(5);
+            
+            for (define i = 0; i < CountOf(PlayersOnHero(Hero.Reinhardt, Team.Team2)); i++) {
+                if (DistanceBetween(PlayersOnHero(Hero.Reinhardt, Team.Team2)[i], Vector(-13.7, -3.68, 90.26)) < 20) {
+                    Heal(PlayersOnHero(Hero.Reinhardt, Team.Team2)[i], null, 200);
+                    Loop();
+                }
+            }
+
             PressButton(PlayersOnHero(Hero.Zarya, Team.Team2)[0], Button.SecondaryFire);
             Wait(0.1);
+
             SpawnAI(Vector(-19.37, -3.84, 85.05), EnemyTypes.Rein);
         } else {
             SmallMessage(EventPlayer(), "Teleporter link broken");
@@ -259,7 +271,7 @@ Event.OngoingPlayer Team.Team1 {
         SpawnAI(Vector(-33.71, 2, 71.89), EnemyTypes.LesserBastion);
         SpawnAI(Vector(-31.24, 1, 62.18), EnemyTypes.LesserBastion);
 
-        Teleport(EventPlayer(), Vector(-23.45, -2, 61.96));
+        Teleport(PlayersWithinRadius(Vector(-13.7, -3.68, 90.26), 12, Team.Team1, RadiusLOS.Off), Vector(-23.45, -2, 61.96));
 
         Wait(0.016);
         PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 1, 0), 5);
@@ -284,6 +296,9 @@ rule: "Encounter - Hack Terminal Trigger"
 Event.OngoingPlayer Team.Team1 {
     if (DistanceBetween(EventPlayer(), Vector(-27.85, 3.1, 84.46)) < 6 && IsButtonHeld(EventPlayer(), Button.Interact)) {
         stunNodeLocs = [Vector(-104.41, -999, 50.62), Vector(-97.73, -999, 39.64), Vector(-101.07, -999, 45.13)];
+        stunNodeVisibility = null;
+
+        capturePointProgress = 0;
 
         ClearStatus(PlayersOnHero(Hero.Zarya, Team.Team2)[0], Status.PhasedOut);
         SmallMessage(AllPlayers(), "The " + HeroIconString(Hero.Zarya) + " Zarya Echo is vulnerable!");
@@ -319,38 +334,46 @@ Event.OngoingPlayer Team.Team1 {
     Loop();
 }
 
+// rule: "Prevent Zarya Health Regeneration"
+// Event.OnDamageTaken Team.Team2 {
+//     if (HeroOf(EventPlayer()) == Hero.Zarya) {
+//         SetMaxHealth(EventPlayer(), Health(EventPlayer()));
+
+//     }
+// }
+
 // Tutorial
-rule: "Tutorial - Enter Trigger"
-Event.OngoingPlayer Team.Team1 {
-    if (DistanceBetween(EventPlayer(), Vector(-110.7, 0, 33.47)) < 6 && IsButtonHeld(EventPlayer(), Button.Interact)) {
-        Teleport(EventPlayer(), Vector(-41.69, 2, 42.15));
-        Wait(0.5);
-        Teleport(EventPlayer(), Vector(-41.69, 2, 42.15));
+// rule: "Tutorial - Enter Trigger"
+// Event.OngoingPlayer Team.Team1 {
+//     if (DistanceBetween(EventPlayer(), Vector(-110.7, 0, 33.47)) < 6 && IsButtonHeld(EventPlayer(), Button.Interact)) {
+//         Teleport(EventPlayer(), Vector(-41.69, 2, 42.15));
+//         Wait(0.5);
+//         Teleport(EventPlayer(), Vector(-41.69, 2, 42.15));
 
-        healthPickupLocs[CountOf(healthPickupLocs)] = Vector(-40.51, 2, 35.9);
-        CreateEffect(AllPlayers(), Effect.Orb, Color.Black, healthPickupLocs[CountOf(healthPickupLocs)-1], 0.5, EffectRev.PositionAndRadius);
-        Wait(0.016);
-        healthPickupEffects[CountOf(healthPickupLocs)-1] = LastCreatedEntity();
-    }
-    Wait(0.25);
-    Loop();
-}
+//         healthPickupLocs[CountOf(healthPickupLocs)] = Vector(-40.51, 2, 35.9);
+//         CreateEffect(AllPlayers(), Effect.Orb, Color.Black, healthPickupLocs[CountOf(healthPickupLocs)-1], 0.5, EffectRev.PositionAndRadius);
+//         Wait(0.016);
+//         healthPickupEffects[CountOf(healthPickupLocs)-1] = LastCreatedEntity();
+//     }
+//     Wait(0.25);
+//     Loop();
+// }
 
-rule: "Tutorial - Exit Trigger"
-Event.OngoingPlayer Team.Team1 {
-    if (DistanceBetween(EventPlayer(), Vector(-36.3, 3.5, 27.46)) < 6 && IsButtonHeld(EventPlayer(), Button.Interact)) {
-        Kill(EventPlayer(), null);
-    }
-    Wait(0.25);
-    Loop();
-}
+// rule: "Tutorial - Exit Trigger"
+// Event.OngoingPlayer Team.Team1 {
+//     if (DistanceBetween(EventPlayer(), Vector(-36.3, 3.5, 27.46)) < 6 && IsButtonHeld(EventPlayer(), Button.Interact)) {
+//         Kill(EventPlayer(), null);
+//     }
+//     Wait(0.25);
+//     Loop();
+// }
 
-globalvar define randomEnemyTypes = [EnemyTypes.LesserBastion, EnemyTypes.StandardBastion, EnemyTypes.GreaterBastion, EnemyTypes.StandardBomber, EnemyTypes.LesserTurret, EnemyTypes.StandardTurret, EnemyTypes.LesserOmnic, EnemyTypes.ExploderOmnic];
-rule: "Tutorial - Enemy Tree"
-Event.OngoingPlayer Team.Team1 {
-    if (DistanceBetween(EventPlayer(), Vector(-35.9, -3.5, 14.11)) < 6 && IsButtonHeld(EventPlayer(), Button.Interact)) {
-        SpawnAI(Vector(-32.8, -5, 7), randomEnemyTypes[RandomInteger(0, CountOf(randomEnemyTypes)-1)]);
-    }
-    Wait(0.25);
-    Loop();
-}
+// globalvar define randomEnemyTypes = [EnemyTypes.LesserBastion, EnemyTypes.StandardBastion, EnemyTypes.GreaterBastion, EnemyTypes.StandardBomber, EnemyTypes.LesserTurret, EnemyTypes.StandardTurret, EnemyTypes.LesserOmnic, EnemyTypes.ExploderOmnic];
+// rule: "Tutorial - Enemy Tree"
+// Event.OngoingPlayer Team.Team1 {
+//     if (DistanceBetween(EventPlayer(), Vector(-35.9, -3.5, 14.11)) < 6 && IsButtonHeld(EventPlayer(), Button.Interact)) {
+//         SpawnAI(Vector(-32.8, -5, 7), randomEnemyTypes[RandomInteger(0, CountOf(randomEnemyTypes)-1)]);
+//     }
+//     Wait(0.25);
+//     Loop();
+// }

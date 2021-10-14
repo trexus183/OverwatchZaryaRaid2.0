@@ -2,6 +2,17 @@ import "master.del";
 
 globalvar define debugNodes = [];
 globalvar define selectedDebugNodes = [];
+
+rule: "Debug Mode - Spawn AI"
+Event.OngoingPlayer if (IsButtonHeld(EventPlayer(), Button.Interact)) {
+    Wait(2);
+    if (IsButtonHeld(EventPlayer(), Button.Interact)) {
+        SmallMessage(EventPlayer(), "Spawning Bot");
+
+        SpawnAI(RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer())*500, AllPlayers(), EventPlayer(), true), EnemyTypes.Rein);
+    }
+}
+
 rule: "Debug Mode - Activation Button"
 Event.OngoingPlayer if (IsButtonHeld(EventPlayer(), Button.Crouch) && IsButtonHeld(EventPlayer(), Button.Interact)) {
     Wait(2);
