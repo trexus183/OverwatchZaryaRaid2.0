@@ -6,7 +6,12 @@ Event.OngoingGlobal
 if (IsAssemblingHeroes()) {
     CreateHudText(AllPlayers(), null, null, " ", Location.Top, 1,  Color.White, Color.White, Color.White, HudTextRev.VisibleToAndString, Spectators.VisibleAlways);
     CreateHudText(AllPlayers(), null, null, " ", Location.Top, 1,  Color.White, Color.White, Color.White, HudTextRev.VisibleToAndString, Spectators.VisibleAlways);
-    CreateHudText(AllPlayers(), null, "Server Load: " + ServerLoadAverage() + "/255", null, Location.Top, 2,  Color.Red, Color.Red, Color.Red, HudTextRev.VisibleToAndString, Spectators.VisibleAlways);
+    CreateHudText(AllPlayers(), null, null, " ", Location.Top, 1,  Color.White, Color.White, Color.White, HudTextRev.VisibleToAndString, Spectators.VisibleAlways);
+    CreateHudText(AllPlayers(), null, null, " ", Location.Top, 1,  Color.White, Color.White, Color.White, HudTextRev.VisibleToAndString, Spectators.VisibleAlways);
+    CreateHudText(AllPlayers(), null, null, " ", Location.Top, 1,  Color.White, Color.White, Color.White, HudTextRev.VisibleToAndString, Spectators.VisibleAlways);
+    
+    CreateHudText(AllPlayers(), null, null, "Iris Charge Held " + playerChargeHeld + "%", Location.Top, 999,  Color.SkyBlue, Color.SkyBlue, Color.SkyBlue, HudTextRev.VisibleToAndString, Spectators.VisibleAlways);
+
     WorkshopSettingCombo("Settings", "Difficulty Scaling", 0, ["Enabled", "Disabled"], 0);
     SetMatchTime(0);
     Wait(1);
@@ -20,7 +25,7 @@ if (IsAssemblingHeroes()) {
     Wait(3);
 }
 
-rule: "Gamemode - Spawn Initial Enemies - Part I"
+rule: "Gamemode - Spawn Initial Enemies"
 Event.OngoingGlobal
 if (IsAssemblingHeroes()) {
     Wait(6);
@@ -32,23 +37,15 @@ if (IsAssemblingHeroes()) {
         SpawnAI(zaryaAdSummonLocs[RandomInteger(0, CountOf(zaryaAdSummonLocs)-1)], EnemyTypes.ExploderOmnic);
     }
 
-    for (define i = 0; i < 1; i++) {
+    for (define i = 0; i < 2; i++) {
         SpawnAI(zaryaAdSummonLocs[RandomInteger(0, CountOf(zaryaAdSummonLocs)-1)], EnemyTypes.LesserOmnic);
     }
-}
 
-rule: "Gamemode - Spawn Initial Enemies - Part II"
-Event.OngoingGlobal
-if (IsAssemblingHeroes()) {
-    Wait(6);
-
-    for (define i = 0; i < 3; i++) {
+    for (define i = 0; i < 5; i++) {
         SpawnAI(zaryaAdSummonLocs[RandomInteger(0, CountOf(zaryaAdSummonLocs)-1)], EnemyTypes.LesserBastion);
     }
 
-    SpawnAI(zaryaAdSummonLocs[RandomInteger(0, CountOf(zaryaAdSummonLocs)-1)], EnemyTypes.StandardTurret);
-
-    for (define i = 0; i < 1; i++) {
+    for (define i = 0; i < 2; i++) {
         SpawnAI(zaryaAdSummonLocs[RandomInteger(0, CountOf(zaryaAdSummonLocs)-1)], EnemyTypes.StandardBastion);
     }
     
@@ -57,15 +54,17 @@ if (IsAssemblingHeroes()) {
 
 //  ------------- Player Scripts -------------
 playervar define heroPerkText = "";
-playervar define heroDebrisText = "";
+playervar define heroKillPerkText = "";
+playervar define heroUltPerkText = "";
 playervar define heroUltChargeText = "";
 rule: "Gamemode - Setup Player Hud"
 Event.OngoingPlayer Team.Team1 {
     // Ability Descriptions
-    CreateHudText(EventPlayer(), "", "Abilities:", "", Location.Left, 1, Color.White, Color.White, Color.White, HudTextRev.VisibleToAndString, Spectators.DefaultVisibility);
+    CreateHudText(EventPlayer(), "", "Abilities:" + IsInAlternateForm(EventPlayer()), "", Location.Left, 1, Color.White, Color.White, Color.White, HudTextRev.VisibleToAndString, Spectators.DefaultVisibility);
     setHeroPassiveText(EventPlayer());
     CreateHudText(EventPlayer(), "", "", heroPerkText, Location.Left, 2, Color.White, Color.White, Color.White, HudTextRev.VisibleToAndString, Spectators.DefaultVisibility);
-    CreateHudText(EventPlayer(), "", "", heroDebrisText, Location.Left, 3, Color.White, Color.White, Color.White, HudTextRev.VisibleToAndString, Spectators.DefaultVisibility);
+    CreateHudText(EventPlayer(), "", "", heroKillPerkText, Location.Left, 3, Color.White, Color.White, Color.White, HudTextRev.VisibleToAndString, Spectators.DefaultVisibility);
+    CreateHudText(EventPlayer(), "", "", heroUltPerkText, Location.Left, 4, Color.White, Color.White, Color.White, HudTextRev.VisibleToAndString, Spectators.DefaultVisibility);
 
     // New Line
     CreateHudText(EventPlayer(), "", "", " ", Location.Left, 7, Color.
@@ -88,10 +87,10 @@ Event.OngoingPlayer if (!IsDummyBot(EventPlayer()) && HasSpawned(EventPlayer()) 
     Wait(0.016);
     StopFacing(EventPlayer());
 
-    if (CountOf(playerConstructionEffects) != 0) {
-        DestroyEffect(playerConstructionEffects);
-        playerConstructionLoc = Vector(0, -999, 0);
-        playerConstructionEffects = [];
+    if (CountOf(playerEffects) != 0) {
+        DestroyEffect(playerEffects);
+        playerVisualEffectLoc = Vector(0, -999, 0);
+        playerEffects = [];
     }
 }
 
@@ -265,13 +264,13 @@ Event.OngoingGlobal {
 
     CreateIcon(stunNodeVisibility, stunNodeLocs[0] + Vector(0, 0.5, 0), Icon.ArrowDown, IconRev.VisibleToPositionAndColor, stunNodeColor[0], true);
     CreateIcon(stunNodeVisibility, stunNodeLocs[1] + Vector(0, 0.5, 0), Icon.ArrowDown, IconRev.VisibleToPositionAndColor, stunNodeColor[1], true);
-    CreateIcon(stunNodeVisibility, stunNodeLocs[1] + Vector(0, 0.5, 0), Icon.ArrowDown, IconRev.VisibleToPositionAndColor, stunNodeColor[1], true);
+    CreateIcon(stunNodeVisibility, stunNodeLocs[2] + Vector(0, 0.5, 0), Icon.ArrowDown, IconRev.VisibleToPositionAndColor, stunNodeColor[2], true);
 
     // Teleporter (I think)
     CreateEffect(AllPlayers(), Effect.LightShaft, Color.SkyBlue, teleporterPos + Vector(0, -3, 0), 1.25, EffectRev.VisibleToPositionRadiusAndColor);
 
     // Capture Point
-    CreateProgressBarInWorldText(AllPlayers(), capturePointProgress, "Power", capturePointPos + Vector(0, 4, 0), 1, Clipping.ClipAgainstSurfaces, Color.SkyBlue, Color.SkyBlue, ProgressBarWorldEvaluation.VisibleToAndValues, Spectators.DefaultVisibility);
+    CreateProgressBarInWorldText(AllPlayers(), capturePointProgress, "Power", capturePointPos + Vector(0, 4, 0), 1, Clipping.ClipAgainstSurfaces, Color.SkyBlue, Color.SkyBlue, ProgressBarWorldEvaluation.VisibleToPositionAndValues, Spectators.DefaultVisibility);
     CreateProgressBarHudText(PlayersWithinRadius(capturePointPos, 10.25, Team.Team1, RadiusLOS.Off), capturePointProgress, "Power", Location.Top, 4, Color.SkyBlue, Color.SkyBlue, ProgressBarHudEvaluation.VisibleToAndValues, Spectators.DefaultVisibility);
 
     CreateEffect(AllPlayers(), Effect.Ring, Color.SkyBlue, capturePointPos, 10, EffectRev.VisibleToPositionRadiusAndColor);
@@ -288,6 +287,9 @@ Event.OngoingGlobal {
     // CreateEffect(AllPlayers(), Effect.GoodAura, Color.SkyBlue, coolerExitPortal + Vector(0, 4, 0), 0.5, EffectRev.VisibleToPositionRadiusAndColor);
     // CreateEffect(AllPlayers(), Effect.BadAura, Color.SkyBlue, coolerExitPortal + Vector(0, 4, 0), 0.5, EffectRev.VisibleToPositionRadiusAndColor);
 
+    // Jump Pad
+    CreateEffect(AllPlayers(), Effect.Ring, Color.Green, jumpPadPos, 2, EffectRev.VisibleToPositionRadiusAndColor);
+
     // Cooler
     CreateProgressBarInWorldText(AllPlayers(), coolerPower, "Cooling Power", coolerPos + Vector(0, 3, 0), 0.75, Clipping.ClipAgainstSurfaces, Color.White, Color.White, ProgressBarWorldEvaluation.VisibleToAndValues, Spectators.DefaultVisibility);
     CreateProgressBarHudText(PlayersWithinRadius(coolerPos, 4.25, Team.Team1, RadiusLOS.Off), coolerPower, "Cooler Power", Location.Top, 4, Color.White, Color.White, ProgressBarHudEvaluation.VisibleToAndValues, Spectators.DefaultVisibility);
@@ -297,15 +299,24 @@ Event.OngoingGlobal {
     CreateEffect(AllPlayers(), Effect.Cloud, Color.SkyBlue, coolerPos, 4, EffectRev.VisibleToPositionRadiusAndColor);
 
     // Button Prompts
-    CreateInWorldText(AllPlayers(), "Hold F to Hack " + HeroIconString(Hero.Zarya), Vector(-27.89, 3.25, 84.5), 1.5, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
+    CreateProgressBarInWorldText(PlayersWithinRadius(Vector(-27.89, 3.4, 84.5), 10.25, Team.Team1, RadiusLOS.Off), hackCharge, "Counter-measure Charge", Vector(-27.89, 3.5, 84.5), 0.75, Clipping.ClipAgainstSurfaces, Color.Purple, Color.Purple, ProgressBarWorldEvaluation.VisibleToPositionAndValues, Spectators.VisibleAlways);
+    
+    CreateInWorldText(AllPlayers(), hackPromptText, Vector(-27.89, 3.25, 84.5), 1.5, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleToAndString, Color.White, Spectators.DefaultVisibility);
+
     CreateEffect(AllPlayers(), Effect.Sparkles, Color.White, Vector(-27.85, 3.1, 84.46), 0.25, EffectRev.VisibleToPositionRadiusAndColor);
 
-    // Thunder Dome
-    CreateEffect(AllPlayers(), Effect.Sphere, Color.Team2, Vector(-13.7, -3.68, 90.26), 11.5, EffectRev.VisibleToPositionRadiusAndColor);
+    CreateInWorldText(AllPlayers(), "Hold F Enter Test Field", Vector(-92.55, 3.15, 69.25), 1.5, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
+    CreateEffect(AllPlayers(), Effect.Sparkles, Color.White, Vector(-92.55, 2.94, 69.25), 0.25, EffectRev.VisibleToPositionRadiusAndColor);
 
-    CreateInWorldText(AllPlayers(), thunderDomeExitButtonPrompt, Vector(-11.19, -2.43, 98.46), 1.5, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleToAndString, Color.White, Spectators.DefaultVisibility);
+    // Thunder Dome
+    CreateEffect(AllPlayers(), Effect.Sphere, Color.Team2, Vector(-13.7, -3.68, 90.26), 12, EffectRev.VisibleToPositionRadiusAndColor);
+
+    CreateInWorldText(AllPlayers(), "Hold F to Exit", Vector(-11.19, -2.43, 98.46), 1.5, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleToAndString, Color.White, Spectators.DefaultVisibility);
     
     CreateEffect(AllPlayers(), Effect.Sparkles, Color.White, thunderDomeExitButtonLoc, 0.25, EffectRev.VisibleToPositionRadiusAndColor);
+
+    CreateInWorldText(AllPlayers(), "Summon Echo", thunderDomeSummonNodeLoc + Vector(0, 0.25, 0), 1.5, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);
+    CreateEffect(AllPlayers(), Effect.Orb, Color.Black, thunderDomeSummonNodeLoc, 1, EffectRev.VisibleTo);
 
     // Spawn Room Text
     CreateInWorldText(AllPlayers(), "Please message me with your thoughts!", Vector(-122.7, 1, 31), 1.5, Clipping.ClipAgainstSurfaces, InworldTextRev.VisibleTo, Color.White, Spectators.DefaultVisibility);

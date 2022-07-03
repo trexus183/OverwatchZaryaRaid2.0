@@ -3,19 +3,28 @@ import "master.del";
 globalvar define debugNodes = [];
 globalvar define selectedDebugNodes = [];
 
+playervar define spawnAICounter = 0;
+
 rule: "Debug Mode - Spawn AI"
 Event.OngoingPlayer if (IsButtonHeld(EventPlayer(), Button.Interact)) {
     Wait(2);
     if (IsButtonHeld(EventPlayer(), Button.Interact)) {
         SmallMessage(EventPlayer(), "Spawning Bot");
+        
+        spawnAICounter++;
 
-        SpawnAI(RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer())*500, AllPlayers(), EventPlayer(), true), EnemyTypes.Rein);
+        define randSpawn = RandomInteger(0, 1);
+            if (randSpawn == 0) {
+                SpawnAI(RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer())*500, AllPlayers(), EventPlayer(), true), EnemyTypes.StandardBastion);
+            } else if (randSpawn == 1) {
+                SpawnAI(RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer())*500, AllPlayers(), EventPlayer(), true), EnemyTypes.GreaterBastion);
+            }
     }
 }
 
 rule: "Debug Mode - Activation Button"
 Event.OngoingPlayer if (IsButtonHeld(EventPlayer(), Button.Crouch) && IsButtonHeld(EventPlayer(), Button.Interact)) {
-    Wait(2);
+    Wait(4);
     if (IsButtonHeld(EventPlayer(), Button.Crouch) && IsButtonHeld(EventPlayer(), Button.Interact)) {
         debugModeEnabled = true;
 
