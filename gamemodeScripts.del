@@ -48,8 +48,6 @@ if (IsAssemblingHeroes()) {
     for (define i = 0; i < 2; i++) {
         SpawnAI(zaryaAdSummonLocs[RandomInteger(0, CountOf(zaryaAdSummonLocs)-1)], EnemyTypes.StandardBastion);
     }
-    
-    SpawnAI(Vector(-56.82, -3.16, 71.79), EnemyTypes.StandardBomber);
 }
 
 //  ------------- Player Scripts -------------
@@ -101,7 +99,7 @@ Event.OngoingPlayer Team.Team1 if (IsInSpawnRoom(EventPlayer())) {
     if (zaryaCastingUlt) {
         Teleport(EventPlayer(), Vector(-87.6, -2, 53.4));
     } else {
-        Teleport(EventPlayer(), Vector(-44.88, -3, 56.67));
+        Teleport(EventPlayer(), Vector(-1.5, -5.8, 16.62));
     }
 
     StartFacing(EventPlayer(), Vector(-55.92, -2, 40.67), 999999, Relative.ToWorld, FacingRev.None);
@@ -112,7 +110,7 @@ Event.OngoingPlayer Team.Team1 if (IsInSpawnRoom(EventPlayer())) {
 }
 
 //  ------------- Walls -------------
-globalvar define wallLocs = [
+globalvar define wallLocs = [/*
     // Vector(-59, 0, 41.31), Vector(-60.33, 0, 43.36), Vector(-58, 0, 39.84), // Right B Entrance
     Vector(-86.5, -4, 75.16), 
     Vector(-83.17, -2, 77.12), // Left Section Walls
@@ -184,9 +182,10 @@ globalvar define wallLocs = [
     Vector(-40.91, -3.16, 74.15),
     Vector(-40.91, -3.16, 74.15),
     Vector(-19.88, -2.16, 61.47)
-];
+*/];
 rule: "Gamemode - Create Walls and effects"
 Event.OngoingGlobal {
+    /*
     // Right B Entrance
 
     // Left Section Walls
@@ -252,6 +251,7 @@ Event.OngoingGlobal {
     CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-37.53, 4.98, 93.37), Vector(-40.15, 2.02, 93.33));
     CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-26.54, -0.25, 86.24), Vector(-26.34, -3.80, 92.70));
     CreateBeamEffect(AllPlayers(), BeamType.GrappleBeam, Vector(-26.43, -0.26, 92.72), Vector(-26.34, -3.81, 86.26));
+    */
 
     for (define i = 0; i < CountOf(stunNodeLocs); i++) {
         stunNodeColor[i] = Color.Team2;
@@ -365,7 +365,7 @@ Event.OngoingGlobal {
 }
 
 playervar define collidingWallPos = null;
-rule: "Wall Collision - Detect Collision"
+/*rule: "Wall Collision - Detect Collision"
 Event.OngoingPlayer Team.Team1 {
     collidingWallPos = null;
 
@@ -388,7 +388,7 @@ Event.OngoingPlayer Team.Team1 {
 
     Wait(0.016);
     Loop();
-}
+}*/
 
 // playervar define damageText = [];
 // rule: "Create Damage Text"

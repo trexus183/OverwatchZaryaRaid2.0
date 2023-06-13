@@ -7,62 +7,62 @@ globalvar define thunderDomeSummonNodeLoc = Vector(-17.76, -1.96, 82.2);
 globalvar define thunderDomeExitButtonLoc = Vector(-11.19, -2.58, 98.46);
 globalvar define hackPromptText = "Hold F to charge with Iris Energy";
 
-rule: "Encounter - Zen Death Handler During Zarya Ult"
-Event.OnDeath Team.Team2 if (HeroOf(EventPlayer()) == Hero.Zenyatta && zaryaCastingUlt) {
-    stunNodeLocs = [Vector(-104.41, 9, 50.62), Vector(-97.73, 9, 39.64), Vector(-101.07, 9, 45.13)];
-    stunNodeVisibility = AllPlayers();
+// rule: "Encounter - Zen Death Handler During Zarya Ult"
+// Event.OnDeath Team.Team2 if (HeroOf(EventPlayer()) == Hero.Zenyatta && zaryaCastingUlt) {
+//     stunNodeLocs = [Vector(-104.41, 9, 50.62), Vector(-97.73, 9, 39.64), Vector(-101.07, 9, 45.13)];
+//     stunNodeVisibility = AllPlayers();
 
-    if (RandomInteger(0, 1) == 0) {
-        SpawnAI(Vector(-96.4, -2, 40.13), EnemyTypes.LesserBastion);
-    } else {
-        SpawnAI(Vector(-103.4, -2, 51.7), EnemyTypes.LesserBastion);
-    }
-}
+//     if (RandomInteger(0, 1) == 0) {
+//         SpawnAI(Vector(-96.4, -2, 40.13), EnemyTypes.LesserBastion);
+//     } else {
+//         SpawnAI(Vector(-103.4, -2, 51.7), EnemyTypes.LesserBastion);
+//     }
+// }
 
 rule: "Encounter - Victory Trigger"
 Event.OnDeath Team.Team2 if (IsDummyBot(EventPlayer()) && HeroOf(EventPlayer()) == Hero.Zarya && !debugModeEnabled) {
     DeclareTeamVictory(Team.Team1);
 }
 
-rule: "Encounter - Thunderdome Boss Death Handler"
-Event.OnFinalBlow Team.Team1 if (HeroOf(Victim()) == Hero.Reinhardt && DistanceBetween(Victim(), Vector(-13.7, -3.68, 90.26)) < 20) {
-    playerChargeHeld += 100;
+// rule: "Encounter - Thunderdome Boss Death Handler"
+// Event.OnFinalBlow Team.Team1 if (HeroOf(Victim()) == Hero.Reinhardt && DistanceBetween(Victim(), Vector(-13.7, -3.68, 90.26)) < 20) {
+//     playerChargeHeld += 100;
     
-    for (define i = 0; i < 6; i++) {
-        SpawnAI(NearestWalkablePosition(Vector(-13.7, -3.68, 90.26) + Vector(RandomReal(-10, 10), 0, RandomReal(-10, 10))), EnemyTypes.LesserBastion);
-    }
-}
+//     for (define i = 0; i < 6; i++) {
+//         SpawnAI(NearestWalkablePosition(Vector(-13.7, -3.68, 90.26) + Vector(RandomReal(-10, 10), 0, RandomReal(-10, 10))), EnemyTypes.LesserBastion);
+//     }
+// }
 
 rule: "Encounter - Player Shot Interactions"
 Event.OngoingPlayer Team.Team1 if (IsFiringPrimary(EventPlayer()) || IsFiringSecondary(EventPlayer())) {
     // ThunderDome Summon Node
-    if (DistanceBetween(EventPlayer(), Vector(-13.7, -3.68, 90.26)) < 13) {
-        define playerAimPos = RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer()) * DistanceBetween(EyePosition(EventPlayer()), thunderDomeSummonNodeLoc));
+    // if (DistanceBetween(EventPlayer(), Vector(-13.7, -3.68, 90.26)) < 13) {
+    //     define playerAimPos = RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer()) * DistanceBetween(EyePosition(EventPlayer()), thunderDomeSummonNodeLoc));
         
-        if (
-        DistanceBetween(playerAimPos, thunderDomeSummonNodeLoc) < 0.75 && 
-        DistanceBetween(playerAimPos, thunderDomeSummonNodeLoc) != 0 && 
-        CountOf(PlayersWithinRadius(Vector(-13.7, -3.68, 90.26), 13, Team.Team2, RadiusLOS.Surfaces)) == 0
-        ) {
-            PlayEffect(AllPlayers(), PlayEffect.GoodPickupEffect, Color.Black, thunderDomeSummonNodeLoc, 2);
-            PlayEffect(AllPlayers(), PlayEffect.MoiraFadeDisappearSound, Color.Black, thunderDomeSummonNodeLoc, 200);
+    //     if (
+    //     DistanceBetween(playerAimPos, thunderDomeSummonNodeLoc) < 0.75 && 
+    //     DistanceBetween(playerAimPos, thunderDomeSummonNodeLoc) != 0 && 
+    //     CountOf(PlayersWithinRadius(Vector(-13.7, -3.68, 90.26), 13, Team.Team2, RadiusLOS.Surfaces)) == 0
+    //     ) {
+    //         PlayEffect(AllPlayers(), PlayEffect.GoodPickupEffect, Color.Black, thunderDomeSummonNodeLoc, 2);
+    //         PlayEffect(AllPlayers(), PlayEffect.MoiraFadeDisappearSound, Color.Black, thunderDomeSummonNodeLoc, 200);
 
-            SpawnAI(Vector(-19.37, -3.84, 85.05), EnemyTypes.ReinBoss);
-            Wait(3);
-        }
-    }
+    //         SpawnAI(Vector(-19.37, -3.84, 85.05), EnemyTypes.ReinBoss);
+    //         Wait(3);
+    //     }
+    // }
 
     // Stun Nodes
-    for (define i = 0; i <= CountOf(stunNodeLocs); i++) {
-        define playerAimPos = RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer()) * DistanceBetween(EyePosition(EventPlayer()), stunNodeLocs[i]));
+    // for (define i = 0; i <= CountOf(stunNodeLocs); i++) {
+    //     define playerAimPos = RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer()) * DistanceBetween(EyePosition(EventPlayer()), stunNodeLocs[i]));
 
-        if (DistanceBetween(playerAimPos, stunNodeLocs[i]) < 0.75 && DistanceBetween(playerAimPos, stunNodeLocs[i]) != 0 && stunNodeColor[i] == Color.Team2) {
-            PlayEffect(AllPlayers(), PlayEffect.GoodPickupEffect, Color.Team1, stunNodeLocs[i], 2);
-            PlayEffect(AllPlayers(), PlayEffect.MoiraFadeDisappearSound, Color.Team1, stunNodeLocs[i], 200);
-            stunNodeColor[i] = Color.Team1;
-        }        
+    //     if (DistanceBetween(playerAimPos, stunNodeLocs[i]) < 0.75 && DistanceBetween(playerAimPos, stunNodeLocs[i]) != 0 && stunNodeColor[i] == Color.Team2) {
+    //         PlayEffect(AllPlayers(), PlayEffect.GoodPickupEffect, Color.Team1, stunNodeLocs[i], 2);
+    //         PlayEffect(AllPlayers(), PlayEffect.MoiraFadeDisappearSound, Color.Team1, stunNodeLocs[i], 200);
+    //         stunNodeColor[i] = Color.Team1;
+    //     }        
 
-    }
+    // }
 
     // Debug Nodes
     if (debugModeEnabled) {
@@ -126,15 +126,8 @@ Event.OngoingGlobal {
             if (zaryaAdSummonCooldown > zaryaAdSummonCooldownSetting*0.67) {
                 zaryaAdSummonCooldown = zaryaAdSummonCooldownSetting*0.67;
             }
-        } else {
-            stunNodeLocs = [Vector(-104.41, 3.5, 50.62), Vector(-97.73, 3.5, 39.64), Vector(-101.07, 9, 45.13)];
-            stunNodeVisibility = AllPlayers();
         }
     } else { // No players fueling
-        if (!zaryaCastingUlt) {
-            stunNodeLocs = [Vector(-104.41, -999, 50.62), Vector(-97.73, -999, 39.64), Vector(-101.07, -999, 45.13)];
-            stunNodeVisibility = null;
-        }
         capturePointProgress -= 0.5;
     }
         
@@ -142,309 +135,215 @@ Event.OngoingGlobal {
     Loop();
 }
 
-rule: "Encounter - Stun Node Handler"
-Event.OngoingGlobal {
-    if (ArrayContains(stunNodeColor, Color.Team1)) {
-        Wait(2);
-        if (!ArrayContains(stunNodeColor, Color.Team2)) {
-            for (define i = 0; i < CountOf(stunNodeLocs); i++) {
-                PlayEffect(AllPlayers(), PlayEffect.TracerRecallReappearEffect, Color.Team1, stunNodeLocs[i], 2);
-                PlayEffect(AllPlayers(), PlayEffect.DebuffImpactSound, Color.Team2, stunNodeLocs[i], 200);
-            }
-
-            if (RandomInteger(0, 1) == 0) {
-                SpawnAI(Vector(-96.4, -2, 40.13), EnemyTypes.StandardBastion);
-            } else {
-                SpawnAI(Vector(-103.4, -2, 51.7), EnemyTypes.StandardBastion);
-            }
-            
-            if (zaryaCastingUlt) {
-                zaryaCastingUlt = false;
-                capturePointProgress = 0;
-                Wait(1);
-                for (define i = 0; i < CountOf(stunNodeLocs); i++) {
-                    PlayEffect(AllPlayers(), PlayEffect.BadPickupEffect, Color.Team2, stunNodeLocs[i], 2);
-                    PlayEffect(AllPlayers(), PlayEffect.MoiraFadeReappearSound, Color.Team2, stunNodeLocs[i], 200);
-                }
-                Wait(0.01);
-                stunNodeLocs = [Vector(-104.41, -999, 50.62), Vector(-97.73, -999, 39.64), Vector(-101.07, -999, 45.13)];
-                stunNodeVisibility = null;
-                Wait(3);
-                SpawnAI(Vector(-102.3, -2, 43.2), EnemyTypes.StandardTurret);
-            } else {
-                SetStatus(PlayersOnHero(Hero.Zarya, Team.Team2)[0], null, Status.Stunned, 10);
-                ChaseVariableOverTime(teleporterPos, Vector(-94.3, -0.76, 49.24), 1, TimeChaseReevaluation.None);
-                Wait(10);
-                ChaseVariableOverTime(teleporterPos, Vector(-94.3, -35, 49.24), 1, TimeChaseReevaluation.None);
-            }
-        }
-
-        for (define i = 0; i < CountOf(stunNodeLocs); i++) {
-            stunNodeColor[i] = Team.Team2;
-        }
-
-        for (define i = 0; i < CountOf(stunNodeLocs); i++) {
-            PlayEffect(AllPlayers(), PlayEffect.BadPickupEffect, Color.Team2, stunNodeLocs[i], 2);
-            PlayEffect(AllPlayers(), PlayEffect.MoiraFadeReappearSound, Color.Team2, stunNodeLocs[i], 200);
-        }
-    }
-    Wait(0.25);
-    Loop();
-}
-
-rule: "Encounter - Cooler Portal"
-Event.OngoingPlayer {
-    if (DistanceBetween(EventPlayer(), coolerEntryPortal) < 3) {
-        Teleport(EventPlayer(), coolerExitPortal + Vector(0, -1, 0));
+// rule: "Encounter - Cooler Portal"
+// Event.OngoingPlayer {
+//     if (DistanceBetween(EventPlayer(), coolerEntryPortal) < 3) {
+//         Teleport(EventPlayer(), coolerExitPortal + Vector(0, -1, 0));
         
-        PlayEffect(AllPlayers(), PlayEffect.EchoStickyBombExplosionEffect, Color.Team2, coolerEntryPortal, 5);
-        PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearSound, Color.Team2, coolerEntryPortal, 200);
-        PlayEffect(AllPlayers(), PlayEffect.EchoStickyBombExplosionEffect, Color.Team2, coolerExitPortal, 5);
-        PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearSound, Color.Team2, coolerExitPortal, 200);
+//         PlayEffect(AllPlayers(), PlayEffect.EchoStickyBombExplosionEffect, Color.Team2, coolerEntryPortal, 5);
+//         PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearSound, Color.Team2, coolerEntryPortal, 200);
+//         PlayEffect(AllPlayers(), PlayEffect.EchoStickyBombExplosionEffect, Color.Team2, coolerExitPortal, 5);
+//         PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearSound, Color.Team2, coolerExitPortal, 200);
 
-        WaitUntil(DistanceBetween(EventPlayer(), coolerExitPortal) > 3, 999);
+//         WaitUntil(DistanceBetween(EventPlayer(), coolerExitPortal) > 3, 999);
 
-    } else if (DistanceBetween(EventPlayer(), coolerExitPortal) < 3) {
-        Teleport(EventPlayer(), coolerEntryPortal + Vector(0, -1, 0));
+//     } else if (DistanceBetween(EventPlayer(), coolerExitPortal) < 3) {
+//         Teleport(EventPlayer(), coolerEntryPortal + Vector(0, -1, 0));
         
-        PlayEffect(AllPlayers(), PlayEffect.EchoStickyBombExplosionEffect, Color.Team2, coolerEntryPortal, 5);
-        PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearSound, Color.Team2, coolerEntryPortal, 200);
-        PlayEffect(AllPlayers(), PlayEffect.EchoStickyBombExplosionEffect, Color.Team2, coolerExitPortal, 5);
-        PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearSound, Color.Team2, coolerExitPortal, 200);
+//         PlayEffect(AllPlayers(), PlayEffect.EchoStickyBombExplosionEffect, Color.Team2, coolerEntryPortal, 5);
+//         PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearSound, Color.Team2, coolerEntryPortal, 200);
+//         PlayEffect(AllPlayers(), PlayEffect.EchoStickyBombExplosionEffect, Color.Team2, coolerExitPortal, 5);
+//         PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearSound, Color.Team2, coolerExitPortal, 200);
 
-        WaitUntil(DistanceBetween(EventPlayer(), coolerEntryPortal) > 3, 999);
-    }
-
-    Wait(0.25);
-    Loop();
-}
-
-rule: "Encounter - Teleporter"
-Event.OngoingPlayer Team.Team1 {
-    if (DistanceBetween(EventPlayer(), teleporterPos) < 1.25) {
-        SmallMessage(EventPlayer(), "Teleporter warming up");
-
-        PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 1, 0), 5);
-        PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearSound, Color.SkyBlue, teleporterPos, 200);
-        Wait(0.25);
-        
-        if (DistanceBetween(EventPlayer(), teleporterPos) > 1.25) {
-            SmallMessage(EventPlayer(), "Teleporter link broken");
-            Wait(0.25);
-            Loop();
-        }
-
-        PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 1, 0), 5);
-        PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearSound, Color.SkyBlue, teleporterPos, 200);
-        Wait(0.25);
-
-        if (DistanceBetween(EventPlayer(), teleporterPos) > 1.25) {
-            SmallMessage(EventPlayer(), "Teleporter link broken");
-            Wait(0.25);
-            Loop();
-        }
-
-        PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 1, 0), 5);
-        PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearSound, Color.SkyBlue, teleporterPos, 200);
-        Wait(0.25);
-
-        if (DistanceBetween(EventPlayer(), teleporterPos) < 1.25) {
-            PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 1, 0), 5);
-            PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearEffect, Color.Team1, PositionOf(EventPlayer()), 2);
-            PlayEffect(AllPlayers(), PlayEffect.BuffImpactSound, Color.SkyBlue, PositionOf(EventPlayer()), 200);
-        
-            
-            // SpawnAI(Vector(-30.5, 2, 76.6), EnemyTypes.ExploderOmnic);
-            // SpawnAI(Vector(-33.1, 2, 82.4), EnemyTypes.StandardBastion);
-            // SpawnAI(Vector(-33.71, 2, 71.89), EnemyTypes.LesserBastion);
-            // SpawnAI(Vector(-31.24, 1, 62.18), EnemyTypes.LesserBastion);
-
-            Teleport(EventPlayer(), Vector(-23.45, -2, 61.96));
-        
-            Wait(0.16);
-            PlayEffect(EventPlayer(), PlayEffect.BuffImpactSound, Color.SkyBlue, PositionOf(EventPlayer()), 200);
-            PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 1, 0), 5);
-            SmallMessage(EventPlayer(), "Teleported");
-        } else {
-            SmallMessage(EventPlayer(), "Teleporter link broken");
-        }
-    }
-    Wait(0.25);
-    Loop();
-}
-
-playervar define CanPlayerTeleport = true;
-
-rule: "Encounter - Thunder Dome Entry Terminal"
-Event.OngoingPlayer Team.Team1 {
-    if (DistanceBetween(EventPlayer(), Vector(-92.55, 3.1, 69.25)) < 3  && IsButtonHeld(EventPlayer(), Button.Interact) && CanPlayerTeleport) {
-        CanPlayerTeleport = false;
-        Teleport(EventPlayer(), Vector(-7.77, -3.84, 96.12));
-        
-        Wait(0.016);
-        
-        BigMessage(EventPlayer(), "You've entered the dome!");
-        PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 1, 0), 5);
-        PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearEffect, Color.Team1, PositionOf(EventPlayer()), 2);
-        PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearSound, Color.Team2, coolerEntryPortal, 200);
-        PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearSound, Color.Team2, coolerExitPortal, 200);
-        Wait(5);
-        CanPlayerTeleport = true;
-    }
-
-    Wait(0.25);
-    Loop();
-}
-
-rule: "Encounter - Thunder Dome Walls - Impulse"
-Event.OngoingPlayer if (DistanceBetween(EventPlayer(), Vector(-13.7, -3.68, 90.26)) <= 13 && DistanceBetween(EventPlayer(), Vector(-13.7, -3.68, 90.26)) >= 10.5) {
-    ApplyImpulse(EventPlayer(), DirectionTowards(EventPlayer(), Vector(-13.7, -3.68, 90.26)), 2, Relative.ToWorld, ContraryMotion.Cancel);
-
-    Wait(0.016);
-    LoopIfConditionIsTrue();
-}
-
-rule: "Encounter - Thunder Dome Exit Terminal"
-Event.OngoingPlayer Team.Team1 {
-    if (DistanceBetween(EventPlayer(), thunderDomeExitButtonLoc) < 3  && IsButtonHeld(EventPlayer(), Button.Interact) && CanPlayerTeleport) {
-        CanPlayerTeleport = false;
-        Teleport(EventPlayer(), Vector(-90.66, 2, 66.66));
-
-        Wait(0.016);
-        PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 1, 0), 5);
-        PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearEffect, Color.Team1, PositionOf(EventPlayer()), 2);
-        PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearSound, Color.Team2, coolerEntryPortal, 200);
-        PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearSound, Color.Team2, coolerExitPortal, 200);
-        Wait(5);
-        CanPlayerTeleport = true;
-    }
-
-    Wait(0.25);
-    Loop();
-}
-
-rule: "Encounter - Hack Room Enemy Spawn Trigger"
-Event.OngoingPlayer Team.Team1 {
-    if (DistanceBetween(EventPlayer(), Vector(-30.97, 2, 86.78)) < 6) {
-        SpawnAI(Vector(-26.4, 2.3, 90), EnemyTypes.Rein);
-        Wait(30);
-    }
-    Wait(0.25);
-    Loop();
-}
-
-rule: "Encounter - Hack Terminal Trigger"
-Event.OngoingPlayer Team.Team1 {
-    if (DistanceBetween(EventPlayer(), Vector(-27.85, 3.1, 84.46)) < 6 && IsButtonHeld(EventPlayer(), Button.Interact)) {
-        if (hackCharge >= 100) {
-            hackCharge = 0;
-            hackPromptText = "Hold F to charge with Iris Energy";
-
-            stunNodeLocs = [Vector(-104.41, -999, 50.62), Vector(-97.73, -999, 39.64), Vector(-101.07, -999, 45.13)];
-            stunNodeVisibility = null;
-
-            capturePointProgress = 0;
-
-            ClearStatus(PlayersOnHero(Hero.Zarya, Team.Team2)[0], Status.PhasedOut);
-            BigMessage(AllPlayers(), "The " + HeroIconString(Hero.Zarya) + " Zarya Echo is vulnerable!");
-            
-            for (define i = 0; i < 3; i++) {
-                SpawnAI(zaryaAdSummonLocs[RandomInteger(0, CountOf(zaryaAdSummonLocs)-1)], EnemyTypes.LesserBastion);
-            }
-
-            capturePointPos = Vector(-999, -999, -999);
-
-            Teleport(AllPlayers(Team.Team1), Vector(-64.67, -1.13, 29.05));
-            SmallMessage(AllPlayers(), "All Players Recalled!");
-            Teleport(PlayersOnHero(Hero.Zarya, Team.Team2)[0], Vector(-94.3, 2, 49.24));
-
-            Wait(0.016);
-            PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 1, 0), 5);
-            PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearEffect, Color.Team1, PositionOf(EventPlayer()), 2);
-            PlayEffect(AllPlayers(), PlayEffect.BuffImpactSound, Color.SkyBlue, PositionOf(EventPlayer()), 200);
-
-            WaitUntil(Health(PlayersOnHero(Hero.Zarya, Team.Team2)[0]) <= MaxHealth(PlayersOnHero(Hero.Zarya, Team.Team2)[0])/2, 9999);
-            BigMessage(AllPlayers(), "The " + HeroIconString(Hero.Zarya) + "Zarya Echo's shield is recharging");
-            Wait(10);
-
-            SetMaxHealth(PlayersOnHero(Hero.Zarya, Team.Team2)[0], (MaxHealth(PlayersOnHero(Hero.Zarya, Team.Team2)[0])/4)/2);
-            SetStatus(PlayersOnHero(Hero.Zarya, Team.Team2)[0], EventPlayer(), Status.PhasedOut, 999999);
-            BigMessage(AllPlayers(), "Zarya Echo's protections return");
-
-            // SetMaxHealth(PlayersOnHero(Hero.Zarya, Team.Team2)[0], );
-            
-            zaryaCastingUlt = true;
-            SpawnAI(Vector(-102.8, -2, 44), EnemyTypes.ExploderOmnic);
-            capturePointPos = Vector(-94.3, -0.76, 49.24);
-
-            Teleport(PlayersOnHero(Hero.Zarya, Team.Team2)[0], Vector(-102.8, 2, 44));
-            Wait(0.1);
-            PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(PlayersOnHero(Hero.Zarya, Team.Team2)[0]) + Vector(0, 1, 0), 15);
-            PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearEffect, Color.Team2, PositionOf(PlayersOnHero(Hero.Zarya, Team.Team2)[0]), 2);
-            PlayEffect(AllPlayers(), PlayEffect.BuffImpactSound, Color.SkyBlue, PositionOf(PlayersOnHero(Hero.Zarya, Team.Team2)[0]), 200);
-        } else if (playerChargeHeld > 0 && hackCharge < 100) {
-            playerChargeHeld -= 20;
-            hackCharge += 10;
-
-            SmallMessage(EventPlayer(), "Charged Countermeasure");
-            PlayEffect(AllPlayers(), PlayEffect.BuffImpactSound, Color.SkyBlue, PositionOf(EventPlayer()), 200);
-
-            if (hackCharge >= 100) {
-                CanPlayerTeleport = false;
-                SmallMessage(EventPlayer(), "Countermeasure Fully Charged!");
-                
-                hackPromptText = "Hold F to Hack " + HeroIconString(Hero.Zarya);
-                
-                Wait(2);
-                CanPlayerTeleport = true;
-            }
-
-            Wait(0.75);
-        }
-    }
-    Wait(0.25);
-    Loop();
-}
-
-// rule: "Prevent Zarya Health Regeneration"
-// Event.OnDamageTaken Team.Team2 {
-//     if (HeroOf(EventPlayer()) == Hero.Zarya) {
-//         SetMaxHealth(EventPlayer(), Health(EventPlayer()));
-
+//         WaitUntil(DistanceBetween(EventPlayer(), coolerEntryPortal) > 3, 999);
 //     }
+
+//     Wait(0.25);
+//     Loop();
 // }
 
-// Tutorial
-// rule: "Tutorial - Enter Trigger"
+// rule: "Encounter - Teleporter"
 // Event.OngoingPlayer Team.Team1 {
-//     if (DistanceBetween(EventPlayer(), Vector(-110.7, 0, 33.47)) < 6 && IsButtonHeld(EventPlayer(), Button.Interact)) {
-//         Teleport(EventPlayer(), Vector(-41.69, 2, 42.15));
-//         Wait(0.5);
-//         Teleport(EventPlayer(), Vector(-41.69, 2, 42.15));
+//     if (DistanceBetween(EventPlayer(), teleporterPos) < 1.25) {
+//         SmallMessage(EventPlayer(), "Teleporter warming up");
 
-//         healthPickupLocs[CountOf(healthPickupLocs)] = Vector(-40.51, 2, 35.9);
-//         CreateEffect(AllPlayers(), Effect.Orb, Color.Black, healthPickupLocs[CountOf(healthPickupLocs)-1], 0.5, EffectRev.PositionAndRadius);
+//         PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 1, 0), 5);
+//         PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearSound, Color.SkyBlue, teleporterPos, 200);
+//         Wait(0.25);
+        
+//         if (DistanceBetween(EventPlayer(), teleporterPos) > 1.25) {
+//             SmallMessage(EventPlayer(), "Teleporter link broken");
+//             Wait(0.25);
+//             Loop();
+//         }
+
+//         PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 1, 0), 5);
+//         PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearSound, Color.SkyBlue, teleporterPos, 200);
+//         Wait(0.25);
+
+//         if (DistanceBetween(EventPlayer(), teleporterPos) > 1.25) {
+//             SmallMessage(EventPlayer(), "Teleporter link broken");
+//             Wait(0.25);
+//             Loop();
+//         }
+
+//         PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 1, 0), 5);
+//         PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearSound, Color.SkyBlue, teleporterPos, 200);
+//         Wait(0.25);
+
+//         if (DistanceBetween(EventPlayer(), teleporterPos) < 1.25) {
+//             PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 1, 0), 5);
+//             PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearEffect, Color.Team1, PositionOf(EventPlayer()), 2);
+//             PlayEffect(AllPlayers(), PlayEffect.BuffImpactSound, Color.SkyBlue, PositionOf(EventPlayer()), 200);
+        
+            
+//             // SpawnAI(Vector(-30.5, 2, 76.6), EnemyTypes.ExploderOmnic);
+//             // SpawnAI(Vector(-33.1, 2, 82.4), EnemyTypes.StandardBastion);
+//             // SpawnAI(Vector(-33.71, 2, 71.89), EnemyTypes.LesserBastion);
+//             // SpawnAI(Vector(-31.24, 1, 62.18), EnemyTypes.LesserBastion);
+
+//             Teleport(EventPlayer(), Vector(-23.45, -2, 61.96));
+        
+//             Wait(0.16);
+//             PlayEffect(EventPlayer(), PlayEffect.BuffImpactSound, Color.SkyBlue, PositionOf(EventPlayer()), 200);
+//             PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 1, 0), 5);
+//             SmallMessage(EventPlayer(), "Teleported");
+//         } else {
+//             SmallMessage(EventPlayer(), "Teleporter link broken");
+//         }
+//     }
+//     Wait(0.25);
+//     Loop();
+// }
+
+// playervar define CanPlayerTeleport = true;
+
+// rule: "Encounter - Thunder Dome Entry Terminal"
+// Event.OngoingPlayer Team.Team1 {
+//     if (DistanceBetween(EventPlayer(), Vector(-92.55, 3.1, 69.25)) < 3  && IsButtonHeld(EventPlayer(), Button.Interact) && CanPlayerTeleport) {
+//         CanPlayerTeleport = false;
+//         Teleport(EventPlayer(), Vector(-7.77, -3.84, 96.12));
+        
 //         Wait(0.016);
-//         healthPickupEffects[CountOf(healthPickupLocs)-1] = LastCreatedEntity();
+        
+//         BigMessage(EventPlayer(), "You've entered the dome!");
+//         PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 1, 0), 5);
+//         PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearEffect, Color.Team1, PositionOf(EventPlayer()), 2);
+//         PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearSound, Color.Team2, coolerEntryPortal, 200);
+//         PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearSound, Color.Team2, coolerExitPortal, 200);
+//         Wait(5);
+//         CanPlayerTeleport = true;
+//     }
+
+//     Wait(0.25);
+//     Loop();
+// }
+
+// rule: "Encounter - Thunder Dome Walls - Impulse"
+// Event.OngoingPlayer if (DistanceBetween(EventPlayer(), Vector(-13.7, -3.68, 90.26)) <= 13 && DistanceBetween(EventPlayer(), Vector(-13.7, -3.68, 90.26)) >= 10.5) {
+//     ApplyImpulse(EventPlayer(), DirectionTowards(EventPlayer(), Vector(-13.7, -3.68, 90.26)), 2, Relative.ToWorld, ContraryMotion.Cancel);
+
+//     Wait(0.016);
+//     LoopIfConditionIsTrue();
+// }
+
+// rule: "Encounter - Thunder Dome Exit Terminal"
+// Event.OngoingPlayer Team.Team1 {
+//     if (DistanceBetween(EventPlayer(), thunderDomeExitButtonLoc) < 3  && IsButtonHeld(EventPlayer(), Button.Interact) && CanPlayerTeleport) {
+//         CanPlayerTeleport = false;
+//         Teleport(EventPlayer(), Vector(-90.66, 2, 66.66));
+
+//         Wait(0.016);
+//         PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 1, 0), 5);
+//         PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearEffect, Color.Team1, PositionOf(EventPlayer()), 2);
+//         PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearSound, Color.Team2, coolerEntryPortal, 200);
+//         PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearSound, Color.Team2, coolerExitPortal, 200);
+//         Wait(5);
+//         CanPlayerTeleport = true;
+//     }
+
+//     Wait(0.25);
+//     Loop();
+// }
+
+// rule: "Encounter - Hack Room Enemy Spawn Trigger"
+// Event.OngoingPlayer Team.Team1 {
+//     if (DistanceBetween(EventPlayer(), Vector(-30.97, 2, 86.78)) < 6) {
+//         SpawnAI(Vector(-26.4, 2.3, 90), EnemyTypes.Rein);
+//         Wait(30);
 //     }
 //     Wait(0.25);
 //     Loop();
 // }
 
-// rule: "Tutorial - Exit Trigger"
+// rule: "Encounter - Hack Terminal Trigger"
 // Event.OngoingPlayer Team.Team1 {
-//     if (DistanceBetween(EventPlayer(), Vector(-36.3, 3.5, 27.46)) < 6 && IsButtonHeld(EventPlayer(), Button.Interact)) {
-//         Kill(EventPlayer(), null);
-//     }
-//     Wait(0.25);
-//     Loop();
-// }
+//     if (DistanceBetween(EventPlayer(), Vector(-27.85, 3.1, 84.46)) < 6 && IsButtonHeld(EventPlayer(), Button.Interact)) {
+//         if (hackCharge >= 100) {
+//             hackCharge = 0;
+//             hackPromptText = "Hold F to charge with Iris Energy";
 
-// globalvar define randomEnemyTypes = [EnemyTypes.LesserBastion, EnemyTypes.StandardBastion, EnemyTypes.GreaterBastion, EnemyTypes.StandardBomber, EnemyTypes.LesserTurret, EnemyTypes.StandardTurret, EnemyTypes.LesserOmnic, EnemyTypes.ExploderOmnic];
-// rule: "Tutorial - Enemy Tree"
-// Event.OngoingPlayer Team.Team1 {
-//     if (DistanceBetween(EventPlayer(), Vector(-35.9, -3.5, 14.11)) < 6 && IsButtonHeld(EventPlayer(), Button.Interact)) {
-//         SpawnAI(Vector(-32.8, -5, 7), randomEnemyTypes[RandomInteger(0, CountOf(randomEnemyTypes)-1)]);
+//             stunNodeLocs = [Vector(-104.41, -999, 50.62), Vector(-97.73, -999, 39.64), Vector(-101.07, -999, 45.13)];
+//             stunNodeVisibility = null;
+
+//             capturePointProgress = 0;
+
+//             ClearStatus(PlayersOnHero(Hero.Zarya, Team.Team2)[0], Status.PhasedOut);
+//             BigMessage(AllPlayers(), "The " + HeroIconString(Hero.Zarya) + " Zarya Echo is vulnerable!");
+            
+//             for (define i = 0; i < 3; i++) {
+//                 SpawnAI(zaryaAdSummonLocs[RandomInteger(0, CountOf(zaryaAdSummonLocs)-1)], EnemyTypes.LesserBastion);
+//             }
+
+//             capturePointPos = Vector(-999, -999, -999);
+
+//             Teleport(AllPlayers(Team.Team1), Vector(-64.67, -1.13, 29.05));
+//             SmallMessage(AllPlayers(), "All Players Recalled!");
+//             Teleport(PlayersOnHero(Hero.Zarya, Team.Team2)[0], Vector(-94.3, 2, 49.24));
+
+//             Wait(0.016);
+//             PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 1, 0), 5);
+//             PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearEffect, Color.Team1, PositionOf(EventPlayer()), 2);
+//             PlayEffect(AllPlayers(), PlayEffect.BuffImpactSound, Color.SkyBlue, PositionOf(EventPlayer()), 200);
+
+//             WaitUntil(Health(PlayersOnHero(Hero.Zarya, Team.Team2)[0]) <= MaxHealth(PlayersOnHero(Hero.Zarya, Team.Team2)[0])/2, 9999);
+//             BigMessage(AllPlayers(), "The " + HeroIconString(Hero.Zarya) + "Zarya Echo's shield is recharging");
+//             Wait(10);
+
+//             SetMaxHealth(PlayersOnHero(Hero.Zarya, Team.Team2)[0], (MaxHealth(PlayersOnHero(Hero.Zarya, Team.Team2)[0])/4)/2);
+//             SetStatus(PlayersOnHero(Hero.Zarya, Team.Team2)[0], EventPlayer(), Status.PhasedOut, 999999);
+//             BigMessage(AllPlayers(), "Zarya Echo's protections return");
+
+//             // SetMaxHealth(PlayersOnHero(Hero.Zarya, Team.Team2)[0], );
+            
+//             zaryaCastingUlt = true;
+//             SpawnAI(Vector(-102.8, -2, 44), EnemyTypes.ExploderOmnic);
+//             capturePointPos = Vector(-94.3, -0.76, 49.24);
+
+//             Teleport(PlayersOnHero(Hero.Zarya, Team.Team2)[0], Vector(-102.8, 2, 44));
+//             Wait(0.1);
+//             PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(PlayersOnHero(Hero.Zarya, Team.Team2)[0]) + Vector(0, 1, 0), 15);
+//             PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearEffect, Color.Team2, PositionOf(PlayersOnHero(Hero.Zarya, Team.Team2)[0]), 2);
+//             PlayEffect(AllPlayers(), PlayEffect.BuffImpactSound, Color.SkyBlue, PositionOf(PlayersOnHero(Hero.Zarya, Team.Team2)[0]), 200);
+//         } else if (playerChargeHeld > 0 && hackCharge < 100) {
+//             playerChargeHeld -= 20;
+//             hackCharge += 10;
+
+//             SmallMessage(EventPlayer(), "Charged Countermeasure");
+//             PlayEffect(AllPlayers(), PlayEffect.BuffImpactSound, Color.SkyBlue, PositionOf(EventPlayer()), 200);
+
+//             if (hackCharge >= 100) {
+//                 CanPlayerTeleport = false;
+//                 SmallMessage(EventPlayer(), "Countermeasure Fully Charged!");
+                
+//                 hackPromptText = "Hold F to Hack " + HeroIconString(Hero.Zarya);
+                
+//                 Wait(2);
+//                 CanPlayerTeleport = true;
+//             }
+
+//             Wait(0.75);
+//         }
 //     }
 //     Wait(0.25);
 //     Loop();

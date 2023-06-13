@@ -5,7 +5,6 @@ enum EnemyTypes {
     LesserBastion = "LesserBastion",
     StandardBastion = "StandardBastion",
     GreaterBastion = "GreaterBastion",
-    StandardBomber = "StandardBomber",
     LesserTurret = "LesserTurret",
     StandardTurret = "StandardTurret",
     LesserOmnic = "LesserOmnic",
@@ -107,22 +106,6 @@ Event.OngoingGlobal {
             SetDamageDealt(targetBot, 20);
             SetMaxHealth(targetBot, 65);
             StartScalingPlayer(targetBot, 1.5, false);
-
-        } else if (enemyType == EnemyTypes.StandardBomber) {
-            ForcePlayerHero(targetBot, Hero.Bastion);
-            StartForcingDummyBotName(targetBot, "Bomber");
-            SetMoveSpeed(targetBot, 0);
-            SetMaxHealth(targetBot, 20);
-            SetProjectileGravity(targetBot, 0);
-            SetProjectileSpeed(targetBot, 300);
-            SetUltimateCharge(targetBot, 100);
-            SetUltimateAbilityEnabled(targetBot, true);
-            SetAbility1Enabled(targetBot, false);
-            SetJumpVerticalSpeed(targetBot, 300);
-            SetDamageDealt(targetBot, 50);
-            StartScalingPlayer(targetBot, 1.2, false);
-            Wait(0.1);
-            PressButton(targetBot, Button.Ultimate);
 
         } else if (enemyType == EnemyTypes.LesserExploderOmnic) {
             ForcePlayerHero(targetBot, Hero.Zenyatta);
@@ -312,39 +295,6 @@ Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) != Hero.Ana) {
     LoopIfConditionIsTrue();
 }
 
-// rule: "Enemy AI - Path Finding"
-// Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) != Hero.Zarya && HeroOf(EventPlayer()) != Hero.Ana) {
-//     if (pathDestination == null || (DistanceBetween(EventPlayer(), pathDestination) < 1.5 && targetPlayer == null)) {
-//         define currentPathNodeId = IndexOfArrayValue(pathNodes, pathDestination);
-
-//         if (currentPathNodeId == -1) {
-//             for (define i = 0; i < CountOf(pathNodes); i++) {
-//                 if (IsInLineOfSight(EyePosition(EventPlayer()), pathNodes[i], BarrierLOS.NoBarriersBlock)) {
-//                     currentPathNodeId = i;
-//                     break;
-//                 }
-//             }
-//         }
-
-//         StopFacing(EventPlayer());
-//         StopForcingThrottle(EventPlayer());
-        
-//         Wait(1);
-
-//         if (pathDestination == null || (DistanceBetween(EventPlayer(), pathDestination) < 1.5 && targetPlayer == null)) {
-//             define randPathNodeConnection = RandomInteger(0, CountOf(pathNodeConnections[currentPathNodeId]));
-//             pathDestination = pathNodes[pathNodeConnections[currentPathNodeId][randPathNodeConnection]];
-
-//             StartFacing(EventPlayer(), DirectionTowards(EyePosition(EventPlayer()), pathDestination), 100, Relative.ToWorld, FacingRev.DirectionAndTurnRate);
-            
-//             StartThrottleInDirection(EventPlayer(), DirectionTowards(PositionOf(EventPlayer()), pathDestination), 0.5, Relative.ToWorld, ThrottleBehavior.ReplaceExistingThrottle, ThrottleRev.DirectionAndMagnitude);
-//         }
-//     }
-
-//     Wait(aiTickDelaySetting);
-//     LoopIfConditionIsTrue();
-// }
-
 rule: "Enemy AI - Bastion enemies"
 Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Bastion) {
     // Scout Bastions
@@ -354,10 +304,8 @@ Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Bastion) {
 
             pathDestination = PositionOf(targetPlayer);
 
-            if (enemyTypeName != EnemyTypes.LesserBastion && Health(EventPlayer()) < MaxHealth(EventPlayer())/2.5) {
-                StartHoldingButton(EventPlayer(), Button.SecondaryFire);
-                Wait(2.5);
-                StopHoldingButton(EventPlayer(), Button.SecondaryFire);
+            if (enemyTypeName != EnemyTypes.LesserBastion  && RandomInteger(1, 10) == 10) {
+                PressButton(EventPlayer(), Button.SecondaryFire);
             }
 
             if (!IsButtonHeld(EventPlayer(), Button.PrimaryFire)) {
@@ -401,6 +349,7 @@ Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Bastion) {
             pathDestination = PositionOf(targetPlayer);
 
             if (!IsInAlternateForm()) {
+                SetAbilityCooldown(EventPlayer(), Button.Ability1, 0);
                 PressButton(EventPlayer(), Button.Ability1);
             }
             
@@ -413,49 +362,6 @@ Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Bastion) {
                 StopHoldingButton(EventPlayer(), Button.PrimaryFire);
             }
 
-            targetPlayer = null;
-        }
-    }
-
-    // Bomber Bastions
-    if (enemyTypeName == EnemyTypes.StandardBomber) {
-        if (!IsUsingUltimate(EventPlayer())) {
-            Wait(0.5);
-            if (!IsUsingUltimate(EventPlayer())) {
-                Kill(EventPlayer());
-            }
-        }
-
-        if (targetPlayer != null && IsInLineOfSight(EventPlayer(), targetPlayer, BarrierLOS.NoBarriersBlock)) {
-            // AI for Bombers
-            StartFacing(EventPlayer(), DirectionTowards(EyePosition(EventPlayer()), EyePosition(targetPlayer)) + Vector(RandomReal(-0.05, 0.05), RandomReal(-0.05, 0.05), RandomReal(-0.05, 0.05)), 1000, Relative.ToWorld, FacingRev.DirectionAndTurnRate);
-
-            pathDestination = PositionOf(targetPlayer);
-            
-            PlayEffect(AllPlayers(), PlayEffect.BrigitteRepairPackImpactEffect, Color.Team2, EventPlayer(), 2.25);
-            PlayEffect(AllPlayers(), PlayEffect.DoomfistRisingUppercutLeapSound, Color.Team2, EventPlayer(), 200);
-            Wait(1.5);
-            PlayEffect(AllPlayers(), PlayEffect.BrigitteRepairPackImpactEffect, Color.Team2, EventPlayer(), 2.25);
-            PlayEffect(AllPlayers(), PlayEffect.DoomfistRisingUppercutLeapSound, Color.Team2, EventPlayer(), 200);
-            Wait(1.5);
-            PlayEffect(AllPlayers(), PlayEffect.BrigitteRepairPackImpactEffect, Color.Team2, EventPlayer(), 2.25);
-            PlayEffect(AllPlayers(), PlayEffect.DoomfistRisingUppercutLeapSound, Color.Team2, EventPlayer(), 200);
-            Wait(0.5);
-            PlayEffect(AllPlayers(), PlayEffect.BrigitteRepairPackImpactEffect, Color.Team2, EventPlayer(), 2.25);
-            PlayEffect(AllPlayers(), PlayEffect.DoomfistRisingUppercutLeapSound, Color.Team2, EventPlayer(), 200);
-            Wait(0.5);
-            PlayEffect(AllPlayers(), PlayEffect.BrigitteRepairPackImpactEffect, Color.Team2, EventPlayer(), 2.25);
-            PlayEffect(AllPlayers(), PlayEffect.DoomfistRisingUppercutLeapSound, Color.Team2, EventPlayer(), 200);
-            Wait(0.5);
-            PlayEffect(AllPlayers(), PlayEffect.BrigitteRepairPackImpactEffect, Color.Team2, EventPlayer(), 2.25);
-            PlayEffect(AllPlayers(), PlayEffect.DoomfistRisingUppercutLeapSound, Color.Team2, EventPlayer(), 200);
-            Wait(0.5);
-            
-            PressButton(EventPlayer(), Button.PrimaryFire);
-            Wait(1);
-            Kill(EventPlayer());
-            Wait(2);
-        } else {
             targetPlayer = null;
         }
     }
@@ -610,88 +516,6 @@ globalvar define zaryaAdSummonComps = [
     [EnemyTypes.StandardTurret]
 ];
 
-globalvar define pathNodes = [
-    // Main Area (0 - 15)
-    Vector(-85.75, -0.98, 54.15),
-    Vector(-87.93, -0.98, 57.71),
-    Vector(-83.79, -0.98, 50.41),
-    Vector(-89.56, -0.98, 45.36),
-    Vector(-98.31, -0.98, 45.62),
-    Vector(-98.24, -0.98, 54.07),
-    Vector(-79.24, -0.98, 56.92),
-    Vector(-71.04, -0.98, 57.07),
-    Vector(-73.82, -0.89, 62.01),
-    Vector(-78.25, -0.98, 67.75),
-    Vector(-77.37, -0.98, 47.99),
-    Vector(-68.95, -1.48, 35.44),
-    Vector(-74.48, -1.48, 33.13),
-    Vector(-86.49, -0.98, 63.70),
-    Vector(-97.01, -2.98, 66.18),
-    Vector(-89.86, -2.98, 69.28),
-
-    // Spawn Guard Area (16 - 17)
-    Vector(-63.69, -1.48, 42.41),
-    Vector(-61.27, -1.48, 39.46),
-
-    // Fuel Truck Area 18 - 26
-    Vector(-58.82, -3.00, 56.70),
-    Vector(-57.71, -4.16, 65.63),
-    Vector(-57.21, -4.16, 74.73),
-    Vector(-49.82, -4.16, 63.50),
-    Vector(-41.36, -4.16, 71.47),
-    Vector(-46.30, -3.96, 78.26),
-    Vector(-49.65, -3.88, 83.51),
-    Vector(-51.79, -4.16, 70.36),
-    Vector(-62.94, -4.16, 71.55),
-
-    // Fuel Truck Area 27 - 30
-    Vector(-32.75, 2.02, 83.35),
-    Vector(-33.21, 2.02, 77.75),
-    Vector(-32.64, 2.02, 68.62),
-    Vector(-31.73, -0.82, 58.48)
-];
-
-globalvar define pathNodeConnections = [
-    // Main Area (0 - 15)
-    [1, 2, 3, 5, 6, 13],
-    [0, 3, 5, 9, 13],
-    [3, 5, 6, 7, 8, 13],
-    [0, 1, 2, 4],
-    [3, 5],
-    [0, 1, 2, 4],
-    [0, 1, 2, 7, 8, 10],
-    [0, 2, 6, 8, 9],
-    [6, 7, 9],
-    [1, 8],
-    [0, 1, 6, 8, 9, 13, 15],
-    [10, 12],
-    [11],
-    [0, 1, 2, 10, 3],
-    [15],
-    [13, 14]
-
-    // Spawn guard area (16 - 17)
-    [17],
-    [16],
-
-    // Spawn guard area (18 - 26)
-    [19, 20],
-    [18, 20, 21, 26],
-    [19, 24, 25, 26],
-    [19, 20, 22, 26],
-    [21, 23],
-    [22, 24],
-    [20, 23, 26],
-    [29, 20, 26],
-    [29, 20, 25],
-
-    // Fuel Truck Area 27 - 30
-    [28],
-    [27, 29],
-    [28, 30],
-    [29]
-];
-
 globalvar define zaryaCastingUlt = false;
 rule: "Enemy AI - Zarya"
 Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Zarya) {
@@ -704,66 +528,11 @@ Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Zarya) {
         StartFacing(EventPlayer(), DirectionTowards(EyePosition(EventPlayer()), EyePosition(targetPlayer)+ Vector(0, -0.25, 0)), 1000, Relative.ToWorld, FacingRev.DirectionAndTurnRate);
     }
 
-    if (zaryaCastingUlt) {
-        StopFacing(EventPlayer());
-        Wait(0.1);
-        StartFacing(EventPlayer(), DirectionTowards(EyePosition(EventPlayer()), Vector(-87.6, -2, 53.4)), 999999, Relative.ToPlayer, FacingRev.None);
-
-        PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.Team2, PositionOf(targetPlayer) + Vector(0, 1, 0), 5);
-        PlayEffect(AllPlayers(), PlayEffect.SymmetraTeleporterReappearEffect, Color.Team2, PositionOf(targetPlayer), 2);
-        PlayEffect(AllPlayers(), PlayEffect.BuffImpactSound, Color.Team2, PositionOf(targetPlayer), 200);
-        Teleport(targetPlayer, Vector(-87.6, -2, 53.4));
-
-        Wait(0.016);
-
-        PlayEffect(targetPlayer, PlayEffect.BuffImpactSound, Color.Team2, PositionOf(targetPlayer), 200);
-        PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.Team2, PositionOf(targetPlayer) + Vector(0, 1, 0), 5);
-
-        while (zaryaCastingUlt) {
-            StartHoldingButton(EventPlayer(), Button.Ultimate);
-            Wait(0.64);
-            StopHoldingButton(EventPlayer(), Button.Ultimate);
-            SetUltimateCharge(EventPlayer(), 100);
-            Wait(3);
-        }
-    }
-
     if (targetPlayer != null && IsInLineOfSight(EventPlayer(), targetPlayer, BarrierLOS.NoBarriersBlock) && ArrayContains(stunNodeColor, Color.Team2)) {
         StartFacing(EventPlayer(), DirectionTowards(EyePosition(EventPlayer()), EyePosition(targetPlayer)+ Vector(0, -0.25, 0)), 1000, Relative.ToWorld, FacingRev.DirectionAndTurnRate);
 
         PressButton(EventPlayer(), Button.SecondaryFire);
 
-        if (zaryaBomberSummonCooldown <= 0 && capturePointProgress < 100) {
-            zaryaBomberSummonCooldown = zaryaBomberSummonCooldownSetting;
-            Wait(0.1);
-
-            SpawnAI(NearestWalkablePosition(capturePointPos + Vector(RandomReal(-9, 9), 0, RandomReal(-9, 9))), EnemyTypes.StandardBomber);
-            Wait(1);
-        } else {
-            zaryaBomberSummonCooldown = zaryaBomberSummonCooldown - aiTickDelaySetting;
-        }
-
-        if (zaryaAdSummonCooldown <= 0) {
-            Wait(1);
-            PressButton(EventPlayer(), Button.Melee);
-
-            define randEncounter = RandomInteger(0, CountOf(zaryaAdSummonComps) - 1);
-
-            for (define i = 0; i < CountOf(zaryaAdSummonComps[randEncounter]); i++) {
-                SpawnAI(zaryaAdSummonLocs[RandomInteger(0, CountOf(zaryaAdSummonLocs)-1)], zaryaAdSummonComps[randEncounter][i]);
-            }
-
-            Wait(1);
-
-            // Cooldown is normal during DPS phase and is essentially disabled until the turret dies outside of it
-            if (HasStatus(EventPlayer(), Status.PhasedOut)) {
-                zaryaAdSummonCooldown = zaryaAdSummonCooldownSetting;
-            } else {
-                zaryaAdSummonCooldown = zaryaAdSummonCooldownSetting*10;
-            }
-        } else {
-            zaryaAdSummonCooldown = zaryaAdSummonCooldown - aiTickDelaySetting;
-        }
     } else {
         targetPlayer = null;
 
