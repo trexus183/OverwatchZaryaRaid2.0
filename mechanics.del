@@ -19,10 +19,10 @@ globalvar define hackPromptText = "Hold F to charge with Iris Energy";
 //     }
 // }
 
-rule: "Encounter - Victory Trigger"
-Event.OnDeath Team.Team2 if (IsDummyBot(EventPlayer()) && HeroOf(EventPlayer()) == Hero.Zarya && !debugModeEnabled) {
-    DeclareTeamVictory(Team.Team1);
-}
+// rule: "Encounter - Victory Trigger"
+// Event.OnDeath Team.Team2 if (IsDummyBot(EventPlayer()) && HeroOf(EventPlayer()) == Hero.Zarya && !debugModeEnabled) {
+//     DeclareTeamVictory(Team.Team1);
+// }
 
 // rule: "Encounter - Thunderdome Boss Death Handler"
 // Event.OnFinalBlow Team.Team1 if (HeroOf(Victim()) == Hero.Reinhardt && DistanceBetween(Victim(), Vector(-13.7, -3.68, 90.26)) < 20) {
@@ -100,40 +100,40 @@ Event.OngoingGlobal {
 }
 
 globalvar define coolerEntryPortal = Vector(-91.4, -1, 26.45);
-globalvar define coolerExitPortal = Vector(-109.36, -0.5, 55.25);//Vector(-113.22, -0.5, 49.48);
+globalvar define coolerExitPortal = Vector(-109.36, -0.5, 55.25);
 globalvar define coolerPos = Vector(-135.26, -1.98, 40.74);
 globalvar define coolerPower = 0;
 globalvar define teleporterPos = Vector(-94.3, -35, 49.24);
-globalvar define capturePointPos = Vector(-94.3, -0.76, 49.24);//Vector(-88.89, -1.98, 52.48);
+globalvar define capturePointPos = Vector(-94.3, -0.76, 49.24);
 globalvar define capturePointProgress = 0;
 globalvar define hackCharge = 0;
 globalvar define playerChargeHeld = 0;
 
-globalvar define capPointSpeed = 1;
-rule: "Encounter - Capture Point"
-Event.OngoingGlobal {
-    define playersFuelingTeleporterCount = 0;
-    define playersNearTeleporter = PlayersWithinRadius(capturePointPos, 10.25, Team.Team1, RadiusLOS.Off);
+// globalvar define capPointSpeed = 1;
+// rule: "Encounter - Capture Point"
+// Event.OngoingGlobal {
+//     define playersFuelingTeleporterCount = 0;
+//     define playersNearTeleporter = PlayersWithinRadius(capturePointPos, 10.25, Team.Team1, RadiusLOS.Off);
 
-    for (define i = 0; i < CountOf(playersNearTeleporter); i++) {
-        playersFuelingTeleporterCount++;
-    }
+//     for (define i = 0; i < CountOf(playersNearTeleporter); i++) {
+//         playersFuelingTeleporterCount++;
+//     }
 
-    if (playersFuelingTeleporterCount > 0) { // Build
-        if (capturePointProgress <= 100) {
-            capturePointProgress += (capPointSpeed/CountOf(AllPlayers(Team.Team1))) * playersFuelingTeleporterCount;
+//     if (playersFuelingTeleporterCount > 0) { // Build
+//         if (capturePointProgress <= 100) {
+//             capturePointProgress += (capPointSpeed/CountOf(AllPlayers(Team.Team1))) * playersFuelingTeleporterCount;
             
-            if (zaryaAdSummonCooldown > zaryaAdSummonCooldownSetting*0.67) {
-                zaryaAdSummonCooldown = zaryaAdSummonCooldownSetting*0.67;
-            }
-        }
-    } else { // No players fueling
-        capturePointProgress -= 0.5;
-    }
+//             if (zaryaAdSummonCooldown > zaryaAdSummonCooldownSetting*0.67) {
+//                 zaryaAdSummonCooldown = zaryaAdSummonCooldownSetting*0.67;
+//             }
+//         }
+//     } else { // No players fueling
+//         capturePointProgress -= 0.5;
+//     }
         
-    Wait(0.25);
-    Loop();
-}
+//     Wait(0.25);
+//     Loop();
+// }
 
 // rule: "Encounter - Cooler Portal"
 // Event.OngoingPlayer {

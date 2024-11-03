@@ -186,6 +186,10 @@ define setHeroPassiveText(Player player) {
         heroPerkText = "Critical hits slightly heal you and generate ultimate ability energy";
         heroKillPerkText = "Final blows heal 25% of your missing health";
         heroUltPerkText = "While using transcendence nearby enemies catch on fire and take significant damage over time";
+    } else {
+        heroPerkText = "Still Working";
+        heroKillPerkText = "Final blows heal 20% of your missing health";
+        heroUltPerkText = "";
     }
 
     return null;
@@ -287,7 +291,7 @@ define collectDebris(Player player) {
 
     } else if (HeroOf(player) == Hero.Roadhog) {
         Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.1);
-        SetAbilityCooldown(EventPlayer(), Button.Ability1, AbilityCooldown(EventPlayer(), Button.Ability1)-2);
+        SetAbilityCooldown(EventPlayer(), Button.Ability1, AbilityCooldown(EventPlayer(), Button.Ability1)-1);
         if (Ammo(EventPlayer(), 0) < 5) {
             SetAmmo(EventPlayer(), 0, Ammo(EventPlayer(), 0) + 1);
         }
@@ -340,6 +344,8 @@ define collectDebris(Player player) {
     } else if (HeroOf(player) == Hero.Zenyatta) {
         Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.25);
 
+    } else {
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.2);
     }
 
     return null;
@@ -481,12 +487,12 @@ Event.OnDamageDealt Team.Team1 {
 
         for (define i = 0; i < CountOf(nearbyEnemies); i++) {
             // if (!nearbyEnemies[i].playerIsFrozen) {
-                SetStatus(nearbyEnemies[i], EventPlayer(), Status.Frozen, 1);
+            SetStatus(nearbyEnemies[i], EventPlayer(), Status.Frozen, 1);
             // }
         }
 
         PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.White, Victim(), 12);
-        PlayEffect(AllPlayers(), PlayEffect.PharahBarrageExplosionSound, Color.White, Victim(), 200);
+        PlayEffect(AllPlayers(), PlayEffect.ExplosionSound, Color.White, Victim(), 200);
 
     } else if (HeroOf(EventPlayer()) == Hero.Orisa) {
         Damage(Victim(), EventPlayer(), EventDamage()*0.5);
@@ -499,12 +505,14 @@ Event.OnDamageDealt Team.Team1 {
         } else if (EventAbility() == Button.Ability1) {
             SetStatus(Victim(), EventPlayer(), Status.KnockedDown, 1.5);
         } else if (EventAbility() == Button.Ultimate) {
-            SetUltimateCharge(EventPlayer(), UltimateChargePercent(EventPlayer()) + 30);
+            if (UltimateChargePercent(EventPlayer()) < 60){
+                SetUltimateCharge(EventPlayer(), UltimateChargePercent(EventPlayer()) + 30);
+            }
         }
 
     } else if (HeroOf(EventPlayer()) == Hero.Roadhog && EventAbility() == Button.Ability1) {
         Wait(1);
-        SetAbilityCooldown(EventPlayer(), Button.Ability1, AbilityCooldown(EventPlayer(), Button.Ability1)-5);
+        SetAbilityCooldown(EventPlayer(), Button.Ability1, AbilityCooldown(EventPlayer(), Button.Ability1)-3);
         
         if (Ammo(EventPlayer(), 0) < 5) {
             SetAmmo(EventPlayer(), 0, Ammo(EventPlayer(), 0) + 1);
@@ -532,7 +540,7 @@ Event.OnDamageDealt Team.Team1 {
 
             PlayEffect(AllPlayers(), PlayEffect.WidowmakerVenomMineExplosionEffect, Color.Purple, Victim(), 5);
             PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.Purple, Victim(), 5);
-            PlayEffect(AllPlayers(), PlayEffect.WidowmakerVenomMineExplosionSound, Color.Purple, Victim(), 200);
+            PlayEffect(AllPlayers(), PlayEffect.DebuffImpactSound, Color.Purple, Victim(), 200);
         } else if (EventAbility() == Button.Ability2) {
             Damage(Victim(), EventPlayer(), EventDamage()*2);
         }
@@ -573,7 +581,7 @@ Event.OnFinalBlow Team.Team1 {
 
     } else if (HeroOf(EventPlayer()) == Hero.Ashe && EventWasCriticalHit()) {
         PlayEffect(AllPlayers(), PlayEffect.AsheDynamiteExplosionEffect, Color.Orange, PositionOf(Victim()), 10);
-        PlayEffect(AllPlayers(), PlayEffect.AsheDynamiteExplosionSound, Color.Orange, PositionOf(Victim()), 200);
+        PlayEffect(AllPlayers(), PlayEffect.ExplosionSound, Color.Orange, PositionOf(Victim()), 200);
 
         Damage(PlayersWithinRadius(PositionOf(Victim()), 10, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), 50);
         SetStatus(PlayersWithinRadius(PositionOf(Victim()), 10, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.Burning, 7);
@@ -591,7 +599,7 @@ Event.OnFinalBlow Team.Team1 {
         PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.Green, blastPosition + Vector(0, 0.75, 0), 7);
 
         PlayEffect(AllPlayers(), PlayEffect.ExplosionSound, Color.Green, blastPosition, 200);
-        PlayEffect(AllPlayers(), PlayEffect.DvaSelfDestructExplosionSound, Color.Green, blastPosition, 200);
+        PlayEffect(AllPlayers(), PlayEffect.ExplosionSound, Color.Green, blastPosition, 200);
 
         ApplyImpulse(PlayersWithinRadius(blastPosition, 7, Team.Team2, RadiusLOS.Surfaces), Vector(0, 1, 0), 5, Relative.ToWorld, ContraryMotion.Cancel);
 
@@ -605,7 +613,7 @@ Event.OnFinalBlow Team.Team1 {
         PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.Purple, PositionOf(Victim()) + Vector(0, 0.75, 0), 10);
 
         PlayEffect(AllPlayers(), PlayEffect.ExplosionSound, Color.Purple, PositionOf(Victim()), 200);
-        PlayEffect(AllPlayers(), PlayEffect.DvaSelfDestructExplosionSound, Color.Purple, PositionOf(Victim()), 200);
+        PlayEffect(AllPlayers(), PlayEffect.ExplosionSound, Color.Purple, PositionOf(Victim()), 200);
 
         ApplyImpulse(PlayersWithinRadius(PositionOf(Victim()), 10, Team.Team2, RadiusLOS.Surfaces), Vector(0, 1, 0), 5, Relative.ToWorld, ContraryMotion.Cancel);
 
@@ -613,7 +621,7 @@ Event.OnFinalBlow Team.Team1 {
     
     } else if (HeroOf(EventPlayer()) == Hero.Reinhardt) {
         if (EventAbility() == Button.Ability1) {
-            SetAbilityCooldown(EventPlayer(), Button.Ability1, AbilityCooldown(EventPlayer(), Button.Ability1) - 6);
+            SetAbilityCooldown(EventPlayer(), Button.Ability1, AbilityCooldown(EventPlayer(), Button.Ability1) - 1);
         }
     
     }

@@ -32,15 +32,17 @@ Event.OngoingGlobal {
     if (CountOf(enemySpawnQueue) > 0) {
         define spawnLoc = enemySpawnQueue[0][0];
         define enemyType = enemySpawnQueue[0][1];
+        define squadName = enemySpawnQueue[0][2];
 
         enemySpawnQueue = RemoveFromArrayAtIndex(enemySpawnQueue, 0);
-        // ModifyVariable(enemySpawnQueue, Operation.RemoveFromArrayByIndex, 0);
 
         CreateDummyBot(Hero.Ana, Team.Team2, -1, Vector(-4.8, -7, -11.8), Vector(0, 0, 0));
         define targetBot = LastCreatedEntity();
 
+        targetBot.enemySquadName = squadName;
+
         PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.Team2, spawnLoc + Vector(0, 1, 0), 5);
-        PlayEffect(AllPlayers(), PlayEffect.EchoStickyBombExplosionSound, Color.Team2, spawnLoc, 200);
+        PlayEffect(AllPlayers(), PlayEffect.RingExplosionSound, Color.Team2, spawnLoc, 200);
 
         if (spawnIndex >= CountOf(PlayersOnHero(Hero.Ana))) {
             spawnIndex = 0;
@@ -75,6 +77,7 @@ Event.OngoingGlobal {
             StartForcingDummyBotName(targetBot, "Lesser Scout");
             SetDamageDealt(targetBot, 4);
             SetMaxHealth(targetBot, 45);
+            SetMoveSpeed(targetBot, 150);
             SetAbility1Enabled(targetBot, false);
             StartScalingPlayer(targetBot, 0.75, false);
 
@@ -83,6 +86,7 @@ Event.OngoingGlobal {
             StartForcingDummyBotName(targetBot, "Scout Bastion");
             SetDamageDealt(targetBot, 12);
             SetMaxHealth(targetBot, 75);
+            SetMoveSpeed(targetBot, 125);
             SetAbility1Enabled(targetBot, false);
             StartScalingPlayer(targetBot, 1, false);
 
@@ -90,6 +94,7 @@ Event.OngoingGlobal {
             ForcePlayerHero(targetBot, Hero.Bastion);
             StartForcingDummyBotName(targetBot, "Greater Scout");
             SetDamageDealt(targetBot, 25);
+            SetMoveSpeed(targetBot, 125);
             StartScalingPlayer(targetBot, 1.25, false);
             SetAbility1Enabled(targetBot, false);
 
@@ -98,6 +103,7 @@ Event.OngoingGlobal {
             StartForcingDummyBotName(targetBot, "Lesser Turret");
             SetDamageDealt(targetBot, 15);
             SetMaxHealth(targetBot, 33);
+            SetMoveSpeed(targetBot, 150);
             StartScalingPlayer(targetBot, 1.25, false);
 
         } else if (enemyType == EnemyTypes.StandardTurret) {
@@ -105,6 +111,7 @@ Event.OngoingGlobal {
             StartForcingDummyBotName(targetBot, "Turret Bastion");
             SetDamageDealt(targetBot, 20);
             SetMaxHealth(targetBot, 65);
+            SetMoveSpeed(targetBot, 150);
             StartScalingPlayer(targetBot, 1.5, false);
 
         } else if (enemyType == EnemyTypes.LesserExploderOmnic) {
@@ -133,7 +140,7 @@ Event.OngoingGlobal {
             SetDamageDealt(targetBot, 15);
             SetProjectileSpeed(targetBot, 50);
             SetMaxHealth(targetBot, 67);
-            SetMoveSpeed(targetBot, 150);
+            SetMoveSpeed(targetBot, 225);
             StartScalingPlayer(targetBot, 0.75, false);
 
         } else if (enemyType == EnemyTypes.Omnic) {
@@ -142,7 +149,7 @@ Event.OngoingGlobal {
             SetDamageDealt(targetBot, 25);
             SetProjectileSpeed(targetBot, 75);
             SetMaxHealth(targetBot, 100);
-            SetMoveSpeed(targetBot, 150);
+            SetMoveSpeed(targetBot, 200);
             StartScalingPlayer(targetBot, 1.1, false);
 
 
@@ -157,7 +164,7 @@ Event.OngoingGlobal {
             StartForcingDummyBotName(targetBot, "Zarya Echo");
             StartScalingPlayer(targetBot, 3, false);
 
-            CreateEffect(AllPlayers(), Effect.EchoCloningEffect, Color.Team2, targetBot, 1, EffectRev.VisibleTo);
+            CreateEffect(AllPlayers(), Effect.BadAura, Color.Team2, targetBot, 1, EffectRev.VisibleTo);
             targetBot.enemyVisualEffect = LastCreatedEntity();
 
         } else if (enemyType == EnemyTypes.ReinBoss) {
@@ -170,7 +177,7 @@ Event.OngoingGlobal {
             SetAbilityCooldown(targetBot, Button.Ability1, 5);
             SetAbilityCooldown(targetBot, Button.Ability2, 2);
 
-            CreateEffect(AllPlayers(), Effect.EchoCloningEffect, Color.Team2, targetBot, 1, EffectRev.VisibleTo);
+            CreateEffect(AllPlayers(), Effect.BadAura, Color.Team2, targetBot, 1, EffectRev.VisibleTo);
             targetBot.enemyVisualEffect = LastCreatedEntity();
     
         } else if (enemyType == EnemyTypes.Rein) {
@@ -183,7 +190,7 @@ Event.OngoingGlobal {
             SetAbilityCooldown(targetBot, Button.Ability1, 5);
             SetAbilityCooldown(targetBot, Button.Ability2, 2);
 
-            CreateEffect(AllPlayers(), Effect.EchoCloningEffect, Color.Team2, targetBot, 1, EffectRev.VisibleTo);
+            CreateEffect(AllPlayers(), Effect.BadAura, Color.Team2, targetBot, 1, EffectRev.VisibleTo);
             targetBot.enemyVisualEffect = LastCreatedEntity();
         } else if (enemyType == EnemyTypes.LesserRein) {
             SetMaxHealth(targetBot, 5);
@@ -196,7 +203,7 @@ Event.OngoingGlobal {
             SetAbility2Enabled(targetBot, false);
             SetAbilityCooldown(targetBot, Button.Ability1, 999999);
 
-            CreateEffect(AllPlayers(), Effect.EchoCloningEffect, Color.Team2, targetBot, 1, EffectRev.VisibleTo);
+            CreateEffect(AllPlayers(), Effect.BadAura, Color.Team2, targetBot, 1, EffectRev.VisibleTo);
             targetBot.enemyVisualEffect = LastCreatedEntity();
         }
         
@@ -211,15 +218,17 @@ Event.OngoingGlobal {
     Loop();
 }
 
-define SpawnAI(Vector spawnLoc, EnemyTypes enemyType) {
+define SpawnAI(Vector spawnLoc, EnemyTypes enemyType, String squadName) {
     if (debugModeEnabled) {
         Abort();
     }
 
-    enemySpawnQueue[CountOf(enemySpawnQueue)] = [spawnLoc, enemyType];
+    enemySpawnQueue[CountOf(enemySpawnQueue)] = [spawnLoc, enemyType, squadName];
     
     return null; 
 }
+
+playervar define enemySquadName = "";
 
 // Enemy AI
 define updateEnemyDamageReceived(define enemy) {
@@ -322,10 +331,10 @@ Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Bastion) {
 
         if (pathDestination != null) {
             if (RandomInteger(0, 1) == 0) {
-                if (DistanceBetween(PositionOf(EventPlayer()), pathDestination) > 7 || targetPlayer == null) {
+                if (DistanceBetween(PositionOf(EventPlayer()), pathDestination) > 12 || targetPlayer == null) {
                     StartThrottleInDirection(EventPlayer(), DirectionTowards(EventPlayer(), pathDestination), 1, Relative.ToWorld, ThrottleBehavior.ReplaceExistingThrottle, ThrottleRev.DirectionAndMagnitude);
-                } else if (DistanceBetween(PositionOf(EventPlayer()), pathDestination) < 4) {
-                    StartThrottleInDirection(EventPlayer(), DirectionTowards(pathDestination, EventPlayer()), 1, Relative.ToWorld, ThrottleBehavior.ReplaceExistingThrottle, ThrottleRev.DirectionAndMagnitude);
+                } else if (DistanceBetween(PositionOf(EventPlayer()), pathDestination) < 5) {
+                    StartThrottleInDirection(EventPlayer(), DirectionTowards(pathDestination, EventPlayer()), 0.5, Relative.ToWorld, ThrottleBehavior.ReplaceExistingThrottle, ThrottleRev.DirectionAndMagnitude);
 
                     if (DistanceBetween(PositionOf(EventPlayer()), pathDestination) < 3) {
                         PressButton(EventPlayer(), Button.Melee);
@@ -380,12 +389,12 @@ Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Zenyatta) {
 
         if (enemyTypeName == EnemyTypes.ExploderOmnic || enemyTypeName == EnemyTypes.LesserExploderOmnic) {
             if (targetPlayer != null && DistanceBetween(EventPlayer(), targetPlayer) < 5 && IsInLineOfSight(EventPlayer(), targetPlayer, BarrierLOS.NoBarriersBlock)) {
-                PlayEffect(AllPlayers(), PlayEffect.WidowmakerVenomMineExplosionSound, Color.Team2, PositionOf(EventPlayer()), 100);
+                PlayEffect(AllPlayers(), PlayEffect.ExplosionSound, Color.Team2, PositionOf(EventPlayer()), 100);
                 PlayEffect(AllPlayers(), PlayEffect.GoodExplosion, Color.Team2, PositionOf(EventPlayer()), 2);
                 
                 StartThrottleInDirection(EventPlayer(), DirectionTowards(EyePosition(EventPlayer()), EyePosition(targetPlayer)), 0.5, Relative.ToWorld, ThrottleBehavior.ReplaceExistingThrottle, ThrottleRev.DirectionAndMagnitude);
             
-                PlayEffect(AllPlayers(), PlayEffect.WidowmakerVenomMineExplosionSound, Color.Team2, PositionOf(EventPlayer()), 100);
+                PlayEffect(AllPlayers(), PlayEffect.ExplosionSound, Color.Team2, PositionOf(EventPlayer()), 100);
                 PlayEffect(AllPlayers(), PlayEffect.GoodExplosion, Color.Team2, PositionOf(EventPlayer()), 2);
 
                 Wait(1);
@@ -394,7 +403,7 @@ Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Zenyatta) {
                     LoopIfConditionIsTrue();
                 }
 
-                PlayEffect(AllPlayers(), PlayEffect.WidowmakerVenomMineExplosionSound, Color.Team2, PositionOf(EventPlayer()), 100);
+                PlayEffect(AllPlayers(), PlayEffect.ExplosionSound, Color.Team2, PositionOf(EventPlayer()), 100);
                 PlayEffect(AllPlayers(), PlayEffect.GoodExplosion, Color.Team2, PositionOf(EventPlayer()), 2);
 
                 Wait(1);
@@ -403,7 +412,7 @@ Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Zenyatta) {
                     LoopIfConditionIsTrue();
                 }
 
-                PlayEffect(AllPlayers(), PlayEffect.WidowmakerVenomMineExplosionSound, Color.Team2, PositionOf(EventPlayer()), 100);
+                PlayEffect(AllPlayers(), PlayEffect.ExplosionSound, Color.Team2, PositionOf(EventPlayer()), 100);
                 PlayEffect(AllPlayers(), PlayEffect.GoodExplosion, Color.Team2, PositionOf(EventPlayer()), 2);
                 
                 Wait(0.5);
@@ -412,7 +421,7 @@ Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Zenyatta) {
                     LoopIfConditionIsTrue();
                 }
                 
-                PlayEffect(AllPlayers(), PlayEffect.WidowmakerVenomMineExplosionSound, Color.Team2, PositionOf(EventPlayer()), 100);
+                PlayEffect(AllPlayers(), PlayEffect.ExplosionSound, Color.Team2, PositionOf(EventPlayer()), 100);
                 PlayEffect(AllPlayers(), PlayEffect.GoodExplosion, Color.Team2, PositionOf(EventPlayer()), 2);
 
                 Wait(0.5);
@@ -422,7 +431,7 @@ Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Zenyatta) {
                 }
 
                 PlayEffect(AllPlayers(), PlayEffect.JunkratRipTireExplosionEffect, Color.Team2, PositionOf(EventPlayer()), 2);
-                PlayEffect(AllPlayers(), PlayEffect.JunkratRipTireExplosionSound, Color.Team2, PositionOf(EventPlayer()), 100);
+                PlayEffect(AllPlayers(), PlayEffect.ExplosionSound, Color.Team2, PositionOf(EventPlayer()), 100);
 
                 define explosionTargets = PlayersWithinRadius(PositionOf(EventPlayer()), 6, Team.Team1, RadiusLOS.SurfacesAndEnemyBarriers);
 
@@ -479,42 +488,6 @@ globalvar define debugModeEnabled = false;
 globalvar define zaryaFiringBeam = false;
 globalvar define zaryaBomberSummonCooldown = zaryaBomberSummonCooldownSetting;
 globalvar define zaryaAdSummonCooldown = zaryaAdSummonCooldownSetting;
-globalvar define zaryaAdSummonLocs = [
-    Vector(-103.46, -0.98, 57.68),
-    Vector(-101.21, -0.98, 50.95),
-    Vector(-96.29, -0.98, 42.34),
-    Vector(-88.72, -2.5, 36.95),
-    Vector(-91.04, -0.98, 50.91),
-    Vector(-107.30, -1.48, 41.29),
-    Vector(-86.38, -0.98, 47.50),
-    Vector(-92.27, -0.98, 56.89),
-    Vector(-72.44, -1.48, 40.52)
-];
-globalvar define zaryaAdSummonComps = [
-    [EnemyTypes.Rein, EnemyTypes.LesserBastion],
-    [EnemyTypes.Rein, EnemyTypes.LesserTurret],
-    [EnemyTypes.Rein, EnemyTypes.LesserOmnic],
-    [EnemyTypes.GreaterBastion, EnemyTypes.LesserRein],
-    [EnemyTypes.GreaterBastion, EnemyTypes.LesserOmnic],
-    [EnemyTypes.GreaterBastion, EnemyTypes.LesserExploderOmnic],
-    [EnemyTypes.GreaterBastion, EnemyTypes.LesserBastion],
-    [EnemyTypes.LesserBastion, EnemyTypes.LesserBastion, EnemyTypes.LesserBastion, EnemyTypes.LesserBastion],
-    [EnemyTypes.StandardBastion, EnemyTypes.StandardBastion],
-    [EnemyTypes.Omnic, EnemyTypes.StandardBastion],
-    [EnemyTypes.Omnic, EnemyTypes.LesserRein],
-    [EnemyTypes.Omnic, EnemyTypes.LesserBastion],
-    [EnemyTypes.StandardBastion, EnemyTypes.LesserOmnic, EnemyTypes.LesserOmnic],
-    [EnemyTypes.StandardBastion, EnemyTypes.LesserOmnic, EnemyTypes.LesserExploderOmnic],
-    [EnemyTypes.StandardBastion, EnemyTypes.LesserBastion, EnemyTypes.LesserOmnic],
-    [EnemyTypes.StandardBastion, EnemyTypes.LesserBastion, EnemyTypes.LesserExploderOmnic],
-    [EnemyTypes.StandardBastion, EnemyTypes.LesserBastion, EnemyTypes.LesserBastion],
-    [EnemyTypes.StandardBastion, EnemyTypes.LesserBastion, EnemyTypes.LesserRein],
-    [EnemyTypes.LesserBastion, EnemyTypes.ExploderOmnic],
-    [EnemyTypes.LesserOmnic, EnemyTypes.ExploderOmnic],
-    [EnemyTypes.LesserTurret, EnemyTypes.LesserBastion],
-    [EnemyTypes.LesserTurret, EnemyTypes.LesserOmnic],
-    [EnemyTypes.StandardTurret]
-];
 
 globalvar define zaryaCastingUlt = false;
 rule: "Enemy AI - Zarya"
