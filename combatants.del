@@ -1,7 +1,7 @@
 import "master.del";
 
 // Enemy Types
-enum EnemyTypes {
+enum CombatantTypes {
     LesserBastion = "LesserBastion",
     StandardBastion = "StandardBastion",
     GreaterBastion = "GreaterBastion",
@@ -14,7 +14,8 @@ enum EnemyTypes {
     Zarya = "Zarya",
     ReinBoss = "ReinBoss",
     Rein = "Rein",
-    LesserRein = "LesserRein"
+    LesserRein = "LesserRein",
+    Echo = "Echo"
 }
 playervar define type = null;
 // globalvar define reinBot = null;
@@ -25,24 +26,38 @@ globalvar define enemySpawnQueue = [];
 playervar define enemyMechanicEffect = null;
 playervar define enemyVisualEffect = null;
 
-playervar define enemyTypeName = null;
+playervar define combatantTypeName = null;
 
-rule: "Game Logic - Process Enemy Spawn Queue"
-Event.OngoingGlobal {
+rule: "Game Logic - Process Enemy Spawn Queue" Event.OngoingGlobal {
     if (CountOf(enemySpawnQueue) > 0) {
         define spawnLoc = enemySpawnQueue[0][0];
-        define enemyType = enemySpawnQueue[0][1];
-        define squadName = enemySpawnQueue[0][2];
+        define combatantType = enemySpawnQueue[0][1];
+        define combatantTeam = enemySpawnQueue[0][2];
+        define squadName = enemySpawnQueue[0][3];
 
         enemySpawnQueue = RemoveFromArrayAtIndex(enemySpawnQueue, 0);
 
-        CreateDummyBot(Hero.Ana, Team.Team2, -1, Vector(-4.8, -7, -11.8), Vector(0, 0, 0));
+        // Skip spawning the combatant if it'll break our upper bound AI count, but still remove it from the queue so it doesn't get backed up
+        if (combatantTeam == Team.Team1 && getPlayerAllyBotCount() >= 3) {
+            Loop();
+        } else if (combatantTeam == Team.Team2 && CountOf(AllPlayers(Team.Team2)) >= 19) {
+            Loop();
+        }
+
+        CreateDummyBot(Hero.Ana, combatantTeam, -1, Vector(-4.8, -7, -11.8), Vector(0, 0, 0));
         define targetBot = LastCreatedEntity();
 
         targetBot.enemySquadName = squadName;
-
-        PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.Team2, spawnLoc + Vector(0, 1, 0), 5);
-        PlayEffect(AllPlayers(), PlayEffect.RingExplosionSound, Color.Team2, spawnLoc, 200);
+        
+        if (combatantTeam == Team.Team1) {
+            PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.Team1, spawnLoc + Vector(0, 1, 0), 5);
+            PlayEffect(AllPlayers(), PlayEffect.RingExplosionSound, Color.Team1, spawnLoc, 200);
+            PlayEffect(AllPlayers(), PlayEffect.BadPickupEffect, Color.Team1, spawnLoc, 3);
+        } else{
+            PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.Team2, spawnLoc + Vector(0, 1, 0), 5);
+            PlayEffect(AllPlayers(), PlayEffect.RingExplosionSound, Color.Team2, spawnLoc, 200);
+            PlayEffect(AllPlayers(), PlayEffect.BadPickupEffect, Color.Team2, spawnLoc, 3);
+        }
 
         if (spawnIndex >= CountOf(PlayersOnHero(Hero.Ana))) {
             spawnIndex = 0;
@@ -70,9 +85,9 @@ Event.OngoingGlobal {
         AllowButton(targetBot, Button.PrimaryFire);
         Wait(0.1);
         
-        targetBot.enemyTypeName = enemyType;
+        targetBot.combatantTypeName = combatantType;
         
-        if (enemyType == EnemyTypes.LesserBastion) {
+        if (combatantType == CombatantTypes.LesserBastion) {
             ForcePlayerHero(targetBot, Hero.Bastion);
             StartForcingDummyBotName(targetBot, "Lesser Scout");
             SetDamageDealt(targetBot, 4);
@@ -81,7 +96,7 @@ Event.OngoingGlobal {
             SetAbility1Enabled(targetBot, false);
             StartScalingPlayer(targetBot, 0.75, false);
 
-        } else if (enemyType == EnemyTypes.StandardBastion) {
+        } else if (combatantType == CombatantTypes.StandardBastion) {
             ForcePlayerHero(targetBot, Hero.Bastion);
             StartForcingDummyBotName(targetBot, "Scout Bastion");
             SetDamageDealt(targetBot, 12);
@@ -90,7 +105,7 @@ Event.OngoingGlobal {
             SetAbility1Enabled(targetBot, false);
             StartScalingPlayer(targetBot, 1, false);
 
-        } else if (enemyType == EnemyTypes.GreaterBastion) {
+        } else if (combatantType == CombatantTypes.GreaterBastion) {
             ForcePlayerHero(targetBot, Hero.Bastion);
             StartForcingDummyBotName(targetBot, "Greater Scout");
             SetDamageDealt(targetBot, 25);
@@ -98,7 +113,7 @@ Event.OngoingGlobal {
             StartScalingPlayer(targetBot, 1.25, false);
             SetAbility1Enabled(targetBot, false);
 
-        } else if (enemyType == EnemyTypes.LesserTurret) {
+        } else if (combatantType == CombatantTypes.LesserTurret) {
             ForcePlayerHero(targetBot, Hero.Bastion);
             StartForcingDummyBotName(targetBot, "Lesser Turret");
             SetDamageDealt(targetBot, 15);
@@ -106,7 +121,7 @@ Event.OngoingGlobal {
             SetMoveSpeed(targetBot, 150);
             StartScalingPlayer(targetBot, 1.25, false);
 
-        } else if (enemyType == EnemyTypes.StandardTurret) {
+        } else if (combatantType == CombatantTypes.StandardTurret) {
             ForcePlayerHero(targetBot, Hero.Bastion);
             StartForcingDummyBotName(targetBot, "Turret Bastion");
             SetDamageDealt(targetBot, 20);
@@ -114,7 +129,7 @@ Event.OngoingGlobal {
             SetMoveSpeed(targetBot, 150);
             StartScalingPlayer(targetBot, 1.5, false);
 
-        } else if (enemyType == EnemyTypes.LesserExploderOmnic) {
+        } else if (combatantType == CombatantTypes.LesserExploderOmnic) {
             ForcePlayerHero(targetBot, Hero.Zenyatta);
             StartForcingDummyBotName(targetBot, "Lesser Exploder Omnic");
             DisallowButton(targetBot, Button.PrimaryFire);
@@ -124,7 +139,7 @@ Event.OngoingGlobal {
             StartScalingPlayer(targetBot, 0.67, false);
             SetStatus(targetBot, null, Status.Burning, 999);
 
-        } else if (enemyType == EnemyTypes.ExploderOmnic) {
+        } else if (combatantType == CombatantTypes.ExploderOmnic) {
             ForcePlayerHero(targetBot, Hero.Zenyatta);
             StartForcingDummyBotName(targetBot, "Exploder Omnic");
             DisallowButton(targetBot, Button.PrimaryFire);
@@ -134,7 +149,7 @@ Event.OngoingGlobal {
             StartScalingPlayer(targetBot, 1.35, false);
             SetStatus(targetBot, null, Status.Burning, 999);
 
-        } else if (enemyType == EnemyTypes.LesserOmnic) {
+        } else if (combatantType == CombatantTypes.LesserOmnic) {
             ForcePlayerHero(targetBot, Hero.Zenyatta);
             StartForcingDummyBotName(targetBot, "Lesser Omnic");
             SetDamageDealt(targetBot, 15);
@@ -143,7 +158,7 @@ Event.OngoingGlobal {
             SetMoveSpeed(targetBot, 225);
             StartScalingPlayer(targetBot, 0.75, false);
 
-        } else if (enemyType == EnemyTypes.Omnic) {
+        } else if (combatantType == CombatantTypes.Omnic) {
             ForcePlayerHero(targetBot, Hero.Zenyatta);
             StartForcingDummyBotName(targetBot, "Omnic");
             SetDamageDealt(targetBot, 25);
@@ -152,8 +167,7 @@ Event.OngoingGlobal {
             SetMoveSpeed(targetBot, 200);
             StartScalingPlayer(targetBot, 1.1, false);
 
-
-        } else if (enemyType == EnemyTypes.Zarya) {
+        } else if (combatantType == CombatantTypes.Zarya) {
             ForcePlayerHero(targetBot, Hero.Zarya);
             SetMaxHealth(targetBot, 1500);
             SetDamageDealt(targetBot, 75);
@@ -167,7 +181,7 @@ Event.OngoingGlobal {
             CreateEffect(AllPlayers(), Effect.BadAura, Color.Team2, targetBot, 1, EffectRev.VisibleTo);
             targetBot.enemyVisualEffect = LastCreatedEntity();
 
-        } else if (enemyType == EnemyTypes.ReinBoss) {
+        } else if (combatantType == CombatantTypes.ReinBoss) {
             SetMaxHealth(targetBot, 250);
             SetDamageDealt(targetBot, 50);
             ForcePlayerHero(targetBot, Hero.Reinhardt);
@@ -180,7 +194,7 @@ Event.OngoingGlobal {
             CreateEffect(AllPlayers(), Effect.BadAura, Color.Team2, targetBot, 1, EffectRev.VisibleTo);
             targetBot.enemyVisualEffect = LastCreatedEntity();
     
-        } else if (enemyType == EnemyTypes.Rein) {
+        } else if (combatantType == CombatantTypes.Rein) {
             SetMaxHealth(targetBot, 50);
             SetDamageDealt(targetBot, 30);
             ForcePlayerHero(targetBot, Hero.Reinhardt);
@@ -192,7 +206,8 @@ Event.OngoingGlobal {
 
             CreateEffect(AllPlayers(), Effect.BadAura, Color.Team2, targetBot, 1, EffectRev.VisibleTo);
             targetBot.enemyVisualEffect = LastCreatedEntity();
-        } else if (enemyType == EnemyTypes.LesserRein) {
+       
+        } else if (combatantType == CombatantTypes.LesserRein) {
             SetMaxHealth(targetBot, 5);
             SetDamageDealt(targetBot, 10);
             ForcePlayerHero(targetBot, Hero.Reinhardt);
@@ -205,9 +220,15 @@ Event.OngoingGlobal {
 
             CreateEffect(AllPlayers(), Effect.BadAura, Color.Team2, targetBot, 1, EffectRev.VisibleTo);
             targetBot.enemyVisualEffect = LastCreatedEntity();
+        } else if (combatantType == CombatantTypes.Echo) {
+            SetMaxHealth(targetBot, 60);
+            SetDamageDealt(targetBot, 30);
+            ForcePlayerHero(targetBot, Hero.Echo);
+            StartForcingDummyBotName(targetBot, "Echo");
+            StartScalingPlayer(targetBot, 1, false);
+            SetMoveSpeed(targetBot, 120);
         }
-        
-        PlayEffect(AllPlayers(), PlayEffect.BadPickupEffect, Color.Team2, spawnLoc, 3);
+
         updateEnemyDamageReceived(targetBot);
         
         // Wait(0.1);
@@ -218,12 +239,12 @@ Event.OngoingGlobal {
     Loop();
 }
 
-define SpawnAI(Vector spawnLoc, EnemyTypes enemyType, String squadName) {
+define SpawnCombatant(Vector spawnLoc, CombatantTypes combatantType, Team combatantTeam, String squadName) {
     if (debugModeEnabled) {
         Abort();
     }
 
-    enemySpawnQueue[CountOf(enemySpawnQueue)] = [spawnLoc, enemyType, squadName];
+    enemySpawnQueue[CountOf(enemySpawnQueue)] = [spawnLoc, combatantType, combatantTeam, squadName];
     
     return null; 
 }
@@ -231,8 +252,29 @@ define SpawnAI(Vector spawnLoc, EnemyTypes enemyType, String squadName) {
 playervar define enemySquadName = "";
 
 // Enemy AI
+
+define getPlayerCount() {
+    define _numPlayers = 0;
+    for (define i = 0; i < CountOf(AllPlayers(Team.Team1)); i++) {
+        if (!IsDummyBot(AllPlayers(Team.Team1)[i])) {
+            _numPlayers++;
+        }
+    }
+
+    return _numPlayers;
+}
+define getPlayerAllyBotCount() {
+    define _numBots = 0;
+    for (define i = 0; i < CountOf(AllPlayers(Team.Team1)); i++) {
+        if (IsDummyBot(AllPlayers(Team.Team1)[i])) {
+            _numBots++;
+        }
+    }
+
+    return _numBots;
+}
 define updateEnemyDamageReceived(define enemy) {
-    define numPlayers = CountOf(AllPlayers(Team.Team1));
+    define numPlayers = getPlayerCount();
 
     if (HeroOf(enemy) == Hero.Bastion) {
         SetDamageReceived(enemy, 100 - (10 * (numPlayers - 1)));
@@ -248,15 +290,14 @@ define updateEnemyDamageReceived(define enemy) {
 }
 
 define updatePlayerDamageReceived() {
-    define numPlayers = CountOf(AllPlayers(Team.Team1));
+    define numPlayers = getPlayerCount();
 
     SetDamageReceived(AllPlayers(Team.Team1), 100 + (15 * (numPlayers - 1)));
 
     return null;
 }
 
-rule: "Update Stats Based on Player Count"
-Event.OnPlayerJoin Team.Team1 {    
+rule: "Update Stats Based on Player Count" Event.OnPlayerJoin Team.Team1 {    
     for (define i = 0; i < CountOf(AllPlayers(Team.Team2)); i++) {
         updateEnemyDamageReceived(AllPlayers(Team.Team2)[i]);
     }
@@ -268,52 +309,70 @@ Event.OnPlayerJoin Team.Team1 {
 
 globalvar define healthPickupLocs = [];
 globalvar define healthPickupEffects = [];
-rule: "Enemy AI - Death Handler"
-Event.OnDeath Team.Team2 if (HeroOf(EventPlayer()) != Hero.Ana) {
-    PlayEffect(AllPlayers(), PlayEffect.BadExplosion, Color.Team2, EyePosition(EventPlayer()), 1.5);
-    if (EventWasCriticalHit()) {
-        PlayEffect(AllPlayers(), PlayEffect.BadExplosion, Color.White, EyePosition(EventPlayer()), 2.25);
+rule: "Enemy AI - Death Handler" Event.OnDeath {
+    if (IsDummyBot(EventPlayer()) && HeroOf(EventPlayer()) != Hero.Ana) {
+        PlayEffect(AllPlayers(), PlayEffect.BadExplosion, Color.Orange, EyePosition(EventPlayer()), 1.5);
+        if (EventWasCriticalHit()) {
+            PlayEffect(AllPlayers(), PlayEffect.BadExplosion, Color.White, EyePosition(EventPlayer()), 2.25);
+        }
+
+        Wait(0.1);
+
+        DestroyDummyBot(EventPlayer());
+        DestroyEffect(EventPlayer().enemyMechanicEffect);
+        DestroyEffect(EventPlayer().enemyVisualEffect);
     }
-
-    Wait(0.1);
-
-    DestroyDummyBot(EventPlayer());
-    DestroyEffect(EventPlayer().enemyMechanicEffect);
-    DestroyEffect(EventPlayer().enemyVisualEffect);
 }
 
 playervar define targetPlayer = null;
 playervar define pathDestination = null;
-rule: "Enemy AI - Target Selection"
-Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) != Hero.Ana) {
-    if (targetPlayer == null) {
-        define players = RandomizedArray(AllPlayers(Team.Team1));
+rule: "Enemy AI - Target Selection" Event.OngoingPlayer {
+    if (IsDummyBot(EventPlayer())) {
+        if (targetPlayer == null || TeamOf(targetPlayer) == TeamOf(EventPlayer()) || !IsDummyBot(targetPlayer)) {
+            define _opposing_players = RandomizedArray(AllPlayers(OppositeTeamOf(TeamOf(EventPlayer()))));
 
-        for (define i = 0; i < CountOf(players); i++) {
-            if (IsInLineOfSight(EventPlayer(), players[i], BarrierLOS.NoBarriersBlock)) {
-                if (!(HeroOf(players[i]) == Hero.Sombra && IsUsingAbility1(players[i]))) {
-                    targetPlayer = players[i];
-                    Wait(aiTickDelaySetting);
-                    LoopIfConditionIsTrue();
+            for (define i = 0; i < CountOf(_opposing_players); i++) {
+                // Only select a new player if the current one is not a bot, or if there is no current player
+                if (!IsDummyBot(targetPlayer) && IsDummyBot(_opposing_players[i]) || targetPlayer == null) {
+                    if (IsInLineOfSight(EventPlayer(), _opposing_players[i], BarrierLOS.NoBarriersBlock)) {
+                        targetPlayer = _opposing_players[i];
+                    
+                        // We want to prioritize dummy bots over players, so we only stop searching if we find one, or there are none
+                        if (IsDummyBot(targetPlayer) || getPlayerAllyBotCount() == 0) {
+                            Wait(aiTickDelaySetting);
+                            LoopIfConditionIsTrue();
+                        }
+                    }
+                }
+            }
+
+            if (targetPlayer == null && TeamOf(EventPlayer()) == Team.Team1) {
+                define _allied_players = RandomizedArray(AllPlayers(TeamOf(EventPlayer())));
+
+                for (define i = 0; i < CountOf(_allied_players); i++) {
+                    if (!IsDummyBot(_allied_players[i]) && IsInLineOfSight(EventPlayer(), _allied_players[i], BarrierLOS.NoBarriersBlock)) {
+                        targetPlayer = _allied_players[i];
+                        Wait(aiTickDelaySetting);
+                        LoopIfConditionIsTrue();
+                    }
                 }
             }
         }
-    }
 
-    Wait(aiTickDelaySetting);
-    LoopIfConditionIsTrue();
+        Wait(aiTickDelaySetting);
+        LoopIfConditionIsTrue();
+    }
 }
 
-rule: "Enemy AI - Bastion enemies"
-Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Bastion) {
+rule: "Enemy AI - Bastion enemies" Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Bastion) {
     // Scout Bastions
-    if (enemyTypeName == EnemyTypes.LesserBastion || enemyTypeName == EnemyTypes.StandardBastion || enemyTypeName == EnemyTypes.GreaterBastion) {
+    if (combatantTypeName == CombatantTypes.LesserBastion || combatantTypeName == CombatantTypes.StandardBastion || combatantTypeName == CombatantTypes.GreaterBastion) {
         if (targetPlayer != null && IsInLineOfSight(EventPlayer(), targetPlayer, BarrierLOS.NoBarriersBlock)) {
             StartFacing(EventPlayer(), DirectionTowards(EyePosition(EventPlayer()), EyePosition(targetPlayer)) + Vector(RandomReal(-0.05, 0.05), RandomReal(-0.05, 0.05), RandomReal(-0.05, 0.05)), 1000, Relative.ToWorld, FacingRev.DirectionAndTurnRate);
 
             pathDestination = PositionOf(targetPlayer);
 
-            if (enemyTypeName != EnemyTypes.LesserBastion  && RandomInteger(1, 10) == 10) {
+            if (combatantTypeName != CombatantTypes.LesserBastion  && RandomInteger(1, 10) == 10) {
                 PressButton(EventPlayer(), Button.SecondaryFire);
             }
 
@@ -330,26 +389,26 @@ Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Bastion) {
         }
 
         if (pathDestination != null) {
-            if (RandomInteger(0, 1) == 0) {
-                if (DistanceBetween(PositionOf(EventPlayer()), pathDestination) > 12 || targetPlayer == null) {
-                    StartThrottleInDirection(EventPlayer(), DirectionTowards(EventPlayer(), pathDestination), 1, Relative.ToWorld, ThrottleBehavior.ReplaceExistingThrottle, ThrottleRev.DirectionAndMagnitude);
-                } else if (DistanceBetween(PositionOf(EventPlayer()), pathDestination) < 5) {
-                    StartThrottleInDirection(EventPlayer(), DirectionTowards(pathDestination, EventPlayer()), 0.5, Relative.ToWorld, ThrottleBehavior.ReplaceExistingThrottle, ThrottleRev.DirectionAndMagnitude);
+            // if (RandomInteger(0, 1) == 0) {
+            if (DistanceBetween(PositionOf(EventPlayer()), pathDestination) > 12 || targetPlayer == null) {
+                StartThrottleInDirection(EventPlayer(), DirectionTowards(EventPlayer(), pathDestination), 1, Relative.ToWorld, ThrottleBehavior.ReplaceExistingThrottle, ThrottleRev.DirectionAndMagnitude);
+            } else if (DistanceBetween(PositionOf(EventPlayer()), pathDestination) < 5) {
+                StartThrottleInDirection(EventPlayer(), DirectionTowards(pathDestination, EventPlayer()), 0.5, Relative.ToWorld, ThrottleBehavior.ReplaceExistingThrottle, ThrottleRev.DirectionAndMagnitude);
 
-                    if (DistanceBetween(PositionOf(EventPlayer()), pathDestination) < 3) {
-                        PressButton(EventPlayer(), Button.Melee);
-                    }
-                } else {
-                    StartThrottleInDirection(EventPlayer(), DirectionTowards(EventPlayer(), pathDestination), 0, Relative.ToWorld, ThrottleBehavior.ReplaceExistingThrottle, ThrottleRev.DirectionAndMagnitude);
+                if (DistanceBetween(PositionOf(EventPlayer()), pathDestination) < 3) {
+                    PressButton(EventPlayer(), Button.Melee);
                 }
             } else {
-                StartThrottleInDirection(EventPlayer(), Vector(0, 0, 1), 0, Relative.ToPlayer, ThrottleBehavior.ReplaceExistingThrottle, ThrottleRev.None);
+                StartThrottleInDirection(EventPlayer(), DirectionTowards(EventPlayer(), pathDestination), 0, Relative.ToWorld, ThrottleBehavior.ReplaceExistingThrottle, ThrottleRev.DirectionAndMagnitude);
             }
+            // } else {
+            //     StartThrottleInDirection(EventPlayer(), Vector(0, 0, 1), 0, Relative.ToPlayer, ThrottleBehavior.ReplaceExistingThrottle, ThrottleRev.None);
+            // }
         }
     }
 
     // Turret Bastions
-    if (enemyTypeName == EnemyTypes.LesserTurret || enemyTypeName == EnemyTypes.StandardTurret) {
+    if (combatantTypeName == CombatantTypes.LesserTurret || combatantTypeName == CombatantTypes.StandardTurret) {
 
         if (targetPlayer != null && IsInLineOfSight(EventPlayer(), targetPlayer, BarrierLOS.NoBarriersBlock)) {
         // AI for Bombers
@@ -380,14 +439,13 @@ Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Bastion) {
 }
 
 
-rule: "Enemy AI - Zen"
-Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Zenyatta) {
+rule: "Enemy AI - Zen" Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Zenyatta) {
     if (targetPlayer != null && IsInLineOfSight(EventPlayer(), targetPlayer, BarrierLOS.NoBarriersBlock) && IsAlive(EventPlayer())) {
         StartFacing(EventPlayer(), DirectionTowards(EyePosition(EventPlayer()), EyePosition(targetPlayer)), 1000, Relative.ToWorld, FacingRev.DirectionAndTurnRate);
 
         pathDestination = PositionOf(targetPlayer);
 
-        if (enemyTypeName == EnemyTypes.ExploderOmnic || enemyTypeName == EnemyTypes.LesserExploderOmnic) {
+        if (combatantTypeName == CombatantTypes.ExploderOmnic || combatantTypeName == CombatantTypes.LesserExploderOmnic) {
             if (targetPlayer != null && DistanceBetween(EventPlayer(), targetPlayer) < 5 && IsInLineOfSight(EventPlayer(), targetPlayer, BarrierLOS.NoBarriersBlock)) {
                 PlayEffect(AllPlayers(), PlayEffect.ExplosionSound, Color.Team2, PositionOf(EventPlayer()), 100);
                 PlayEffect(AllPlayers(), PlayEffect.GoodExplosion, Color.Team2, PositionOf(EventPlayer()), 2);
@@ -480,18 +538,17 @@ Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Zenyatta) {
 }
 
 
-globalvar define zaryaBomberSummonCooldownSetting = WorkshopSettingReal("Difficulty Settings", "Boss Summon Cooldown - Bomber (Seconds)", 2.5, 0, 30, 0);
-globalvar define zaryaAdSummonCooldownSetting = WorkshopSettingReal("Difficulty Settings", "Boss Summon Cooldown - Ads (Seconds)", 4.5, 0, 20, 0);
+// globalvar define zaryaBomberSummonCooldownSetting = WorkshopSettingReal("Difficulty Settings", "Boss Summon Cooldown - Bomber (Seconds)", 2.5, 0, 30, 0);
+// globalvar define zaryaAdSummonCooldownSetting = WorkshopSettingReal("Difficulty Settings", "Boss Summon Cooldown - Ads (Seconds)", 4.5, 0, 20, 0);
 globalvar define aiTickDelaySetting = 1 / WorkshopSettingReal("Performance Settings", "AI Tick Rate", 10,
 0.1, 60, 0);
 globalvar define debugModeEnabled = false;
-globalvar define zaryaFiringBeam = false;
-globalvar define zaryaBomberSummonCooldown = zaryaBomberSummonCooldownSetting;
-globalvar define zaryaAdSummonCooldown = zaryaAdSummonCooldownSetting;
+// globalvar define zaryaFiringBeam = false;
+// globalvar define zaryaBomberSummonCooldown = zaryaBomberSummonCooldownSetting;
+// globalvar define zaryaAdSummonCooldown = zaryaAdSummonCooldownSetting;
 
 globalvar define zaryaCastingUlt = false;
-rule: "Enemy AI - Zarya"
-Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Zarya) {
+rule: "Enemy AI - Zarya" Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Zarya) {
     if (debugModeEnabled) {
         Abort();
     }
@@ -518,9 +575,7 @@ Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Zarya) {
 }
 
 
-
-rule: "Enemy AI - Rein"
-Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Reinhardt) {
+rule: "Enemy AI - Rein" Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Reinhardt) {
     if (!IsButtonHeld(EventPlayer(), Button.PrimaryFire) && DistanceBetween(targetPlayer, EventPlayer()) < 7) {
         Wait(0.5);
         StartHoldingButton(EventPlayer(), Button.PrimaryFire);
@@ -557,8 +612,71 @@ Event.OngoingPlayer Team.Team2 if (HeroOf(EventPlayer()) == Hero.Reinhardt) {
     LoopIfConditionIsTrue();
 }
 
-rule: "Enemy AI - Rein Impulse On Hit"
-Event.OnDamageDealt Team.Team2 if (HeroOf(EventPlayer()) == Hero.Reinhardt) {
+rule: "Enemy AI - Rein Impulse On Hit" Event.OnDamageDealt Team.Team2 if (HeroOf(EventPlayer()) == Hero.Reinhardt) {
     ApplyImpulse(Victim(), Vector(0, 0.25, -1), 25, Relative.ToPlayer, ContraryMotion.Cancel);
 }
 
+
+rule: "Ally AI - Echo " Event.OngoingPlayer Team.Team1 if (HeroOf(EventPlayer()) == Hero.Echo) {
+    if (targetPlayer != null && !IsAlive(targetPlayer)) {
+        targetPlayer = null;
+        pathDestination = null;
+    }
+
+    // Scout Bastions
+    if (combatantTypeName == CombatantTypes.Echo) {
+        if (targetPlayer != null && IsInLineOfSight(EventPlayer(), targetPlayer, BarrierLOS.NoBarriersBlock)) {
+            pathDestination = PositionOf(targetPlayer);
+            
+            // We only attack if looking at an enemy player
+            if (TeamOf(targetPlayer) != TeamOf(EventPlayer())) {
+                StartFacing(EventPlayer(), DirectionTowards(EyePosition(EventPlayer()), EyePosition(targetPlayer)) + Vector(RandomReal(-0.05, 0.05), RandomReal(-0.05, 0.05), RandomReal(-0.05, 0.05)), 1000, Relative.ToWorld, FacingRev.DirectionAndTurnRate);
+
+
+                if (DistanceBetween(PositionOf(EventPlayer()), targetPlayer) < 3) {
+                    PressButton(EventPlayer(), Button.Melee);
+                }
+
+                if (RandomInteger(1, 10) == 10) {
+                    PressButton(EventPlayer(), Button.SecondaryFire);
+                }
+
+                if (!IsButtonHeld(EventPlayer(), Button.PrimaryFire)) {
+                    Wait(0.5);
+                    StartHoldingButton(EventPlayer(), Button.PrimaryFire);
+                }
+
+            } else {
+                if (IsButtonHeld(EventPlayer(), Button.PrimaryFire)) {
+                    StopHoldingButton(EventPlayer(), Button.PrimaryFire);
+                }
+
+                if (RandomReal(0, 1) <= 0.15) {
+                    StartFacing(EventPlayer(), Vector(RandomReal(-1, 1), RandomReal(-1, 1), RandomReal(0.4, 0.6)), 1, Relative.ToWorld, FacingRev.DirectionAndTurnRate);
+                }
+            }
+            
+        } else {
+            if (IsButtonHeld(EventPlayer(), Button.PrimaryFire)) {
+                StopHoldingButton(EventPlayer(), Button.PrimaryFire);
+            }
+
+            targetPlayer = null;
+        }
+
+        if (pathDestination != null) {
+            if (targetPlayer != null && TeamOf(targetPlayer) == Team.Team1 && DistanceBetween(PositionOf(EventPlayer()), pathDestination) > 3) {
+                StartThrottleInDirection(EventPlayer(), DirectionTowards(EventPlayer(), pathDestination), 1, Relative.ToWorld, ThrottleBehavior.ReplaceExistingThrottle, ThrottleRev.DirectionAndMagnitude);
+            } else if (DistanceBetween(PositionOf(EventPlayer()), pathDestination) > 12 || targetPlayer == null) {
+                StartThrottleInDirection(EventPlayer(), DirectionTowards(EventPlayer(), pathDestination), 1, Relative.ToWorld, ThrottleBehavior.ReplaceExistingThrottle, ThrottleRev.DirectionAndMagnitude);
+            } else if (targetPlayer != null && TeamOf(targetPlayer) == Team.Team1 && DistanceBetween(PositionOf(EventPlayer()), pathDestination) < 5) {
+                StartThrottleInDirection(EventPlayer(), DirectionTowards(pathDestination, EventPlayer()), 0.25, Relative.ToWorld, ThrottleBehavior.ReplaceExistingThrottle, ThrottleRev.DirectionAndMagnitude);
+            } else {
+                StartThrottleInDirection(EventPlayer(), DirectionTowards(EventPlayer(), pathDestination), 0, Relative.ToWorld, ThrottleBehavior.ReplaceExistingThrottle, ThrottleRev.DirectionAndMagnitude);
+            }
+        }
+    }
+
+    Wait(aiTickDelaySetting);
+    LoopIfConditionIsTrue();
+}

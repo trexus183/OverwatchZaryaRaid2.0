@@ -7,34 +7,30 @@ globalvar define thunderDomeSummonNodeLoc = Vector(-17.76, -1.96, 82.2);
 globalvar define thunderDomeExitButtonLoc = Vector(-11.19, -2.58, 98.46);
 globalvar define hackPromptText = "Hold F to charge with Iris Energy";
 
-// rule: "Encounter - Zen Death Handler During Zarya Ult"
-// Event.OnDeath Team.Team2 if (HeroOf(EventPlayer()) == Hero.Zenyatta && zaryaCastingUlt) {
+// rule: "Encounter - Zen Death Handler During Zarya Ult" // Event.OnDeath Team.Team2 if (HeroOf(EventPlayer()) == Hero.Zenyatta && zaryaCastingUlt) {
 //     stunNodeLocs = [Vector(-104.41, 9, 50.62), Vector(-97.73, 9, 39.64), Vector(-101.07, 9, 45.13)];
 //     stunNodeVisibility = AllPlayers();
 
 //     if (RandomInteger(0, 1) == 0) {
-//         SpawnAI(Vector(-96.4, -2, 40.13), EnemyTypes.LesserBastion);
+//         SpawnCombatant(Vector(-96.4, -2, 40.13), CombatantTypes.LesserBastion);
 //     } else {
-//         SpawnAI(Vector(-103.4, -2, 51.7), EnemyTypes.LesserBastion);
+//         SpawnCombatant(Vector(-103.4, -2, 51.7), CombatantTypes.LesserBastion);
 //     }
 // }
 
-// rule: "Encounter - Victory Trigger"
-// Event.OnDeath Team.Team2 if (IsDummyBot(EventPlayer()) && HeroOf(EventPlayer()) == Hero.Zarya && !debugModeEnabled) {
+// rule: "Encounter - Victory Trigger" // Event.OnDeath Team.Team2 if (IsDummyBot(EventPlayer()) && HeroOf(EventPlayer()) == Hero.Zarya && !debugModeEnabled) {
 //     DeclareTeamVictory(Team.Team1);
 // }
 
-// rule: "Encounter - Thunderdome Boss Death Handler"
-// Event.OnFinalBlow Team.Team1 if (HeroOf(Victim()) == Hero.Reinhardt && DistanceBetween(Victim(), Vector(-13.7, -3.68, 90.26)) < 20) {
+// rule: "Encounter - Thunderdome Boss Death Handler" // Event.OnFinalBlow Team.Team1 if (HeroOf(Victim()) == Hero.Reinhardt && DistanceBetween(Victim(), Vector(-13.7, -3.68, 90.26)) < 20) {
 //     playerChargeHeld += 100;
     
 //     for (define i = 0; i < 6; i++) {
-//         SpawnAI(NearestWalkablePosition(Vector(-13.7, -3.68, 90.26) + Vector(RandomReal(-10, 10), 0, RandomReal(-10, 10))), EnemyTypes.LesserBastion);
+//         SpawnCombatant(NearestWalkablePosition(Vector(-13.7, -3.68, 90.26) + Vector(RandomReal(-10, 10), 0, RandomReal(-10, 10))), CombatantTypes.LesserBastion);
 //     }
 // }
 
-rule: "Encounter - Player Shot Interactions"
-Event.OngoingPlayer Team.Team1 if (IsFiringPrimary(EventPlayer()) || IsFiringSecondary(EventPlayer())) {
+rule: "Encounter - Player Shot Interactions" Event.OngoingPlayer Team.Team1 if (IsFiringPrimary(EventPlayer()) || IsFiringSecondary(EventPlayer())) {
     // ThunderDome Summon Node
     // if (DistanceBetween(EventPlayer(), Vector(-13.7, -3.68, 90.26)) < 13) {
     //     define playerAimPos = RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer()) * DistanceBetween(EyePosition(EventPlayer()), thunderDomeSummonNodeLoc));
@@ -47,7 +43,7 @@ Event.OngoingPlayer Team.Team1 if (IsFiringPrimary(EventPlayer()) || IsFiringSec
     //         PlayEffect(AllPlayers(), PlayEffect.GoodPickupEffect, Color.Black, thunderDomeSummonNodeLoc, 2);
     //         PlayEffect(AllPlayers(), PlayEffect.MoiraFadeDisappearSound, Color.Black, thunderDomeSummonNodeLoc, 200);
 
-    //         SpawnAI(Vector(-19.37, -3.84, 85.05), EnemyTypes.ReinBoss);
+    //         SpawnCombatant(Vector(-19.37, -3.84, 85.05), CombatantTypes.ReinBoss);
     //         Wait(3);
     //     }
     // }
@@ -84,8 +80,7 @@ Event.OngoingPlayer Team.Team1 if (IsFiringPrimary(EventPlayer()) || IsFiringSec
 }
 
 globalvar define jumpPadPos = Vector(-88.12, -1.98, 60.7);
-rule: "Encounter - Jump Pad"
-Event.OngoingGlobal {
+rule: "Encounter - Jump Pad" Event.OngoingGlobal {
     define playersNearJumpPad = PlayersWithinRadius(jumpPadPos, 2, Team.All, RadiusLOS.Off);
 
     for (define i = 0; i < CountOf(playersNearJumpPad); i++) {
@@ -110,8 +105,7 @@ globalvar define hackCharge = 0;
 globalvar define playerChargeHeld = 0;
 
 // globalvar define capPointSpeed = 1;
-// rule: "Encounter - Capture Point"
-// Event.OngoingGlobal {
+// rule: "Encounter - Capture Point" // Event.OngoingGlobal {
 //     define playersFuelingTeleporterCount = 0;
 //     define playersNearTeleporter = PlayersWithinRadius(capturePointPos, 10.25, Team.Team1, RadiusLOS.Off);
 
@@ -135,8 +129,7 @@ globalvar define playerChargeHeld = 0;
 //     Loop();
 // }
 
-// rule: "Encounter - Cooler Portal"
-// Event.OngoingPlayer {
+// rule: "Encounter - Cooler Portal" // Event.OngoingPlayer {
 //     if (DistanceBetween(EventPlayer(), coolerEntryPortal) < 3) {
 //         Teleport(EventPlayer(), coolerExitPortal + Vector(0, -1, 0));
         
@@ -162,8 +155,7 @@ globalvar define playerChargeHeld = 0;
 //     Loop();
 // }
 
-// rule: "Encounter - Teleporter"
-// Event.OngoingPlayer Team.Team1 {
+// rule: "Encounter - Teleporter" // Event.OngoingPlayer Team.Team1 {
 //     if (DistanceBetween(EventPlayer(), teleporterPos) < 1.25) {
 //         SmallMessage(EventPlayer(), "Teleporter warming up");
 
@@ -197,10 +189,10 @@ globalvar define playerChargeHeld = 0;
 //             PlayEffect(AllPlayers(), PlayEffect.BuffImpactSound, Color.SkyBlue, PositionOf(EventPlayer()), 200);
         
             
-//             // SpawnAI(Vector(-30.5, 2, 76.6), EnemyTypes.ExploderOmnic);
-//             // SpawnAI(Vector(-33.1, 2, 82.4), EnemyTypes.StandardBastion);
-//             // SpawnAI(Vector(-33.71, 2, 71.89), EnemyTypes.LesserBastion);
-//             // SpawnAI(Vector(-31.24, 1, 62.18), EnemyTypes.LesserBastion);
+//             // SpawnCombatant(Vector(-30.5, 2, 76.6), CombatantTypes.ExploderOmnic);
+//             // SpawnCombatant(Vector(-33.1, 2, 82.4), CombatantTypes.StandardBastion);
+//             // SpawnCombatant(Vector(-33.71, 2, 71.89), CombatantTypes.LesserBastion);
+//             // SpawnCombatant(Vector(-31.24, 1, 62.18), CombatantTypes.LesserBastion);
 
 //             Teleport(EventPlayer(), Vector(-23.45, -2, 61.96));
         
@@ -218,8 +210,7 @@ globalvar define playerChargeHeld = 0;
 
 // playervar define CanPlayerTeleport = true;
 
-// rule: "Encounter - Thunder Dome Entry Terminal"
-// Event.OngoingPlayer Team.Team1 {
+// rule: "Encounter - Thunder Dome Entry Terminal" // Event.OngoingPlayer Team.Team1 {
 //     if (DistanceBetween(EventPlayer(), Vector(-92.55, 3.1, 69.25)) < 3  && IsButtonHeld(EventPlayer(), Button.Interact) && CanPlayerTeleport) {
 //         CanPlayerTeleport = false;
 //         Teleport(EventPlayer(), Vector(-7.77, -3.84, 96.12));
@@ -239,16 +230,14 @@ globalvar define playerChargeHeld = 0;
 //     Loop();
 // }
 
-// rule: "Encounter - Thunder Dome Walls - Impulse"
-// Event.OngoingPlayer if (DistanceBetween(EventPlayer(), Vector(-13.7, -3.68, 90.26)) <= 13 && DistanceBetween(EventPlayer(), Vector(-13.7, -3.68, 90.26)) >= 10.5) {
+// rule: "Encounter - Thunder Dome Walls - Impulse" // Event.OngoingPlayer if (DistanceBetween(EventPlayer(), Vector(-13.7, -3.68, 90.26)) <= 13 && DistanceBetween(EventPlayer(), Vector(-13.7, -3.68, 90.26)) >= 10.5) {
 //     ApplyImpulse(EventPlayer(), DirectionTowards(EventPlayer(), Vector(-13.7, -3.68, 90.26)), 2, Relative.ToWorld, ContraryMotion.Cancel);
 
 //     Wait(0.016);
 //     LoopIfConditionIsTrue();
 // }
 
-// rule: "Encounter - Thunder Dome Exit Terminal"
-// Event.OngoingPlayer Team.Team1 {
+// rule: "Encounter - Thunder Dome Exit Terminal" // Event.OngoingPlayer Team.Team1 {
 //     if (DistanceBetween(EventPlayer(), thunderDomeExitButtonLoc) < 3  && IsButtonHeld(EventPlayer(), Button.Interact) && CanPlayerTeleport) {
 //         CanPlayerTeleport = false;
 //         Teleport(EventPlayer(), Vector(-90.66, 2, 66.66));
@@ -266,18 +255,16 @@ globalvar define playerChargeHeld = 0;
 //     Loop();
 // }
 
-// rule: "Encounter - Hack Room Enemy Spawn Trigger"
-// Event.OngoingPlayer Team.Team1 {
+// rule: "Encounter - Hack Room Enemy Spawn Trigger" // Event.OngoingPlayer Team.Team1 {
 //     if (DistanceBetween(EventPlayer(), Vector(-30.97, 2, 86.78)) < 6) {
-//         SpawnAI(Vector(-26.4, 2.3, 90), EnemyTypes.Rein);
+//         SpawnCombatant(Vector(-26.4, 2.3, 90), CombatantTypes.Rein);
 //         Wait(30);
 //     }
 //     Wait(0.25);
 //     Loop();
 // }
 
-// rule: "Encounter - Hack Terminal Trigger"
-// Event.OngoingPlayer Team.Team1 {
+// rule: "Encounter - Hack Terminal Trigger" // Event.OngoingPlayer Team.Team1 {
 //     if (DistanceBetween(EventPlayer(), Vector(-27.85, 3.1, 84.46)) < 6 && IsButtonHeld(EventPlayer(), Button.Interact)) {
 //         if (hackCharge >= 100) {
 //             hackCharge = 0;
@@ -292,7 +279,7 @@ globalvar define playerChargeHeld = 0;
 //             BigMessage(AllPlayers(), "The " + HeroIconString(Hero.Zarya) + " Zarya Echo is vulnerable!");
             
 //             for (define i = 0; i < 3; i++) {
-//                 SpawnAI(zaryaAdSummonLocs[RandomInteger(0, CountOf(zaryaAdSummonLocs)-1)], EnemyTypes.LesserBastion);
+//                 SpawnCombatant(zaryaAdSummonLocs[RandomInteger(0, CountOf(zaryaAdSummonLocs)-1)], CombatantTypes.LesserBastion);
 //             }
 
 //             capturePointPos = Vector(-999, -999, -999);
@@ -317,7 +304,7 @@ globalvar define playerChargeHeld = 0;
 //             // SetMaxHealth(PlayersOnHero(Hero.Zarya, Team.Team2)[0], );
             
 //             zaryaCastingUlt = true;
-//             SpawnAI(Vector(-102.8, -2, 44), EnemyTypes.ExploderOmnic);
+//             SpawnCombatant(Vector(-102.8, -2, 44), CombatantTypes.ExploderOmnic);
 //             capturePointPos = Vector(-94.3, -0.76, 49.24);
 
 //             Teleport(PlayersOnHero(Hero.Zarya, Team.Team2)[0], Vector(-102.8, 2, 44));

@@ -1,10 +1,17 @@
 import "master.del";
 
+playervar define playerVisualEffectLoc = Vector(0, -999, 0);
+playervar define playerEffects = [];
+
+playervar define playerIsFrozen = false;
+
+playervar define allyBot;
+
 define setHeroPassiveText(Player player) {
     if (HeroOf(player) == Hero.Ana) { // I can enable and disable
-        heroPerkText = "Biotic Grenade final blows refresh Sleep Dart, Sleep Dart hits refresh Biotic Grenade";
-        heroKillPerkText = "Biotic Grenade stuns enemies and deals 500% damage to targets below 75% health, final blows heal 25% of your missing health";
-        heroUltPerkText = "Hold your ultimate button with no target to refresh your abilities at the cost of 25% ultimate ability energy";
+        heroPerkText = "Biotic Grenade deals damage over time to enemies affected by it, and generates additional ultimate charge";
+        heroKillPerkText = "Sleep Dart freezes affected targets";
+        heroUltPerkText = "Final blows heal 15% of your missing health and summon an ally bot, if you have less than 3";
 
     } else if (HeroOf(player) == Hero.Ashe) { // I am precise and powerful
         heroPerkText = "Your Viper Rifle deals 25% additional damage to targets who are burning, critical kills create dynamite explosions";
@@ -12,9 +19,9 @@ define setHeroPassiveText(Player player) {
         heroUltPerkText = "Bob will not be targeted by enemies, and never leaves your side";
 
     } else if (HeroOf(player) == Hero.Baptiste) { // I am well trained and resourceful
-        heroPerkText = "Immortality Field cannot be destroyed by enemies, regenerative burst damages and displaces nearby enemies";
-        heroKillPerkText = "Final blows heal 25% of your missing health";
-        heroUltPerkText = "";
+        heroPerkText = "Regenerative burst damages and displaces nearby enemies and summons an ally bot if you have none";
+        heroKillPerkText = "Immortality field summons ally bots up to a max of 3";
+        heroUltPerkText = "Final blows heal 25% of your missing health";
     
     } else if (HeroOf(player) == Hero.Bastion) { // I am a machine of war
         heroPerkText = "Dealing damage lowers the cooldown of grenade, grenade damage lowers the cooldown of reconfigure";
@@ -37,7 +44,7 @@ define setHeroPassiveText(Player player) {
         heroUltPerkText = "";
     
     } else if (HeroOf(player) == Hero.Echo) { // I am elegant and dangerous
-        heroPerkText = "Taking flight stuns nearby enemies, eliminations refresh sticky bombs";
+        heroPerkText = "Taking flight summons an ally bot if you have none, eliminations refresh sticky bombs";
         heroKillPerkText = "Final blows heal 25% of your missing health";
         heroUltPerkText = "";
     
@@ -56,6 +63,11 @@ define setHeroPassiveText(Player player) {
         heroKillPerkText = "Final blows heal 10% of your missing health";
         heroUltPerkText = "You are immune to damage while your ultimate is active";
     
+    }  else if (HeroOf(player) == Hero.Juno) { 
+        heroPerkText = "Glide Boost and Hyper Ring summon an ally bot if you have less than 3";
+        heroKillPerkText = "Hyper ring summons an ally bot up to a max of 3";
+        heroUltPerkText = "";
+    
     } else if (HeroOf(player) == Hero.Junkrat) { // I'm a chaotic demolitionist
         heroPerkText = "Concussion mine applies random status effects";
         heroKillPerkText = "Final blows heal 25% of your missing health, refill your frag launcher, and add charges of concussion ";
@@ -63,13 +75,13 @@ define setHeroPassiveText(Player player) {
     
     } else if (HeroOf(player) == Hero.Kiriko) { // I'm a slippery assassin and spell caster
         heroPerkText = "Still Working";
-        heroKillPerkText = "Final blows heal 25% of your missing health and reduce the cooldown of dash";
+        heroKillPerkText = "Final blows heal 25% of your missing health, and create an ally bot, if you have less than 3";
         heroUltPerkText = "";
     
     } else if (HeroOf(player) == Hero.Lifeweaver) { // I'm an elegant builder
-        heroPerkText = "Still Working";
-        heroKillPerkText = "Final blows heal 25% of your missing health and reduce the cooldown of dash";
-        heroUltPerkText = "";
+        heroPerkText = "Heal yourself and move faster while charging healing blossom";
+        heroKillPerkText = "Final blows heal 15% of your missing health";
+        heroUltPerkText = "Defeated enemies grows into ally bots, if you have less than 3";
     
     } else if (HeroOf(player) == Hero.Lucio) { // I destroy enemies with style 
         heroPerkText = "Soundwave deals 500% bonus damage and knocks down enemies, sound barrier knocks down enemies";
@@ -139,7 +151,7 @@ define setHeroPassiveText(Player player) {
     } else if (HeroOf(player) == Hero.Soldier76) { // I am well disciplined and powerful
         heroPerkText = "Sprint knocks back and stuns enemies, you receive 33% less damage while sprinting";
         heroKillPerkText = "Final blows heal 10% of your missing health";
-        heroUltPerkText = "";
+        heroUltPerkText = "Dropping your biotic field summons an ally bot if you have none";
     
     } else if (HeroOf(player) == Hero.Sombra) { // I'm sneaky, clever disabler
         heroPerkText = "Hacking an enemy disables them, and spreads the hack to other nearby enemies";
@@ -197,7 +209,7 @@ define setHeroPassiveText(Player player) {
 
 define collectDebris(Player player) {
     if (HeroOf(player) == Hero.Ana) {
-        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.25);
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.15);
 
     } else if (HeroOf(player) == Hero.Ashe) {
         Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.25);
@@ -239,8 +251,7 @@ define collectDebris(Player player) {
         Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.25);
 
     }  else if (HeroOf(player) == Hero.Lifeweaver) {
-        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.25);
-        SetAbilityCooldown(EventPlayer(), Button.Jump, AbilityCooldown(EventPlayer(), Button.Jump)-0.3);
+        Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.15);
         
     
     } else if (HeroOf(player) == Hero.Junkrat) {
@@ -351,12 +362,7 @@ define collectDebris(Player player) {
     return null;
 }
 
-playervar define playerVisualEffectLoc = Vector(0, -999, 0);
-playervar define playerEffects = [];
-
-playervar define playerIsFrozen = false;
-rule: "Update playerIsFrozen Flag"
-Event.OngoingPlayer Team.Team2 {
+rule: "Update playerIsFrozen Flag" Event.OngoingPlayer Team.Team2 {
     if (HasStatus(EventPlayer(), Status.Frozen)) {
         Wait(0.016);
         playerIsFrozen = true;
@@ -367,555 +373,614 @@ Event.OngoingPlayer Team.Team2 {
     Loop();
 }
 
-rule: "Hero Abilities - Dealt Damage"
-Event.OnDamageDealt Team.Team1 {
-    if (CountOf(PlayersOnHero(Hero.Winston, Team.Team1)) != 0 && DistanceBetween(EventPlayer(), PlayersOnHero(Hero.Winston, Team.Team1)[0].playerVisualEffectLoc) < 7.25 && DistanceBetween(Victim(), PlayersOnHero(Hero.Winston, Team.Team1)[0].playerVisualEffectLoc) < 7.25 && EventAbility() != null) {
-        Damage(Victim(), EventPlayer(), EventDamage()*5);
-    }
-
-    if (HeroOf(EventPlayer()) == Hero.Ana) {
-        if (EventAbility() == Button.Ability2 && Health(Victim()) < (MaxHealth(Victim())/4)*3 ) {
+rule: "Hero Abilities - Dealt Damage" Event.OnDamageDealt Team.Team1 {
+    if (!IsDummyBot(EventPlayer())) {
+        if (CountOf(PlayersOnHero(Hero.Winston, Team.Team1)) != 0 && DistanceBetween(EventPlayer(), PlayersOnHero(Hero.Winston, Team.Team1)[0].playerVisualEffectLoc) < 7.25 && DistanceBetween(Victim(), PlayersOnHero(Hero.Winston, Team.Team1)[0].playerVisualEffectLoc) < 7.25 && EventAbility() != null) {
             Damage(Victim(), EventPlayer(), EventDamage()*5);
-            Wait(0.01);
+        }
 
-            if (!IsAlive(Victim())) {
-                SetAbilityCooldown(EventPlayer(), Button.Ability1, 0);
+        if (HeroOf(EventPlayer()) == Hero.Ana) {
+            if (EventAbility() == Button.Ability2) {
+                StartDamageOverTime(PlayersWithinRadius(PositionOf(Victim()), 3, Team.Team2, RadiusLOS.Off), EventPlayer(), 4, 25);
+            } else if (EventAbility() == Button.Ability1) {
+                SetStatus(Victim(), EventPlayer(), Status.Frozen, 4);
             }
-        }
-
-        if (EventAbility() == Button.Ability2) {
-            SetStatus(PlayersWithinRadius(PositionOf(Victim()), 3, Team.Team2, RadiusLOS.Off), EventPlayer(), Status.Stunned, 4);
-        } else if (EventAbility() == Button.Ability1) {
-            SetAbilityCooldown(EventPlayer(), Button.Ability2, 0);
-        }
-    
-    } else if (HeroOf(EventPlayer()) == Hero.Ashe && EventAbility() != null) {
-        if (HasStatus(Victim(), Status.Burning)) {
-            Damage(Victim(), EventPlayer(), EventDamage() * 0.25);
-        }
-
-    } else if (HeroOf(EventPlayer()) == Hero.Brigitte) {
-        SetAbilityCooldown(EventPlayer(), Button.PrimaryFire, AbilityCooldown(EventPlayer(), Button.PrimaryFire)-1);
-
-        if (EventAbility() == Button.PrimaryFire && IsFiringSecondary(EventPlayer())) {            
-            ApplyImpulse(PlayersWithinRadius(PositionOf(Victim()), 3, Team.Team2, RadiusLOS.Surfaces), FacingDirectionOf(EventPlayer()) + Vector(0, 0.25, 0), 25, Relative.ToWorld, ContraryMotion.Cancel);
-
-            SetAbilityCooldown(EventPlayer(), Button.Ability1, 0);
-            
-        } else if (EventAbility() == Button.Ability1) {
-            if (DistanceBetween(EventPlayer(), Victim()) > 7) {
-                SetStatus(Victim(), EventPlayer(), Status.KnockedDown, 4);
-                
-                Damage(Victim(), EventPlayer(), EventDamage() * 2);
-               
-                PlayEffect(AllPlayers(), PlayEffect.BadExplosion, Color.Yellow, Victim(), DistanceBetween(EventPlayer(), Victim()) / 3);
-                
-                WaitUntil(!IsUsingAbility1(EventPlayer()), 1);
-                SetAbilityCooldown(EventPlayer(), Button.PrimaryFire, 0);
-            } else {
-                SetStatus(Victim(), EventPlayer(), Status.Stunned, 0.25);
-            }
-        }
-
-    } else if (HeroOf(EventPlayer()) == Hero.Bastion) {
-        if (EventAbility() == Button.PrimaryFire) {
-            SetAbilityCooldown(EventPlayer(), Button.SecondaryFire, AbilityCooldown(EventPlayer(), Button.SecondaryFire)-1);
-        } else if (EventAbility() == Button.SecondaryFire) {
-            SetAbilityCooldown(EventPlayer(), Button.Ability1, AbilityCooldown(EventPlayer(), Button.Ability1)-0.5);
-        }
-    
-    } else if (HeroOf(EventPlayer()) == Hero.Doomfist) {
-        if (EventAbility() != Button.PrimaryFire) {
-            SetAmmo(EventPlayer(), 0, 4);
-            Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.15);
-            Damage(Victim(), EventPlayer(), EventDamage()*2);
-        }
-
-        SetAbilityCooldown(EventPlayer(), Button.SecondaryFire, AbilityCooldown(EventPlayer(), Button.SecondaryFire)-0.5);
-        SetAbilityCooldown(EventPlayer(), Button.Ability1, AbilityCooldown(EventPlayer(), Button.Ability1)-0.5);
-        SetAbilityCooldown(EventPlayer(), Button.Ability2, AbilityCooldown(EventPlayer(), Button.Ability2)-0.5);
-        SetUltimateCharge(EventPlayer(), UltimateChargePercent(EventPlayer()) + 1);
-    
-    } else if (HeroOf(EventPlayer()) == Hero.Dva) {
-        SetAbilityCooldown(EventPlayer(), Button.Ability1, AbilityCooldown(EventPlayer(), Button.Ability1)-0.5);
-
-    } else if (HeroOf(EventPlayer()) == Hero.Genji) {
-        if (EventAbility() == Button.Ability1 || EventAbility() == Button.Melee || EventAbility() == Button.Ultimate) {
-            SetStatus(Victim(), EventPlayer(), Status.Stunned, 2);
-        } else if (IsUsingAbility2(EventPlayer()) && EventAbility() != null) {
-            Damage(Victim(), EventPlayer(), EventDamage()*4);
-        }
-
-
-    } else if (HeroOf(EventPlayer()) == Hero.Hanzo && EventAbility() == Button.Ability1) {
-        SetStatus(Victim(), EventPlayer(), Status.Stunned, 2);
- 
-    } else if (HeroOf(EventPlayer()) == Hero.JunkerQueen) {
-        SetAbilityCooldown(EventPlayer(), Button.Ability1, AbilityCooldown(EventPlayer(), Button.Ability1) - 0.25);
-
-    } else if (HeroOf(EventPlayer()) == Hero.Junkrat) {
-        if (EventAbility() == Button.Ability1) {
-            define randomEffectId = RandomInteger(0, 5);
-
-            if (randomEffectId == 0) {
-                Wait(0.016);
-                SetStatus(PlayersWithinRadius(PositionOf(Victim()), 3, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.Asleep, RandomReal(2, 5));
-            } else if (randomEffectId == 1) {
-                SetStatus(PlayersWithinRadius(PositionOf(Victim()), 3, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.Burning, 4);
-                StartDamageOverTime(PlayersWithinRadius(PositionOf(Victim()), 3, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), RandomReal(5, 10), RandomReal(10, 20));
-            } else if (randomEffectId == 2) {
-                SetStatus(PlayersWithinRadius(PositionOf(Victim()), 3, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.Frozen, RandomReal(2, 5));
-            } else if (randomEffectId == 3) {
-                SetStatus(PlayersWithinRadius(PositionOf(Victim()), 3, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.Hacked, RandomReal(2, 5));
-            } else if (randomEffectId == 4) {
-                SetStatus(PlayersWithinRadius(PositionOf(Victim()), 3, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.KnockedDown, RandomReal(2, 5));
-            } else if (randomEffectId == 5) {
-                SetStatus(PlayersWithinRadius(PositionOf(Victim()), 3, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.Stunned, RandomReal(2, 5));
-            }
-        }
-
-    } else if (HeroOf(EventPlayer()) == Hero.Lucio && EventAbility() == Button.SecondaryFire) {
-        PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.Green, Victim(), 5);
-        Damage(PlayersWithinRadius(PositionOf(Victim()), 5, Team.Team2, RadiusLOS.Off), EventPlayer(), EventDamage()*5);
-        SetStatus(PlayersWithinRadius(PositionOf(Victim()), 5, Team.Team2, RadiusLOS.Off), EventPlayer(), Status.KnockedDown, 2);
-    
-    } else if (HeroOf(EventPlayer()) == Hero.Cassidy && EventAbility() == Button.SecondaryFire) {
-        SetAbilityCooldown(EventPlayer(), Button.Ability1, AbilityCooldown(EventPlayer(), Button.Ability1)-1);
-
-    } else if (HeroOf(EventPlayer()) == Hero.Mei && Victim().playerIsFrozen && EventAbility() == Button.SecondaryFire) {
-        define nearbyEnemies = PlayersWithinRadius(PositionOf(Victim()), 12, Team.Team2, RadiusLOS.Off);
-
-        for (define i = 0; i < CountOf(nearbyEnemies); i++) {
-            // if (!nearbyEnemies[i].playerIsFrozen) {
-            SetStatus(nearbyEnemies[i], EventPlayer(), Status.Frozen, 1);
-            // }
-        }
-
-        PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.White, Victim(), 12);
-        PlayEffect(AllPlayers(), PlayEffect.ExplosionSound, Color.White, Victim(), 200);
-
-    } else if (HeroOf(EventPlayer()) == Hero.Orisa) {
-        Damage(Victim(), EventPlayer(), EventDamage()*0.5);
-
-        SetAbilityCooldown(EventPlayer(), Button.Ability1, AbilityCooldown(EventPlayer(), Button.Ability1)-0.3);
-
-    } else if (HeroOf(EventPlayer()) == Hero.Reinhardt) {
-        if (EventAbility() == Button.PrimaryFire) {
-            SetAbilityCooldown(EventPlayer(), Button.Ability2, AbilityCooldown(EventPlayer(), Button.Ability2)-2);
-        } else if (EventAbility() == Button.Ability1) {
-            SetStatus(Victim(), EventPlayer(), Status.KnockedDown, 1.5);
-        } else if (EventAbility() == Button.Ultimate) {
-            if (UltimateChargePercent(EventPlayer()) < 60){
-                SetUltimateCharge(EventPlayer(), UltimateChargePercent(EventPlayer()) + 30);
-            }
-        }
-
-    } else if (HeroOf(EventPlayer()) == Hero.Roadhog && EventAbility() == Button.Ability1) {
-        Wait(1);
-        SetAbilityCooldown(EventPlayer(), Button.Ability1, AbilityCooldown(EventPlayer(), Button.Ability1)-3);
         
-        if (Ammo(EventPlayer(), 0) < 5) {
-            SetAmmo(EventPlayer(), 0, Ammo(EventPlayer(), 0) + 1);
-        }
+        } else if (HeroOf(EventPlayer()) == Hero.Ashe && EventAbility() != null) {
+            if (HasStatus(Victim(), Status.Burning)) {
+                Damage(Victim(), EventPlayer(), EventDamage() * 0.25);
+            }
+
+        } else if (HeroOf(EventPlayer()) == Hero.Brigitte) {
+            SetAbilityCooldown(EventPlayer(), Button.PrimaryFire, AbilityCooldown(EventPlayer(), Button.PrimaryFire)-1);
+
+            if (EventAbility() == Button.PrimaryFire && IsFiringSecondary(EventPlayer())) {            
+                ApplyImpulse(PlayersWithinRadius(PositionOf(Victim()), 3, Team.Team2, RadiusLOS.Surfaces), FacingDirectionOf(EventPlayer()) + Vector(0, 0.25, 0), 25, Relative.ToWorld, ContraryMotion.Cancel);
+
+                SetAbilityCooldown(EventPlayer(), Button.Ability1, 0);
+                
+            } else if (EventAbility() == Button.Ability1) {
+                if (DistanceBetween(EventPlayer(), Victim()) > 7) {
+                    SetStatus(Victim(), EventPlayer(), Status.KnockedDown, 4);
+                    
+                    Damage(Victim(), EventPlayer(), EventDamage() * 2);
+                
+                    PlayEffect(AllPlayers(), PlayEffect.BadExplosion, Color.Yellow, Victim(), DistanceBetween(EventPlayer(), Victim()) / 3);
+                    
+                    WaitUntil(!IsUsingAbility1(EventPlayer()), 1);
+                    SetAbilityCooldown(EventPlayer(), Button.PrimaryFire, 0);
+                } else {
+                    SetStatus(Victim(), EventPlayer(), Status.Stunned, 0.25);
+                }
+            }
+
+        } else if (HeroOf(EventPlayer()) == Hero.Bastion) {
+            if (EventAbility() == Button.PrimaryFire) {
+                SetAbilityCooldown(EventPlayer(), Button.SecondaryFire, AbilityCooldown(EventPlayer(), Button.SecondaryFire)-1);
+            } else if (EventAbility() == Button.SecondaryFire) {
+                SetAbilityCooldown(EventPlayer(), Button.Ability1, AbilityCooldown(EventPlayer(), Button.Ability1)-0.5);
+            }
+        
+        } else if (HeroOf(EventPlayer()) == Hero.Doomfist) {
+            if (EventAbility() != Button.PrimaryFire) {
+                SetAmmo(EventPlayer(), 0, 4);
+                Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.15);
+                Damage(Victim(), EventPlayer(), EventDamage()*2);
+            }
+
+            SetAbilityCooldown(EventPlayer(), Button.SecondaryFire, AbilityCooldown(EventPlayer(), Button.SecondaryFire)-0.5);
+            SetAbilityCooldown(EventPlayer(), Button.Ability1, AbilityCooldown(EventPlayer(), Button.Ability1)-0.5);
+            SetAbilityCooldown(EventPlayer(), Button.Ability2, AbilityCooldown(EventPlayer(), Button.Ability2)-0.5);
+            SetUltimateCharge(EventPlayer(), UltimateChargePercent(EventPlayer()) + 1);
+        
+        } else if (HeroOf(EventPlayer()) == Hero.Dva) {
+            SetAbilityCooldown(EventPlayer(), Button.Ability1, AbilityCooldown(EventPlayer(), Button.Ability1)-0.5);
+
+        } else if (HeroOf(EventPlayer()) == Hero.Genji) {
+            if (EventAbility() == Button.Ability1 || EventAbility() == Button.Melee || EventAbility() == Button.Ultimate) {
+                SetStatus(Victim(), EventPlayer(), Status.Stunned, 2);
+            } else if (IsUsingAbility2(EventPlayer()) && EventAbility() != null) {
+                Damage(Victim(), EventPlayer(), EventDamage()*4);
+            }
+
+
+        } else if (HeroOf(EventPlayer()) == Hero.Hanzo && EventAbility() == Button.Ability1) {
+            SetStatus(Victim(), EventPlayer(), Status.Stunned, 2);
     
-    } else if (HeroOf(EventPlayer()) == Hero.Sigma && EventAbility() == Button.PrimaryFire && Attacker() != Victim()) {
-        SetStatus(Victim(), EventPlayer(), Status.Stunned, 0.5);
-
-    } else if (HeroOf(EventPlayer()) == Hero.Sombra) {
-        if (HasStatus(Victim(), Status.Hacked)) {
-            SetAbilityCooldown(EventPlayer(), Button.SecondaryFire, AbilityCooldown(EventPlayer(), Button.SecondaryFire) - 0.5);
-            Damage(Victim(), EventPlayer(), EventDamage()*1.5);
-        }
-
-    } else if (HeroOf(EventPlayer()) == Hero.Symmetra && EventAbility() == Button.Ability1) {
-        Heal(Victim(), null, EventDamage() * 0.35);
-    
-    } else if (HeroOf(EventPlayer()) == Hero.Torbjorn && IsUsingAbility2(EventPlayer()) && Weapon(EventPlayer()) == 2) {
-        Damage(Victim(), EventPlayer(), EventDamage()*4);
-    
-    } else if (HeroOf(EventPlayer()) == Hero.Widowmaker) {
-        if (EventAbility() == Button.PrimaryFire) {
-            define widowExplosionTargets = PlayersWithinRadius(PositionOf(Victim()), 5, Team.Team2, RadiusLOS.Off);
-            StartDamageOverTime(widowExplosionTargets, EventPlayer(), 5, 45);
-
-            PlayEffect(AllPlayers(), PlayEffect.WidowmakerVenomMineExplosionEffect, Color.Purple, Victim(), 5);
-            PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.Purple, Victim(), 5);
-            PlayEffect(AllPlayers(), PlayEffect.DebuffImpactSound, Color.Purple, Victim(), 200);
-        } else if (EventAbility() == Button.Ability2) {
-            Damage(Victim(), EventPlayer(), EventDamage()*2);
-        }
-    
-    } else if (HeroOf(EventPlayer()) == Hero.Zenyatta && EventWasCriticalHit()) {
-        SetUltimateCharge(EventPlayer(), UltimateChargePercent(EventPlayer()) + 5);
-        Heal(EventPlayer(), EventPlayer(), 15);
-    }
-
-    Wait(0.016);
-}
-
-rule: "Hero Abilities - Hero Took Damage"
-Event.OnDamageTaken Team.Team1 {
-
-    if (HeroOf(EventPlayer()) == Hero.Bastion && IsUsingAbility1(EventPlayer())) {
-        Heal(EventPlayer(), null, EventDamage()/2);
-
-    } else if (HeroOf(EventPlayer()) == Hero.Pharah && !IsOnGround(EventPlayer())) {
-        Heal(EventPlayer(), null, EventDamage()/2);
-    
-    } else if (HeroOf(EventPlayer()) == Hero.Soldier76 && !IsUsingAbility1(EventPlayer())) {
-        Heal(EventPlayer(), null, EventDamage()/3);
-    
-    } else if (HeroOf(EventPlayer()) == Hero.Zarya) {
-        SetAbilityCooldown(EventPlayer(), Button.Ability1, AbilityCooldown(EventPlayer(), Button.Ability1)-0.5);
-    }
-}
-
-rule: "Hero Abilities - Dealt Final Blow"
-Event.OnFinalBlow Team.Team1 {
-    collectDebris(EventPlayer());
-
-    if (HeroOf(EventPlayer()) == Hero.Ana) {
-        if (EventAbility() == Button.Ability2) {
-            SetAbilityCooldown(EventPlayer(), Button.Ability1, 0);
-        }
-
-    } else if (HeroOf(EventPlayer()) == Hero.Ashe && EventWasCriticalHit()) {
-        PlayEffect(AllPlayers(), PlayEffect.AsheDynamiteExplosionEffect, Color.Orange, PositionOf(Victim()), 10);
-        PlayEffect(AllPlayers(), PlayEffect.ExplosionSound, Color.Orange, PositionOf(Victim()), 200);
-
-        Damage(PlayersWithinRadius(PositionOf(Victim()), 10, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), 50);
-        SetStatus(PlayersWithinRadius(PositionOf(Victim()), 10, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.Burning, 7);
-        StartDamageOverTime(PlayersWithinRadius(PositionOf(Victim()), 10, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), 7, 5);
-
-    } else if (HeroOf(EventPlayer()) == Hero.Cassidy && EventWasCriticalHit()) {
-        SetAbilityCooldown(EventPlayer(), Button.Ability1, 0);
-
-    } else if (HeroOf(EventPlayer()) == Hero.Genji && (EventAbility() == Button.Ability1 || EventAbility() == Button.Melee || EventAbility() == Button.Ultimate)) {
-        define blastPosition = PositionOf(Victim());
-
-        Wait(0.75);
-
-        PlayEffect(AllPlayers(), PlayEffect.BadExplosion, Color.Green, blastPosition, 7);
-        PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.Green, blastPosition + Vector(0, 0.75, 0), 7);
-
-        PlayEffect(AllPlayers(), PlayEffect.ExplosionSound, Color.Green, blastPosition, 200);
-        PlayEffect(AllPlayers(), PlayEffect.ExplosionSound, Color.Green, blastPosition, 200);
-
-        ApplyImpulse(PlayersWithinRadius(blastPosition, 7, Team.Team2, RadiusLOS.Surfaces), Vector(0, 1, 0), 5, Relative.ToWorld, ContraryMotion.Cancel);
-
-        Damage(PlayersWithinRadius(blastPosition, 7, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), 75);
-    
-    } else if (HeroOf(EventPlayer()) == Hero.Hanzo && EventWasCriticalHit()) {
-        SetAbilityCooldown(EventPlayer(), Button.Ability1, 0);
-    
-    } else if (HeroOf(EventPlayer()) == Hero.Moira && (EventAbility() == Button.Melee || EventAbility() == Button.Ultimate || EventAbility() == Button.Ability2)) {
-        PlayEffect(AllPlayers(), PlayEffect.BadExplosion, Color.Purple, PositionOf(Victim()), 10);
-        PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.Purple, PositionOf(Victim()) + Vector(0, 0.75, 0), 10);
-
-        PlayEffect(AllPlayers(), PlayEffect.ExplosionSound, Color.Purple, PositionOf(Victim()), 200);
-        PlayEffect(AllPlayers(), PlayEffect.ExplosionSound, Color.Purple, PositionOf(Victim()), 200);
-
-        ApplyImpulse(PlayersWithinRadius(PositionOf(Victim()), 10, Team.Team2, RadiusLOS.Surfaces), Vector(0, 1, 0), 5, Relative.ToWorld, ContraryMotion.Cancel);
-
-        Damage(PlayersWithinRadius(PositionOf(Victim()), 10, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), 100);
-    
-    } else if (HeroOf(EventPlayer()) == Hero.Reinhardt) {
-        if (EventAbility() == Button.Ability1) {
-            SetAbilityCooldown(EventPlayer(), Button.Ability1, AbilityCooldown(EventPlayer(), Button.Ability1) - 1);
-        }
-    
-    }
-}
-
-rule: "Hero Abilities - Scored Elimination"
-Event.OnElimination Team.Team1 {
-    if (HeroOf(EventPlayer()) == Hero.Echo) {
-        SetAbilityCooldown(EventPlayer(), Button.SecondaryFire, 0);
-
-    } else if (HeroOf(EventPlayer()) == Hero.Pharah) {
-        SetAmmo(EventPlayer(), 0, Ammo(EventPlayer(), 0)+1);
-
-    } else if (HeroOf(EventPlayer()) == Hero.WreckingBall) {
-        SetAbilityCooldown(EventPlayer(), Button.Crouch, 0);
-    
-    } else if (HeroOf(EventPlayer()) == Hero.Widowmaker) {
-        SetAmmo(EventPlayer(), 0, 35);
-    }
-}
-
-rule: "Hero Abilities - Used Ability 1"
-Event.OngoingPlayer Team.Team1 {
-    if (IsUsingAbility1(EventPlayer())) {
-        if (HeroOf(EventPlayer()) == Hero.Baptiste) {
-            Damage(PlayersWithinRadius(PositionOf(EventPlayer()), 8, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), 125);
-            ApplyImpulse(PlayersWithinRadius(PositionOf(EventPlayer()), 8, Team.Team2, RadiusLOS.Surfaces), Vector(0, 0.25, -1), 20, Relative.ToPlayer, ContraryMotion.Cancel);
-
-            PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.Yellow, PositionOf(EventPlayer()) + Vector(0, 0.75, 0), 8);
-
-        } else if (HeroOf(EventPlayer()) == Hero.Echo) {
-            SetStatus(PlayersWithinRadius(PositionOf(EventPlayer()), 12, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.Stunned, 2);
-
-            PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 0.75, 0), 12);
-            PlayEffect(AllPlayers(), PlayEffect.RingExplosionSound, Color.SkyBlue, PositionOf(EventPlayer()) + Vector(0, 0.75, 0), 200);
-
-            Wait(4);
-
         } else if (HeroOf(EventPlayer()) == Hero.JunkerQueen) {
-                SetStatus(PlayersWithinRadius(PositionOf(EventPlayer()), 15, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.KnockedDown, 2);
-                PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.Yellow, PositionOf(EventPlayer()) + Vector(0, 0.75, 0), 15);
-                WaitUntil(!IsUsingAbility1(EventPlayer()), 20);
+            SetAbilityCooldown(EventPlayer(), Button.Ability1, AbilityCooldown(EventPlayer(), Button.Ability1) - 0.25);
 
-        } else if (HeroOf(EventPlayer()) == Hero.Cassidy) {
-            Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.30);
-            Wait(1);
+        } else if (HeroOf(EventPlayer()) == Hero.Junkrat) {
+            if (EventAbility() == Button.Ability1) {
+                define randomEffectId = RandomInteger(0, 5);
 
-        } else if (HeroOf(EventPlayer()) == Hero.Mercy) {
-            ApplyImpulse(EventPlayer(), FacingDirectionOf(EventPlayer()) + Vector(0, 0.25, 0), 17, Relative.ToWorld, ContraryMotion.Cancel);
+                if (randomEffectId == 0) {
+                    Wait(0.016);
+                    SetStatus(PlayersWithinRadius(PositionOf(Victim()), 3, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.Asleep, RandomReal(2, 5));
+                } else if (randomEffectId == 1) {
+                    SetStatus(PlayersWithinRadius(PositionOf(Victim()), 3, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.Burning, 4);
+                    StartDamageOverTime(PlayersWithinRadius(PositionOf(Victim()), 3, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), RandomReal(5, 10), RandomReal(10, 20));
+                } else if (randomEffectId == 2) {
+                    SetStatus(PlayersWithinRadius(PositionOf(Victim()), 3, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.Frozen, RandomReal(2, 5));
+                } else if (randomEffectId == 3) {
+                    SetStatus(PlayersWithinRadius(PositionOf(Victim()), 3, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.Hacked, RandomReal(2, 5));
+                } else if (randomEffectId == 4) {
+                    SetStatus(PlayersWithinRadius(PositionOf(Victim()), 3, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.KnockedDown, RandomReal(2, 5));
+                } else if (randomEffectId == 5) {
+                    SetStatus(PlayersWithinRadius(PositionOf(Victim()), 3, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.Stunned, RandomReal(2, 5));
+                }
+            }
 
-            SetAbilityCooldown(EventPlayer(), Button.Ability1, 2);
-            Wait(2);
+        } else if (HeroOf(EventPlayer()) == Hero.Lucio && EventAbility() == Button.SecondaryFire) {
+            PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.Green, Victim(), 5);
+            Damage(PlayersWithinRadius(PositionOf(Victim()), 5, Team.Team2, RadiusLOS.Off), EventPlayer(), EventDamage()*5);
+            SetStatus(PlayersWithinRadius(PositionOf(Victim()), 5, Team.Team2, RadiusLOS.Off), EventPlayer(), Status.KnockedDown, 2);
+        
+        } else if (HeroOf(EventPlayer()) == Hero.Cassidy && EventAbility() == Button.SecondaryFire) {
+            SetAbilityCooldown(EventPlayer(), Button.Ability1, AbilityCooldown(EventPlayer(), Button.Ability1)-1);
+
+        } else if (HeroOf(EventPlayer()) == Hero.Mei && Victim().playerIsFrozen && EventAbility() == Button.SecondaryFire) {
+            define nearbyEnemies = PlayersWithinRadius(PositionOf(Victim()), 12, Team.Team2, RadiusLOS.Off);
+
+            for (define i = 0; i < CountOf(nearbyEnemies); i++) {
+                // if (!nearbyEnemies[i].playerIsFrozen) {
+                SetStatus(nearbyEnemies[i], EventPlayer(), Status.Frozen, 1);
+                // }
+            }
+
+            PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.White, Victim(), 12);
+            PlayEffect(AllPlayers(), PlayEffect.ExplosionSound, Color.White, Victim(), 200);
 
         } else if (HeroOf(EventPlayer()) == Hero.Orisa) {
-            ApplyImpulse(EventPlayer(), ThrottleOf(EventPlayer()), 10, Relative.ToPlayer, ContraryMotion.Incorporate);
+            Damage(Victim(), EventPlayer(), EventDamage()*0.5);
 
-            ApplyImpulse(PlayersWithinRadius(PositionOf(EventPlayer()), 7.5, Team.Team2, RadiusLOS.Surfaces), FacingDirectionOf(EventPlayer()) + Vector(0, 0.25, 0), 25, Relative.ToWorld, ContraryMotion.Cancel);
+            SetAbilityCooldown(EventPlayer(), Button.Ability1, AbilityCooldown(EventPlayer(), Button.Ability1)-0.3);
 
-            PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.Green, PositionOf(EventPlayer()) + Vector(0, 0.67, 0), 15);
-
-            Wait(1);
-            Loop();
-
-        } else if (HeroOf(EventPlayer()) == Hero.Soldier76) {
-            ApplyImpulse(PlayersWithinRadius(PositionOf(EventPlayer()), 2.5, Team.Team2, RadiusLOS.Surfaces), FacingDirectionOf(EventPlayer()) + Vector(0, 0.25, 0), 15, Relative.ToWorld, ContraryMotion.Cancel);
-
-            SetStatus(PlayersWithinRadius(PositionOf(EventPlayer()), 2.5, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.Stunned, 1);
-    
-        } else if (HeroOf(EventPlayer()) == Hero.Tracer) {
-            SetStatus(EventPlayer(), EventPlayer(), Status.PhasedOut, 2);
-
-            if (CountOf(playerEffects) == 0) {
-                StartDamageModification(AllPlayers(), EventPlayer(), 150, DamageModificationRev.ReceiversAndDamagers);
-                playerEffects[0] = LastDamageModificationID();
-
-                CreateEffect(AllPlayers(), Effect.Sparkles, Color.SkyBlue, UpdateEveryFrame(playerVisualEffectLoc), 2, EffectRev.PositionAndRadius);
-                playerEffects[CountOf(playerEffects)] = LastCreatedEntity();
-                CreateEffect(AllPlayers(), Effect.Sparkles, Color.SkyBlue, UpdateEveryFrame(playerVisualEffectLoc), 2, EffectRev.PositionAndRadius);
-                playerEffects[CountOf(playerEffects)] = LastCreatedEntity();
-                // CreateEffect(AllPlayers(), Effect.Sparkles, Color.SkyBlue, UpdateEveryFrame(playerVisualEffectLoc), 2, EffectRev.PositionAndRadius);
-                // playerEffects[CountOf(playerEffects)] = LastCreatedEntity();
-
-                playerVisualEffectLoc = EventPlayer();    
-            }  
-        }
-    }
-    Wait(0.1);
-    Loop();
-}
-
-rule: "Hero Abilities - Used Ability 2"
-Event.OngoingPlayer Team.Team1 {
-    if (IsUsingAbility2(EventPlayer())) {
-        if (HeroOf(EventPlayer()) == Hero.Winston) {
-            if (CountOf(playerEffects) == 0) {
-                CreateEffect(AllPlayers(), Effect.Sphere, Color.Red, UpdateEveryFrame(playerVisualEffectLoc), 7, EffectRev.PositionAndRadius);
-                playerEffects[CountOf(playerEffects)] = LastCreatedEntity();
-
-                CreateBeamEffect(AllPlayers(), BeamType.BadBeam, UpdateEveryFrame(playerVisualEffectLoc), UpdateEveryFrame(playerVisualEffectLoc + Vector(0, 5, 0)), Color.Red, EffectRev.PositionAndRadius);
-                playerEffects[CountOf(playerEffects)] = LastCreatedEntity();
+        } else if (HeroOf(EventPlayer()) == Hero.Reinhardt) {
+            if (EventAbility() == Button.PrimaryFire) {
+                SetAbilityCooldown(EventPlayer(), Button.Ability2, AbilityCooldown(EventPlayer(), Button.Ability2)-2);
+            } else if (EventAbility() == Button.Ability1) {
+                SetStatus(Victim(), EventPlayer(), Status.KnockedDown, 1.5);
+            } else if (EventAbility() == Button.Ultimate) {
+                if (UltimateChargePercent(EventPlayer()) < 60){
+                    SetUltimateCharge(EventPlayer(), UltimateChargePercent(EventPlayer()) + 30);
+                }
             }
 
-            playerVisualEffectLoc = PositionOf(EventPlayer());
-
-            ChaseVariableAtRate(playerVisualEffectLoc, RayCastHitPosition(EyePosition(EventPlayer()), PositionOf(EventPlayer()) + Vector(0, -100, 0), null, EventPlayer(), true), 8, RateChaseReevaluation.None);
-
+        } else if (HeroOf(EventPlayer()) == Hero.Roadhog && EventAbility() == Button.Ability1) {
             Wait(1);
-            WaitUntil(IsUsingAbility2(EventPlayer()), 8);
+            SetAbilityCooldown(EventPlayer(), Button.Ability1, AbilityCooldown(EventPlayer(), Button.Ability1)-3);
+            
+            if (Ammo(EventPlayer(), 0) < 5) {
+                SetAmmo(EventPlayer(), 0, Ammo(EventPlayer(), 0) + 1);
+            }
+        
+        } else if (HeroOf(EventPlayer()) == Hero.Sigma && EventAbility() == Button.PrimaryFire && Attacker() != Victim()) {
+            SetStatus(Victim(), EventPlayer(), Status.Stunned, 0.5);
 
-            if (IsUsingAbility2(EventPlayer())) {
+        } else if (HeroOf(EventPlayer()) == Hero.Sombra) {
+            if (HasStatus(Victim(), Status.Hacked)) {
+                SetAbilityCooldown(EventPlayer(), Button.SecondaryFire, AbilityCooldown(EventPlayer(), Button.SecondaryFire) - 0.5);
+                Damage(Victim(), EventPlayer(), EventDamage()*1.5);
+            }
+
+        } else if (HeroOf(EventPlayer()) == Hero.Symmetra && EventAbility() == Button.Ability1) {
+            Heal(Victim(), null, EventDamage() * 0.35);
+        
+        } else if (HeroOf(EventPlayer()) == Hero.Torbjorn && IsUsingAbility2(EventPlayer()) && Weapon(EventPlayer()) == 2) {
+            Damage(Victim(), EventPlayer(), EventDamage()*4);
+        
+        } else if (HeroOf(EventPlayer()) == Hero.Widowmaker) {
+            if (EventAbility() == Button.PrimaryFire) {
+                define widowExplosionTargets = PlayersWithinRadius(PositionOf(Victim()), 5, Team.Team2, RadiusLOS.Off);
+                StartDamageOverTime(widowExplosionTargets, EventPlayer(), 5, 45);
+
+                PlayEffect(AllPlayers(), PlayEffect.WidowmakerVenomMineExplosionEffect, Color.Purple, Victim(), 5);
+                PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.Purple, Victim(), 5);
+                PlayEffect(AllPlayers(), PlayEffect.DebuffImpactSound, Color.Purple, Victim(), 200);
+            } else if (EventAbility() == Button.Ability2) {
+                Damage(Victim(), EventPlayer(), EventDamage()*2);
+            }
+        
+        } else if (HeroOf(EventPlayer()) == Hero.Zenyatta && EventWasCriticalHit()) {
+            SetUltimateCharge(EventPlayer(), UltimateChargePercent(EventPlayer()) + 5);
+            Heal(EventPlayer(), EventPlayer(), 15);
+        }
+        Wait(0.016);
+    }
+}
+
+rule: "Hero Abilities - Hero Took Damage" Event.OnDamageTaken Team.Team1 {
+    if (!IsDummyBot(EventPlayer())) {
+        if (HeroOf(EventPlayer()) == Hero.Bastion && IsUsingAbility1(EventPlayer())) {
+            Heal(EventPlayer(), null, EventDamage()/2);
+
+        } else if (HeroOf(EventPlayer()) == Hero.Pharah && !IsOnGround(EventPlayer())) {
+            Heal(EventPlayer(), null, EventDamage()/2);
+        
+        } else if (HeroOf(EventPlayer()) == Hero.Soldier76 && !IsUsingAbility1(EventPlayer())) {
+            Heal(EventPlayer(), null, EventDamage()/3);
+        
+        } else if (HeroOf(EventPlayer()) == Hero.Zarya) {
+            SetAbilityCooldown(EventPlayer(), Button.Ability1, AbilityCooldown(EventPlayer(), Button.Ability1)-0.5);
+        }
+    }
+}
+
+rule: "Hero Abilities - Dealt Final Blow" Event.OnFinalBlow Team.Team1 {
+    if (!IsDummyBot(EventPlayer())) {
+        collectDebris(EventPlayer());
+
+        if (HeroOf(EventPlayer()) == Hero.Ana) {
+            if (EventAbility() == Button.Ability2) {
+                SetAbilityCooldown(EventPlayer(), Button.Ability1, 0);
+            }
+            if (getPlayerAllyBotCount() < 3) {
+                SpawnCombatant(PositionOf(EventPlayer()), CombatantTypes.Echo, Team.Team1, "Player Ally Bot");
+            }
+
+        } else if (HeroOf(EventPlayer()) == Hero.Ashe && EventWasCriticalHit()) {
+            PlayEffect(AllPlayers(), PlayEffect.AsheDynamiteExplosionEffect, Color.Orange, PositionOf(Victim()), 10);
+            PlayEffect(AllPlayers(), PlayEffect.ExplosionSound, Color.Orange, PositionOf(Victim()), 200);
+
+            Damage(PlayersWithinRadius(PositionOf(Victim()), 10, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), 50);
+            SetStatus(PlayersWithinRadius(PositionOf(Victim()), 10, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.Burning, 7);
+            StartDamageOverTime(PlayersWithinRadius(PositionOf(Victim()), 10, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), 7, 5);
+
+        } else if (HeroOf(EventPlayer()) == Hero.Cassidy && EventWasCriticalHit()) {
+            SetAbilityCooldown(EventPlayer(), Button.Ability1, 0);
+
+        } else if (HeroOf(EventPlayer()) == Hero.Genji && (EventAbility() == Button.Ability1 || EventAbility() == Button.Melee || EventAbility() == Button.Ultimate)) {
+            define blastPosition = PositionOf(Victim());
+
+            Wait(0.75);
+
+            PlayEffect(AllPlayers(), PlayEffect.BadExplosion, Color.Green, blastPosition, 7);
+            PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.Green, blastPosition + Vector(0, 0.75, 0), 7);
+
+            PlayEffect(AllPlayers(), PlayEffect.ExplosionSound, Color.Green, blastPosition, 200);
+            PlayEffect(AllPlayers(), PlayEffect.ExplosionSound, Color.Green, blastPosition, 200);
+
+            ApplyImpulse(PlayersWithinRadius(blastPosition, 7, Team.Team2, RadiusLOS.Surfaces), Vector(0, 1, 0), 5, Relative.ToWorld, ContraryMotion.Cancel);
+
+            Damage(PlayersWithinRadius(blastPosition, 7, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), 75);
+        
+        } else if (HeroOf(EventPlayer()) == Hero.Hanzo && EventWasCriticalHit()) {
+            SetAbilityCooldown(EventPlayer(), Button.Ability1, 0);
+        
+
+        } else if (HeroOf(EventPlayer()) == Hero.Kiriko) {
+            if (getPlayerAllyBotCount() < 3) {
+                SpawnCombatant(PositionOf(Victim()), CombatantTypes.Echo, Team.Team1, "Player Ally Bot");
+            }
+
+        } else if (HeroOf(EventPlayer()) == Hero.Lifeweaver) {
+            if (getPlayerAllyBotCount() < 3) {
+                SpawnCombatant(PositionOf(Victim()), CombatantTypes.Echo, Team.Team1, "Player Ally Bot");
+            }
+
+        } else if (HeroOf(EventPlayer()) == Hero.Moira && (EventAbility() == Button.Melee || EventAbility() == Button.Ultimate || EventAbility() == Button.Ability2)) {
+            PlayEffect(AllPlayers(), PlayEffect.BadExplosion, Color.Purple, PositionOf(Victim()), 10);
+            PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.Purple, PositionOf(Victim()) + Vector(0, 0.75, 0), 10);
+
+            PlayEffect(AllPlayers(), PlayEffect.ExplosionSound, Color.Purple, PositionOf(Victim()), 200);
+            PlayEffect(AllPlayers(), PlayEffect.ExplosionSound, Color.Purple, PositionOf(Victim()), 200);
+
+            ApplyImpulse(PlayersWithinRadius(PositionOf(Victim()), 10, Team.Team2, RadiusLOS.Surfaces), Vector(0, 1, 0), 5, Relative.ToWorld, ContraryMotion.Cancel);
+
+            Damage(PlayersWithinRadius(PositionOf(Victim()), 10, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), 100);
+        
+        } else if (HeroOf(EventPlayer()) == Hero.Reinhardt) {
+            if (EventAbility() == Button.Ability1) {
+                SetAbilityCooldown(EventPlayer(), Button.Ability1, AbilityCooldown(EventPlayer(), Button.Ability1) - 1);
+            }
+        
+        }
+    }
+}
+
+rule: "Hero Abilities - Scored Elimination" Event.OnElimination Team.Team1 {
+    if (!IsDummyBot(EventPlayer())) {
+        if (HeroOf(EventPlayer()) == Hero.Echo) {
+            SetAbilityCooldown(EventPlayer(), Button.SecondaryFire, 0);
+
+        } else if (HeroOf(EventPlayer()) == Hero.Pharah) {
+            SetAmmo(EventPlayer(), 0, Ammo(EventPlayer(), 0)+1);
+
+        } else if (HeroOf(EventPlayer()) == Hero.WreckingBall) {
+            SetAbilityCooldown(EventPlayer(), Button.Crouch, 0);
+        
+        } else if (HeroOf(EventPlayer()) == Hero.Widowmaker) {
+            SetAmmo(EventPlayer(), 0, 35);
+        }
+    }
+}
+
+rule: "Hero Abilities - Used Ability 1" Event.OngoingPlayer Team.Team1 {
+    if (!IsDummyBot(EventPlayer())) {
+        if (IsUsingAbility1(EventPlayer())) {
+            if (HeroOf(EventPlayer()) == Hero.Baptiste) {
+                Damage(PlayersWithinRadius(PositionOf(EventPlayer()), 8, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), 125);
+                ApplyImpulse(PlayersWithinRadius(PositionOf(EventPlayer()), 8, Team.Team2, RadiusLOS.Surfaces), Vector(0, 0.25, -1), 20, Relative.ToPlayer, ContraryMotion.Cancel);
+
+                PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.Yellow, PositionOf(EventPlayer()) + Vector(0, 0.75, 0), 8);
+
+                if (getPlayerAllyBotCount() < 1) {
+                    SpawnCombatant(PositionOf(EventPlayer()), CombatantTypes.Echo, Team.Team1, "Player Ally Bot");
+                }
+
+            } else if (HeroOf(EventPlayer()) == Hero.Echo) {
+                if (getPlayerAllyBotCount() < 1) {
+                    SpawnCombatant(PositionOf(EventPlayer()), CombatantTypes.Echo, Team.Team1, "Player Ally Bot");
+                }
+                Wait(5);
+
+            } else if (HeroOf(EventPlayer()) == Hero.JunkerQueen) {
+                    SetStatus(PlayersWithinRadius(PositionOf(EventPlayer()), 15, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.KnockedDown, 2);
+                    PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.Yellow, PositionOf(EventPlayer()) + Vector(0, 0.75, 0), 15);
+                    WaitUntil(!IsUsingAbility1(EventPlayer()), 20);
+
+            } else if (HeroOf(EventPlayer()) == Hero.Cassidy) {
+                Heal(EventPlayer(), EventPlayer(), (MaxHealth(EventPlayer()) - Health(EventPlayer())) * 0.30);
+                Wait(1);
+            
+            } else if (HeroOf(EventPlayer()) == Hero.Juno) {
+                if (getPlayerAllyBotCount() < 3) {
+                    SpawnCombatant(PositionOf(EventPlayer()), CombatantTypes.Echo, Team.Team1, "Player Ally Bot");
+                }
+                Wait(5);
+
+            } else if (HeroOf(EventPlayer()) == Hero.Mercy) {
+                ApplyImpulse(EventPlayer(), FacingDirectionOf(EventPlayer()) + Vector(0, 0.25, 0), 17, Relative.ToWorld, ContraryMotion.Cancel);
+
+                SetAbilityCooldown(EventPlayer(), Button.Ability1, 2);
+                Wait(2);
+
+            } else if (HeroOf(EventPlayer()) == Hero.Orisa) {
+                ApplyImpulse(EventPlayer(), ThrottleOf(EventPlayer()), 10, Relative.ToPlayer, ContraryMotion.Incorporate);
+
+                ApplyImpulse(PlayersWithinRadius(PositionOf(EventPlayer()), 7.5, Team.Team2, RadiusLOS.Surfaces), FacingDirectionOf(EventPlayer()) + Vector(0, 0.25, 0), 25, Relative.ToWorld, ContraryMotion.Cancel);
+
+                PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.Green, PositionOf(EventPlayer()) + Vector(0, 0.67, 0), 15);
+
+                Wait(1);
                 Loop();
-            } else {
-                playerVisualEffectLoc = Vector(0, -999, 0);
+
+            } else if (HeroOf(EventPlayer()) == Hero.Soldier76) {
+                ApplyImpulse(PlayersWithinRadius(PositionOf(EventPlayer()), 2.5, Team.Team2, RadiusLOS.Surfaces), FacingDirectionOf(EventPlayer()) + Vector(0, 0.25, 0), 15, Relative.ToWorld, ContraryMotion.Cancel);
+
+                SetStatus(PlayersWithinRadius(PositionOf(EventPlayer()), 2.5, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.Stunned, 1);
+        
+            } else if (HeroOf(EventPlayer()) == Hero.Tracer) {
+                SetStatus(EventPlayer(), EventPlayer(), Status.PhasedOut, 2);
+
+                if (CountOf(playerEffects) == 0) {
+                    StartDamageModification(AllPlayers(), EventPlayer(), 150, DamageModificationRev.ReceiversAndDamagers);
+                    playerEffects[0] = LastDamageModificationID();
+
+                    CreateEffect(AllPlayers(), Effect.Sparkles, Color.SkyBlue, UpdateEveryFrame(playerVisualEffectLoc), 2, EffectRev.PositionAndRadius);
+                    playerEffects[CountOf(playerEffects)] = LastCreatedEntity();
+                    CreateEffect(AllPlayers(), Effect.Sparkles, Color.SkyBlue, UpdateEveryFrame(playerVisualEffectLoc), 2, EffectRev.PositionAndRadius);
+                    playerEffects[CountOf(playerEffects)] = LastCreatedEntity();
+                    // CreateEffect(AllPlayers(), Effect.Sparkles, Color.SkyBlue, UpdateEveryFrame(playerVisualEffectLoc), 2, EffectRev.PositionAndRadius);
+                    // playerEffects[CountOf(playerEffects)] = LastCreatedEntity();
+
+                    playerVisualEffectLoc = EventPlayer();    
+                }  
             }
         }
+        Wait(0.1);
+        Loop();
     }
-    Wait(0.1);
-    Loop();
 }
 
-rule: "Hero Abilities - Mercy Self Rez"
-Event.OngoingPlayer Team.Team1 {
-    if (HeroOf(EventPlayer()) == Hero.Mercy && !IsAlive(EventPlayer()) && IsButtonHeld(EventPlayer(), Button.Ability2) && AbilityCooldown(EventPlayer(), Button.Ability2) <= 0) {
-        Resurrect(EventPlayer());
+rule: "Hero Abilities - Used Ability 2" Event.OngoingPlayer Team.Team1 {
+    if (!IsDummyBot(EventPlayer())) {
+        if (IsUsingAbility2(EventPlayer())) {
+            if (HeroOf(EventPlayer()) == Hero.Baptiste) {
+                for (define i = 0; i < 3 - getPlayerAllyBotCount(); i++) {
+                    if (getPlayerAllyBotCount() < 3) {
+                        SpawnCombatant(RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer())*30, null, EventPlayer(), true), CombatantTypes.Echo, Team.Team1, "Player Ally Bot");
+                    }
+                }
+                Wait(5);
 
-        PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.Yellow, PositionOf(EventPlayer()) + Vector(0, 0.75, 0), 5);
+            } else if (HeroOf(EventPlayer()) == Hero.Juno) {
+                if (getPlayerAllyBotCount() < 3) {
+                    SpawnCombatant(RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer())*20, null, EventPlayer(), true), CombatantTypes.Echo, Team.Team1, "Player Ally Bot");
+                }
+                Wait(2);
 
-        SetAbilityCooldown(EventPlayer(), Button.Ability2, 30);
-    }
+            } else if (HeroOf(EventPlayer()) == Hero.Soldier76) {
+                if (getPlayerAllyBotCount() < 1) {
+                    SpawnCombatant(PositionOf(EventPlayer()), CombatantTypes.Echo, Team.Team1, "Player Ally Bot");
+                }
+            } else if (HeroOf(EventPlayer()) == Hero.Winston) {
+                if (CountOf(playerEffects) == 0) {
+                    CreateEffect(AllPlayers(), Effect.Sphere, Color.Red, UpdateEveryFrame(playerVisualEffectLoc), 7, EffectRev.PositionAndRadius);
+                    playerEffects[CountOf(playerEffects)] = LastCreatedEntity();
 
-    Wait(0.1);
-    Loop();
-}
+                    CreateBeamEffect(AllPlayers(), BeamType.BadBeam, UpdateEveryFrame(playerVisualEffectLoc), UpdateEveryFrame(playerVisualEffectLoc + Vector(0, 5, 0)), Color.Red, EffectRev.PositionAndRadius);
+                    playerEffects[CountOf(playerEffects)] = LastCreatedEntity();
+                }
 
-rule: "Hero Abilities - Used Melee"
-Event.OngoingPlayer Team.Team1 {
-    if (IsMeleeing(EventPlayer())) {
-        if (HeroOf(EventPlayer()) == Hero.Reaper) {
-            if (IsInViewAngle(EventPlayer(), PlayerClosestToReticle(EventPlayer()), 45) && IsInLineOfSight(EventPlayer(), PlayerClosestToReticle(EventPlayer())) && !HasStatus(PlayerClosestToReticle(EventPlayer()), Status.PhasedOut)) {
-                define reaperPullTarget = PlayerClosestToReticle(EventPlayer());
-                define reaperPullDirection = DirectionTowards(reaperPullTarget, EventPlayer());
+                playerVisualEffectLoc = PositionOf(EventPlayer());
 
-                DisableMovementCollisionWithEnvironment(reaperPullTarget, false);
-                SetStatus(reaperPullTarget, EventPlayer(), Status.Stunned, 0.05 * DistanceBetween(reaperPullTarget, EventPlayer()));
+                ChaseVariableAtRate(playerVisualEffectLoc, RayCastHitPosition(EyePosition(EventPlayer()), PositionOf(EventPlayer()) + Vector(0, -100, 0), null, EventPlayer(), true), 8, RateChaseReevaluation.None);
 
-                ApplyImpulse(reaperPullTarget, Vector(XOf(reaperPullDirection), 0, ZOf(reaperPullDirection)) + Vector(0, 0.1, 0), 2 * DistanceBetween(reaperPullTarget, EventPlayer()), Relative.ToWorld, ContraryMotion.Cancel);
+                Wait(1);
+                WaitUntil(IsUsingAbility2(EventPlayer()), 8);
 
-                CreateBeamEffect(AllPlayers(), BeamType.BadBeam, EyePosition(EventPlayer()) + Vector(0, -0.5, 0), EyePosition(reaperPullTarget) + Vector(0, -0.5, 0), Color.Black, EffectRev.PositionAndRadius);
-                define reaperBeam = LastCreatedEntity();
-
-                CreateEffect(AllPlayers(), Effect.Cloud, Color.Black, reaperPullTarget, 1.5, EffectRev.VisibleToPositionAndRadius);
-                define reaperPullEffect  = LastCreatedEntity();
-
-                WaitUntil(DistanceBetween(reaperPullTarget, EventPlayer()) < 4 || !IsAlive(reaperPullTarget), 1);
-
-                EnableMovementCollisionWithEnvironment(reaperPullTarget);
-                DestroyEffect(reaperBeam);
-                DestroyEffect(reaperPullEffect);
-                reaperPullTarget = null;
-            }
-        }
-    }
-    Wait(0.1);
-    Loop();
-}
-
-rule: "Hero Abilities - Fired Primary"
-Event.OngoingPlayer Team.Team1 {
-    if (IsFiringPrimary(EventPlayer())) {
-        if (HeroOf(EventPlayer()) == Hero.Sigma) {
-            define sigmaPullLoc = RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer()) * DistanceBetween(EyePosition(EventPlayer()), PlayerClosestToReticle(EventPlayer(), Team.Team2)));
-
-            define sigmaPullTargets = PlayersWithinRadius(sigmaPullLoc, 7, Team.Team2, RadiusLOS.Surfaces);
-
-            for (define i = 0; i < CountOf(sigmaPullTargets); i++) {
-                if (sigmaPullTargets[i].enemyTypeName != EnemyTypes.Zarya) {
-                    ApplyImpulse(sigmaPullTargets[i], Vector(XOf(DirectionTowards(sigmaPullTargets[i], sigmaPullLoc)), 0.25, ZOf(DirectionTowards(sigmaPullTargets[i], sigmaPullLoc))) + (FacingDirectionOf(EventPlayer()) * 2), 7, Relative.ToWorld, ContraryMotion.Cancel);
-
-                    PlayEffect(AllPlayers(), PlayEffect.BadExplosion, Color.Blue, sigmaPullTargets[i], 0.5);
+                if (IsUsingAbility2(EventPlayer())) {
+                    Loop();
+                } else {
+                    playerVisualEffectLoc = Vector(0, -999, 0);
                 }
             }
         }
+        Wait(0.1);
+        Loop();
     }
-    Wait(0.1);
-    Loop();
 }
 
-rule: "Hero Abilities - Used Ultimate"
-Event.OngoingPlayer Team.Team1 {
-    if (IsUsingUltimate(EventPlayer())) {
-        if (HeroOf(EventPlayer()) == Hero.Bastion) {
-            SetStatus(EventPlayer(), EventPlayer(), Status.PhasedOut, 999);
+rule: "Hero Abilities - Mercy Self Rez" Event.OngoingPlayer Team.Team1 {
+    if (!IsDummyBot(EventPlayer())) {
+        if (HeroOf(EventPlayer()) == Hero.Mercy && !IsAlive(EventPlayer()) && IsButtonHeld(EventPlayer(), Button.Ability2) && AbilityCooldown(EventPlayer(), Button.Ability2) <= 0) {
+            Resurrect(EventPlayer());
 
-            CreateEffect(AllPlayers(), Effect.Sphere, Color.Blue, UpdateEveryFrame(playerVisualEffectLoc), 1.5, EffectRev.PositionAndRadius);
-            playerEffects[CountOf(playerEffects)] = LastCreatedEntity();
+            PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.Yellow, PositionOf(EventPlayer()) + Vector(0, 0.75, 0), 5);
 
-            playerVisualEffectLoc = EventPlayer();
-
-            WaitUntil(!IsUsingUltimate(EventPlayer()), 11);
-            Wait(0.75);
-
-            DestroyEffect(playerEffects);
-            ClearStatus(EventPlayer(), Status.PhasedOut);
-        
-        } else if (HeroOf(EventPlayer()) == Hero.Dva) {
-            Wait(0.5);
-
-            WaitUntil(!IsInAlternateForm(), 999);
-            SetUltimateCharge(EventPlayer(), 0);
-         
-        
-        } else if (HeroOf(EventPlayer()) == Hero.Junkrat) {
-            SetStatus(EventPlayer(), EventPlayer(), Status.PhasedOut, 999);
-
-            CreateEffect(AllPlayers(), Effect.Sphere, Color.Orange, UpdateEveryFrame(playerVisualEffectLoc), 1.5, EffectRev.PositionAndRadius);
-            playerEffects[CountOf(playerEffects)] = LastCreatedEntity();
-
-            playerVisualEffectLoc = EventPlayer();
-
-            WaitUntil(!IsUsingUltimate(EventPlayer()), 11);
-            Wait(0.75);
-
-            DestroyEffect(playerEffects);
-            ClearStatus(EventPlayer(), Status.PhasedOut);
-
-        }  else if (HeroOf(EventPlayer()) == Hero.Cassidy) {
-            SetStatus(EventPlayer(), EventPlayer(), Status.Unkillable, 999);
-            
-            WaitUntil(!IsUsingUltimate(EventPlayer()), 7);
-
-            ClearStatus(EventPlayer(), Status.Unkillable);
-
-        } else if (HeroOf(EventPlayer()) == Hero.Zenyatta) {
-            SetStatus(PlayersWithinRadius(PositionOf(EventPlayer()), 15, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.Burning, 10);
-            StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()), 15, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), 1, 25);
+            SetAbilityCooldown(EventPlayer(), Button.Ability2, 30);
         }
+        Wait(0.1);
+        Loop();
     }
-
-    Wait(0.1);
-    Loop();
 }
 
-rule: "Hero Abilities - Remove buffs"
-Event.OngoingPlayer Team.Team1 {
-    if (HeroOf(EventPlayer()) == Hero.Reaper && HasStatus(EventPlayer(), Status.Burning)) {
-        WaitUntil(!HasStatus(EventPlayer(), Status.Burning), 999);
-        StopDamageModification(playerEffects[0]);
-        playerEffects = [];
+rule: "Hero Abilities - Used Melee" Event.OngoingPlayer Team.Team1 {
+    if (!IsDummyBot(EventPlayer())) {
+        if (IsMeleeing(EventPlayer())) {
+            if (HeroOf(EventPlayer()) == Hero.Reaper) {
+                if (IsInViewAngle(EventPlayer(), PlayerClosestToReticle(EventPlayer()), 45) && IsInLineOfSight(EventPlayer(), PlayerClosestToReticle(EventPlayer())) && !HasStatus(PlayerClosestToReticle(EventPlayer()), Status.PhasedOut)) {
+                    define reaperPullTarget = PlayerClosestToReticle(EventPlayer());
+                    define reaperPullDirection = DirectionTowards(reaperPullTarget, EventPlayer());
 
-    } else if (HeroOf(EventPlayer()) == Hero.Sombra && HasStatus(EventPlayer(), Status.PhasedOut)) {
-        WaitUntil(!HasStatus(EventPlayer(), Status.PhasedOut), 999);
-        DestroyEffect(playerEffects);
-        playerEffects = [];
-    
-    } else if (HeroOf(EventPlayer()) == Hero.Tracer && HasStatus(EventPlayer(), Status.PhasedOut)) {
-        WaitUntil(!HasStatus(EventPlayer(), Status.PhasedOut), 999);
-        StopDamageModification(playerEffects[0]);
-        DestroyEffect(playerEffects);
-        playerEffects = [];
-    }
+                    DisableMovementCollisionWithEnvironment(reaperPullTarget, false);
+                    SetStatus(reaperPullTarget, EventPlayer(), Status.Stunned, 0.05 * DistanceBetween(reaperPullTarget, EventPlayer()));
 
-    Wait(0.1);
-    Loop();
-}
+                    ApplyImpulse(reaperPullTarget, Vector(XOf(reaperPullDirection), 0, ZOf(reaperPullDirection)) + Vector(0, 0.1, 0), 2 * DistanceBetween(reaperPullTarget, EventPlayer()), Relative.ToWorld, ContraryMotion.Cancel);
 
-rule: "Hero Abilities - Is Holding Ult Button"
-Event.OngoingPlayer Team.Team1 {
-    if (IsButtonHeld(EventPlayer(), Button.Ultimate)) {
-        if (HeroOf(EventPlayer()) == Hero.Ana) {
-            Wait(1);
-            if (UltimateChargePercent(EventPlayer()) >= 25 && (AbilityCooldown(EventPlayer(), Button.Ability1) > 1 || AbilityCooldown(EventPlayer(), Button.Ability2) > 1) ) {
-                SetUltimateCharge(EventPlayer(), UltimateChargePercent(EventPlayer()) - 25);
-                
-                SetAbilityCooldown(EventPlayer(), Button.Ability1, 0);
-                SetAbilityCooldown(EventPlayer(), Button.Ability2, 0);
+                    CreateBeamEffect(AllPlayers(), BeamType.BadBeam, EyePosition(EventPlayer()) + Vector(0, -0.5, 0), EyePosition(reaperPullTarget) + Vector(0, -0.5, 0), Color.Black, EffectRev.PositionAndRadius);
+                    define reaperBeam = LastCreatedEntity();
 
-                WaitUntil(!IsButtonHeld(EventPlayer(), Button.Ultimate), 30);
+                    CreateEffect(AllPlayers(), Effect.Cloud, Color.Black, reaperPullTarget, 1.5, EffectRev.VisibleToPositionAndRadius);
+                    define reaperPullEffect  = LastCreatedEntity();
+
+                    WaitUntil(DistanceBetween(reaperPullTarget, EventPlayer()) < 4 || !IsAlive(reaperPullTarget), 1);
+
+                    EnableMovementCollisionWithEnvironment(reaperPullTarget);
+                    DestroyEffect(reaperBeam);
+                    DestroyEffect(reaperPullEffect);
+                    reaperPullTarget = null;
+                }
             }
         }
+        Wait(0.1);
+        Loop();
     }
+}
 
+rule: "Hero Abilities - Pressed Jump Button" Event.OngoingPlayer Team.Team1 {
+    if (!IsDummyBot(EventPlayer())) {
+        if (AbilityCooldown(EventPlayer(), Button.Jump) >= 4) {
+            SmallMessage(AllPlayers(), "Jump Button Cooldown Over 4");
+            WaitUntil(AbilityCooldown(EventPlayer(), Button.Jump) < 4, 999);
+        }
+        Wait(0.1);
+        Loop();
+    }
+}
+
+rule: "Hero Abilities - Fired Primary" Event.OngoingPlayer Team.Team1 {
+    if (!IsDummyBot(EventPlayer())) {
+        if (IsFiringPrimary(EventPlayer())) {
+            if (HeroOf(EventPlayer()) == Hero.Sigma) {
+                define sigmaPullLoc = RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer()) * DistanceBetween(EyePosition(EventPlayer()), PlayerClosestToReticle(EventPlayer(), Team.Team2)));
+
+                define sigmaPullTargets = PlayersWithinRadius(sigmaPullLoc, 7, Team.Team2, RadiusLOS.Surfaces);
+
+                for (define i = 0; i < CountOf(sigmaPullTargets); i++) {
+                    if (sigmaPullTargets[i].combatantTypeName != CombatantTypes.Zarya) {
+                        ApplyImpulse(sigmaPullTargets[i], Vector(XOf(DirectionTowards(sigmaPullTargets[i], sigmaPullLoc)), 0.25, ZOf(DirectionTowards(sigmaPullTargets[i], sigmaPullLoc))) + (FacingDirectionOf(EventPlayer()) * 2), 7, Relative.ToWorld, ContraryMotion.Cancel);
+
+                        PlayEffect(AllPlayers(), PlayEffect.BadExplosion, Color.Blue, sigmaPullTargets[i], 0.5);
+                    }
+                }
+            } else if (HeroOf(EventPlayer()) == Hero.Lifeweaver) {
+                SetMoveSpeed(EventPlayer(), 125); // TODO: Create move speed var per player to control this
+                Heal(EventPlayer(), EventPlayer(), 15);
+                PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.Yellow, EventPlayer(), 7.5);
+                SetStatus(PlayersWithinRadius(EventPlayer(), 7.5, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.Burning, 2);
+                StartDamageOverTime(PlayersWithinRadius(EventPlayer(), 7.5, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), 2, 15);
+                Wait(0.5);
+            }
+        } else {
+            if (HeroOf(EventPlayer()) == Hero.Lifeweaver) {
+                SetMoveSpeed(EventPlayer(), 100); // TODO: Create move speed var per player to control this
+            }
+        }
+        Wait(0.1);
+        Loop();
+    }
+}
+
+rule: "Hero Abilities - Used Ultimate" Event.OngoingPlayer Team.Team1 {
+    if (!IsDummyBot(EventPlayer())) {
+        if (IsUsingUltimate(EventPlayer())) {
+            if (HeroOf(EventPlayer()) == Hero.Bastion) {
+                SetStatus(EventPlayer(), EventPlayer(), Status.PhasedOut, 999);
+
+                CreateEffect(AllPlayers(), Effect.Sphere, Color.Blue, UpdateEveryFrame(playerVisualEffectLoc), 1.5, EffectRev.PositionAndRadius);
+                playerEffects[CountOf(playerEffects)] = LastCreatedEntity();
+
+                playerVisualEffectLoc = EventPlayer();
+
+                WaitUntil(!IsUsingUltimate(EventPlayer()), 11);
+                Wait(0.75);
+
+                DestroyEffect(playerEffects);
+                ClearStatus(EventPlayer(), Status.PhasedOut);
+            
+            } else if (HeroOf(EventPlayer()) == Hero.Dva) {
+                Wait(0.5);
+
+                WaitUntil(!IsInAlternateForm(), 999);
+                SetUltimateCharge(EventPlayer(), 0);
+            
+            
+            } else if (HeroOf(EventPlayer()) == Hero.Junkrat) {
+                SetStatus(EventPlayer(), EventPlayer(), Status.PhasedOut, 999);
+
+                CreateEffect(AllPlayers(), Effect.Sphere, Color.Orange, UpdateEveryFrame(playerVisualEffectLoc), 1.5, EffectRev.PositionAndRadius);
+                playerEffects[CountOf(playerEffects)] = LastCreatedEntity();
+
+                playerVisualEffectLoc = EventPlayer();
+
+                WaitUntil(!IsUsingUltimate(EventPlayer()), 11);
+                Wait(0.75);
+
+                DestroyEffect(playerEffects);
+                ClearStatus(EventPlayer(), Status.PhasedOut);
+
+            }  else if (HeroOf(EventPlayer()) == Hero.Cassidy) {
+                SetStatus(EventPlayer(), EventPlayer(), Status.Unkillable, 999);
+                
+                WaitUntil(!IsUsingUltimate(EventPlayer()), 7);
+
+                ClearStatus(EventPlayer(), Status.Unkillable);
+
+            } else if (HeroOf(EventPlayer()) == Hero.Zenyatta) {
+                SetStatus(PlayersWithinRadius(PositionOf(EventPlayer()), 15, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), Status.Burning, 10);
+                StartDamageOverTime(PlayersWithinRadius(PositionOf(EventPlayer()), 15, Team.Team2, RadiusLOS.Surfaces), EventPlayer(), 1, 25);
+            }
+        }
+        Wait(0.1);
+        Loop();
+    }
+}
+
+rule: "Hero Abilities - Remove buffs" Event.OngoingPlayer Team.Team1 {
+    
+    if (!IsDummyBot(EventPlayer())) {
+        if (HeroOf(EventPlayer()) == Hero.Reaper && HasStatus(EventPlayer(), Status.Burning)) {
+            WaitUntil(!HasStatus(EventPlayer(), Status.Burning), 999);
+            StopDamageModification(playerEffects[0]);
+            playerEffects = [];
+
+        } else if (HeroOf(EventPlayer()) == Hero.Sombra && HasStatus(EventPlayer(), Status.PhasedOut)) {
+            WaitUntil(!HasStatus(EventPlayer(), Status.PhasedOut), 999);
+            DestroyEffect(playerEffects);
+            playerEffects = [];
+        
+        } else if (HeroOf(EventPlayer()) == Hero.Tracer && HasStatus(EventPlayer(), Status.PhasedOut)) {
+            WaitUntil(!HasStatus(EventPlayer(), Status.PhasedOut), 999);
+            StopDamageModification(playerEffects[0]);
+            DestroyEffect(playerEffects);
+            playerEffects = [];
+        }
+    }
     Wait(0.1);
     Loop();
 }
 
-rule: "Hero Abilities - Lucio Used Ultimate"
-Event.OngoingPlayer Team.Team1 
-if (HeroOf(EventPlayer()) == Hero.Lucio && IsUsingUltimate(EventPlayer()) && IsOnGround(EventPlayer())) {
-    SetStatus(PlayersWithinRadius(PositionOf(EventPlayer()), 10, Team.Team2, RadiusLOS.Surfaces), null, Status.KnockedDown, 2.5);
+rule: "Hero Abilities - Is Holding Ult Button" Event.OngoingPlayer Team.Team1 {
+    if (!IsDummyBot(EventPlayer())) {
+        if (IsButtonHeld(EventPlayer(), Button.Ultimate)) {
+            if (HeroOf(EventPlayer()) == Hero.Ana) {
+                Wait(1);
+                if (UltimateChargePercent(EventPlayer()) >= 25 && (AbilityCooldown(EventPlayer(), Button.Ability1) > 1 || AbilityCooldown(EventPlayer(), Button.Ability2) > 1) ) {
+                    SetUltimateCharge(EventPlayer(), UltimateChargePercent(EventPlayer()) - 25);
+                    
+                    SetAbilityCooldown(EventPlayer(), Button.Ability1, 0);
+                    SetAbilityCooldown(EventPlayer(), Button.Ability2, 0);
+
+                    WaitUntil(!IsButtonHeld(EventPlayer(), Button.Ultimate), 30);
+                }
+            }
+        }
+        Wait(0.1);
+        Loop();
+    }
+}
+
+rule: "Hero Abilities - Lucio Used Ultimate" Event.OngoingPlayer Team.Team1 if (HeroOf(EventPlayer()) == Hero.Lucio && IsUsingUltimate(EventPlayer()) && IsOnGround(EventPlayer())) {
+    if (!IsDummyBot(EventPlayer())) {
+        SetStatus(PlayersWithinRadius(PositionOf(EventPlayer()), 10, Team.Team2, RadiusLOS.Surfaces), null, Status.KnockedDown, 2.5);
+    }
     Wait(10);
 }
 
-rule: "Hero Abilities - Hacked enemy"
-Event.OngoingPlayer Team.Team2 {
+rule: "Hero Abilities - Hacked enemy" Event.OngoingPlayer Team.Team2 {
     if (HasStatus(EventPlayer(), Status.Hacked)) {
         SetStatus(EventPlayer(), null, Status.KnockedDown, 5.5);
         SetStatus(PlayersWithinRadius(PositionOf(EventPlayer()), 5, Team.Team2, RadiusLOS.Off), null, Status.Hacked, 5.5);

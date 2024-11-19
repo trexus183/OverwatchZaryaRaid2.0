@@ -4,5 +4,5 @@
 import "gamemodeScripts.del";
 import "mechanics.del";
 import "heroScripts.del";
-import "enemies.del";
+import "combatants.del";
 import "debugSystem.del";

@@ -1,9 +1,7 @@
 import "master.del";
 
 //  ------------- Gamemode Setup -------------
-rule: "Gamemode - Init"
-Event.OngoingGlobal
-if (IsAssemblingHeroes()) {
+rule: "Gamemode - Init" Event.OngoingGlobal if (IsAssemblingHeroes()) {
     CreateHudText(AllPlayers(), null, null, " ", Location.Top, 1,  Color.White, Color.White, Color.White, HudTextRev.VisibleToAndString, Spectators.VisibleAlways);
     CreateHudText(AllPlayers(), null, null, " ", Location.Top, 1,  Color.White, Color.White, Color.White, HudTextRev.VisibleToAndString, Spectators.VisibleAlways);
     CreateHudText(AllPlayers(), null, null, " ", Location.Top, 1,  Color.White, Color.White, Color.White, HudTextRev.VisibleToAndString, Spectators.VisibleAlways);
@@ -27,90 +25,106 @@ if (IsAssemblingHeroes()) {
 
 globalvar define encounterSpawnLocationSets = [
     // Street outside the fountain
-    [
-        Vector(28, 4, 42),
-        Vector(27, 4, 45),
-        Vector(28, 4, 38),
-        Vector(18, 2.8, 34),
-        Vector(18, 2.8, 47)
+    // [
+    //     Vector(28, 4, 42),
+    //     Vector(27, 4, 45),
+    //     Vector(28, 4, 38),
+    //     Vector(18, 2.8, 34),
+    //     Vector(18, 2.8, 47)
+    // ],
+    [ // Fountain entrance 1
+        Vector(62, 6, 27),
+        Vector(66, 7, 22),
+        Vector(59, 7, 22),
+        Vector(62, 7, 16),
+        Vector(64, 7, 13),
+        Vector(60, 7, 16),
+        Vector(66, 7, 19)
     ],
-    // Fountain entrance walkway
-    [
-        Vector(62, 7, 21),
-        Vector(67, 7, 20),
-        Vector(69, 6.75, 10),
-        Vector(69, 6.75, 10),
-        Vector(55, 6.75, 7)
+    [ // Fountain entrance 2
+        Vector(62, 6, 56),
+        Vector(60, 6.5, 58),
+        Vector(65, 6.5, 58),
+        Vector(63, 7, 60),
+        Vector(62, 7, 65),
+        Vector(64, 7, 67)
     ]
 ];
 globalvar define encounterWaypointLocations = [
-    Vector(19, 5, 40), // Street outside the fountain
-    Vector(64, 6.75, 12) // Street outside the fountain
+    // Vector(19, 5, 40), // Street outside the fountain
+    Vector(64, 10, 12), // Fountain entrance 1
+    Vector(63, 10, 60) // Fountain entrance 2
 ];
 
 globalvar define encounterCompositions = [
     [
-        EnemyTypes.Rein,
-        EnemyTypes.LesserBastion,
-        EnemyTypes.LesserBastion,
-        EnemyTypes.LesserBastion,
-        EnemyTypes.LesserBastion,
-        EnemyTypes.LesserBastion,
-        EnemyTypes.LesserBastion
+        CombatantTypes.Rein,
+        CombatantTypes.Rein,
+        CombatantTypes.LesserBastion,
+        CombatantTypes.LesserBastion,
+        CombatantTypes.LesserBastion,
+        CombatantTypes.LesserBastion,
+        CombatantTypes.LesserBastion,
+        CombatantTypes.LesserBastion
     ],
     [
-        EnemyTypes.Rein,
-        EnemyTypes.LesserOmnic,
-        EnemyTypes.LesserOmnic,
-        EnemyTypes.LesserOmnic,
-        EnemyTypes.LesserOmnic,
-        EnemyTypes.LesserOmnic,
-        EnemyTypes.LesserOmnic
+        CombatantTypes.Rein,
+        CombatantTypes.Rein,
+        CombatantTypes.LesserOmnic,
+        CombatantTypes.LesserOmnic,
+        CombatantTypes.LesserOmnic,
+        CombatantTypes.LesserOmnic,
+        CombatantTypes.LesserOmnic,
+        CombatantTypes.LesserOmnic
     ],
     [
-        EnemyTypes.GreaterBastion,
-        EnemyTypes.LesserRein,
-        EnemyTypes.LesserRein,
-        EnemyTypes.LesserRein,
-        EnemyTypes.LesserRein
+        CombatantTypes.GreaterBastion,
+        CombatantTypes.GreaterBastion,
+        CombatantTypes.LesserRein,
+        CombatantTypes.LesserRein,
+        CombatantTypes.LesserRein,
+        CombatantTypes.LesserRein
     ],
     [
-        EnemyTypes.GreaterBastion,
-        EnemyTypes.LesserOmnic,
-        EnemyTypes.LesserOmnic,
-        EnemyTypes.LesserOmnic,
-        EnemyTypes.LesserOmnic,
-        EnemyTypes.LesserOmnic,
-        EnemyTypes.LesserOmnic
+        CombatantTypes.GreaterBastion,
+        CombatantTypes.GreaterBastion,
+        CombatantTypes.LesserOmnic,
+        CombatantTypes.LesserOmnic,
+        CombatantTypes.LesserOmnic,
+        CombatantTypes.LesserOmnic,
+        CombatantTypes.LesserOmnic,
+        CombatantTypes.LesserOmnic
     ],
     [
-        EnemyTypes.GreaterBastion,
-        EnemyTypes.LesserExploderOmnic,
-        EnemyTypes.LesserExploderOmnic,
-        EnemyTypes.LesserExploderOmnic,
-        EnemyTypes.LesserExploderOmnic
+        CombatantTypes.GreaterBastion,
+        CombatantTypes.GreaterBastion,
+        CombatantTypes.LesserExploderOmnic,
+        CombatantTypes.LesserExploderOmnic,
+        CombatantTypes.LesserExploderOmnic,
+        CombatantTypes.LesserExploderOmnic
     ],
     [
-        EnemyTypes.GreaterBastion,
-        EnemyTypes.LesserBastion,
-        EnemyTypes.LesserBastion,
-        EnemyTypes.LesserBastion,
-        EnemyTypes.LesserBastion,
-        EnemyTypes.LesserBastion
+        CombatantTypes.GreaterBastion,
+        CombatantTypes.GreaterBastion,
+        CombatantTypes.LesserBastion,
+        CombatantTypes.LesserBastion,
+        CombatantTypes.LesserBastion,
+        CombatantTypes.LesserBastion,
+        CombatantTypes.LesserBastion
     ],
     [
-        EnemyTypes.Omnic,
-        EnemyTypes.StandardBastion,
-        EnemyTypes.StandardBastion,
-        EnemyTypes.StandardBastion,
-        EnemyTypes.StandardBastion
+        CombatantTypes.Omnic,
+        CombatantTypes.Omnic,
+        CombatantTypes.Omnic,
+        CombatantTypes.StandardBastion,
+        CombatantTypes.StandardBastion,
+        CombatantTypes.StandardBastion,
+        CombatantTypes.StandardBastion
     ]
 ];
 globalvar define currentEnemyEncounterLocation = -1;
 globalvar define currentEnemyEncounterComposition = -1;
-rule: "Gamemode - Spawn Enemy Encounter"
-Event.OngoingGlobal
-if (IsAssemblingHeroes()) {
+rule: "Gamemode - Spawn Enemy Encounter" Event.OngoingGlobal if (IsAssemblingHeroes()) {
     // Select Random Encounter Location
     currentEnemyEncounterLocation = RandomInteger(0, CountOf(encounterSpawnLocationSets)-1);
     currentEnemyEncounterComposition = RandomInteger(0, CountOf(encounterCompositions)-1);
@@ -119,7 +133,7 @@ if (IsAssemblingHeroes()) {
 
     // Spawn enemies for the current composition at the current location
     for (define i = 0; i < CountOf(encounterCompositions[currentEnemyEncounterComposition])-1; i++) {
-        SpawnAI(encounterSpawnLocationSets[currentEnemyEncounterLocation][RandomInteger(0, CountOf(encounterSpawnLocationSets[currentEnemyEncounterLocation])-1)], encounterCompositions[currentEnemyEncounterComposition][i], "Encounter " + currentEnemyEncounterLocation);
+        SpawnCombatant(encounterSpawnLocationSets[currentEnemyEncounterLocation][RandomInteger(0, CountOf(encounterSpawnLocationSets[currentEnemyEncounterLocation])-1)], encounterCompositions[currentEnemyEncounterComposition][i], Team.Team2, "Encounter " + currentEnemyEncounterLocation);
     }
     
     WaitUntil(CountOf(AllLivingPlayers(Team.Team2)) > 1, 999999);
@@ -133,8 +147,7 @@ playervar define heroPerkText = "";
 playervar define heroKillPerkText = "";
 playervar define heroUltPerkText = "";
 playervar define heroUltChargeText = "";
-rule: "Gamemode - Setup Player Hud"
-Event.OngoingPlayer Team.Team1 {
+rule: "Gamemode - Setup Player Hud" Event.OngoingPlayer Team.Team1 {
     // Ability Descriptions
     CreateHudText(EventPlayer(), "", "Abilities:" + IsInAlternateForm(EventPlayer()), "", Location.Left, 1, Color.White, Color.White, Color.White, HudTextRev.VisibleToAndString, Spectators.DefaultVisibility);
     setHeroPassiveText(EventPlayer());
@@ -154,8 +167,7 @@ Event.OngoingPlayer Team.Team1 {
     DisableGameModeInworldUI(EventPlayer());
 }
 
-rule: "Gamemode - Respawn Player"
-Event.OngoingPlayer if (!IsDummyBot(EventPlayer()) && HasSpawned(EventPlayer()) && !IsDead(EventPlayer())) {
+rule: "Gamemode - Respawn Player" Event.OngoingPlayer if (!IsDummyBot(EventPlayer()) && HasSpawned(EventPlayer()) && !IsDead(EventPlayer())) {
     setHeroPassiveText(EventPlayer());
 
     StartFacing(EventPlayer(), Vector(-55.92, -2, 40.67), 999999, Relative.ToWorld, FacingRev.None);
@@ -169,8 +181,7 @@ Event.OngoingPlayer if (!IsDummyBot(EventPlayer()) && HasSpawned(EventPlayer()) 
     }
 }
 
-rule: "Gamemode - Player Exits Spawn Room"
-Event.OngoingPlayer Team.Team1 if (IsInSpawnRoom(EventPlayer())) {
+rule: "Gamemode - Player Exits Spawn Room" Event.OngoingPlayer Team.Team1 if (IsInSpawnRoom(EventPlayer())) {
     WaitUntil(!IsInSpawnRoom(EventPlayer()), 9999999);
 
     // Teleport(EventPlayer(), Vector(16, 4, 88.5));
@@ -259,8 +270,7 @@ globalvar define wallLocs = [/*
 
 
 globalvar define currentEncounterWaypointPos = Vector(10, 10, 10);
-rule: "Gamemode - Create Walls and effects"
-Event.OngoingGlobal {
+rule: "Gamemode - Create Walls and effects" Event.OngoingGlobal {
     // Teleporter (I think)
     // CreateEffect(AllPlayers(), Effect.LightShaft, Color.SkyBlue, teleporterPos + Vector(0, -3, 0), 1.25, EffectRev.VisibleToPositionRadiusAndColor);
 
@@ -291,8 +301,7 @@ Event.OngoingGlobal {
 }
 
 // playervar define collidingWallPos = null;
-/*rule: "Wall Collision - Detect Collision"
-Event.OngoingPlayer Team.Team1 {
+/*rule: "Wall Collision - Detect Collision" Event.OngoingPlayer Team.Team1 {
     collidingWallPos = null;
 
     for (define i = 0; i < CountOf(wallLocs); i++) {
@@ -305,8 +314,7 @@ Event.OngoingPlayer Team.Team1 {
     Loop();
 }
 
-rule: "Wall Collision - Apply Impulse"
-Event.OngoingPlayer Team.Team1 {
+rule: "Wall Collision - Apply Impulse" Event.OngoingPlayer Team.Team1 {
     if (collidingWallPos != null) {
         define pushLocation = Vector(XOf(collidingWallPos), YOf(PositionOf(EventPlayer())), ZOf(collidingWallPos));
         ApplyImpulse(EventPlayer(), DirectionTowards(pushLocation, EventPlayer()), 1.5, Relative.ToWorld, ContraryMotion.Cancel);
@@ -317,8 +325,7 @@ Event.OngoingPlayer Team.Team1 {
 }*/
 
 // playervar define damageText = [];
-// rule: "Create Damage Text"
-// Event.OnDamageDealt Team.Team1 {
+// rule: "Create Damage Text" // Event.OnDamageDealt Team.Team1 {
 //     if (EventWasCriticalHit()) {
 //         CreateInWorldText(EventPlayer(), EventDamage(), PositionOf(Victim()) + Vector(RandomReal(-1, 1), RandomReal(-1, 1), RandomReal(-1, 1)), 1, Clipping.DoNotClip, InworldTextRev.None, Color.Yellow, Spectators.DefaultVisibility);
 //     } else {
@@ -328,8 +335,7 @@ Event.OngoingPlayer Team.Team1 {
 //     InsertValueInArray(damageText, 0, LastTextID());
 // }
 
-// rule: "Destroy Damage Text"
-// Event.OngoingPlayer Team.Team1 if (CountOf(damageText) > 0) {
+// rule: "Destroy Damage Text" // Event.OngoingPlayer Team.Team1 if (CountOf(damageText) > 0) {
 //     Wait(2);
 //     DestroyInWorldText(damageText[CountOf(damageText)]);
 //     RemoveFromArrayAtIndex(damageText, CountOf(damageText));

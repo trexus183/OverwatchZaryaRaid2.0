@@ -3,27 +3,25 @@ import "master.del";
 globalvar define debugNodes = [];
 globalvar define selectedDebugNodes = [];
 
-playervar define spawnAICounter = 0;
+playervar define SpawnCombatantCounter = 0;
 
-rule: "Debug Mode - Spawn AI"
-Event.OngoingPlayer if (IsButtonHeld(EventPlayer(), Button.Interact)) {
+rule: "Debug Mode - Spawn AI" Event.OngoingPlayer if (IsButtonHeld(EventPlayer(), Button.Interact)) {
     Wait(2);
     if (IsButtonHeld(EventPlayer(), Button.Interact)) {
         SmallMessage(EventPlayer(), "Spawning Bot");
         
-        spawnAICounter++;
+        SpawnCombatantCounter++;
 
         define randSpawn = RandomInteger(0, 1);
             if (randSpawn == 0) {
-                SpawnAI(RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer())*500, AllPlayers(), EventPlayer(), true), EnemyTypes.LesserBastion, "debug");
+                SpawnCombatant(RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer())*500, AllPlayers(), EventPlayer(), true), CombatantTypes.LesserBastion, Team.Team2, "debug");
             } else if (randSpawn == 1) {
-                SpawnAI(RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer())*500, AllPlayers(), EventPlayer(), true), EnemyTypes.StandardBastion, "debug");
+                SpawnCombatant(RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer())*500, AllPlayers(), EventPlayer(), true), CombatantTypes.StandardBastion, Team.Team2, "debug");
             }
     }
 }
 
-rule: "Debug Mode - Activation Button"
-Event.OngoingPlayer if (IsButtonHeld(EventPlayer(), Button.Crouch) && IsButtonHeld(EventPlayer(), Button.Interact)) {
+rule: "Debug Mode - Activation Button" Event.OngoingPlayer if (IsButtonHeld(EventPlayer(), Button.Crouch) && IsButtonHeld(EventPlayer(), Button.Interact)) {
     Wait(4);
     if (IsButtonHeld(EventPlayer(), Button.Crouch) && IsButtonHeld(EventPlayer(), Button.Interact)) {
         debugModeEnabled = true;
@@ -43,16 +41,14 @@ Event.OngoingPlayer if (IsButtonHeld(EventPlayer(), Button.Crouch) && IsButtonHe
         CreateHudText(AllPlayers(), RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer())*500, AllPlayers(), EventPlayer(), true), "", "", Location.Top, 0, Color.White, Color.White, Color.White, HudTextRev.String, Spectators.DefaultVisibility);
     }
 }
-rule: "Debug Mode - Place Nodes"
-Event.OngoingPlayer if (debugModeEnabled && IsButtonHeld(EventPlayer(), Button.SecondaryFire) && !IsButtonHeld(EventPlayer(), Button.Crouch)) {
+rule: "Debug Mode - Place Nodes" Event.OngoingPlayer if (debugModeEnabled && IsButtonHeld(EventPlayer(), Button.SecondaryFire) && !IsButtonHeld(EventPlayer(), Button.Crouch)) {
     debugNodes[CountOf(debugNodes)] = PositionOf(EventPlayer()) + Vector(0, 1, 0);
     
     CreateEffect(AllPlayers(), Effect.Orb, Color.Black, PositionOf(EventPlayer()) + Vector(0, 1, 0), 0.5, EffectRev.None);
     CreateInWorldText(AllPlayers(), CountOf(debugNodes)-1, PositionOf(EventPlayer()) + Vector(0, 1, 0), 1.5, Clipping.ClipAgainstSurfaces, InworldTextRev.None, Color.White, Spectators.DefaultVisibility);
 }
 
-rule: "Debug Mode - Place Nodes With Ray"
-Event.OngoingPlayer if (debugModeEnabled && IsButtonHeld(EventPlayer(), Button.Ability2) && !IsButtonHeld(EventPlayer(), Button.Crouch)) {
+rule: "Debug Mode - Place Nodes With Ray" Event.OngoingPlayer if (debugModeEnabled && IsButtonHeld(EventPlayer(), Button.Ability2) && !IsButtonHeld(EventPlayer(), Button.Crouch)) {
     debugNodes[CountOf(debugNodes)] = RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer())*500, AllPlayers(), EventPlayer(), true);
     
     CreateEffect(AllPlayers(), Effect.Orb, Color.Black, RayCastHitPosition(EyePosition(EventPlayer()), EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer())*500, AllPlayers(), EventPlayer(), true), 0.5, EffectRev.None);
@@ -72,8 +68,7 @@ define resetEffects() {
     return null;
 }
 
-rule: "Debug Mode - Destroy Nodes"
-Event.OngoingPlayer if (debugModeEnabled && IsButtonHeld(EventPlayer(), Button.SecondaryFire) && IsButtonHeld(EventPlayer(), Button.Crouch)) {
+rule: "Debug Mode - Destroy Nodes" Event.OngoingPlayer if (debugModeEnabled && IsButtonHeld(EventPlayer(), Button.SecondaryFire) && IsButtonHeld(EventPlayer(), Button.Crouch)) {
     for (define i = 0; i < CountOf(selectedDebugNodes); i++) {
         PlayEffect(AllPlayers(), PlayEffect.BadExplosion, Color.Black, selectedDebugNodes[i], 1.5);
     }
@@ -84,13 +79,11 @@ Event.OngoingPlayer if (debugModeEnabled && IsButtonHeld(EventPlayer(), Button.S
     resetEffects();
 }
 
-rule: "Debug Mode - Deselect All Nodes"
-Event.OngoingPlayer if (debugModeEnabled && IsFiringPrimary(EventPlayer()) && IsButtonHeld(EventPlayer(), Button.Crouch)) {
+rule: "Debug Mode - Deselect All Nodes" Event.OngoingPlayer if (debugModeEnabled && IsFiringPrimary(EventPlayer()) && IsButtonHeld(EventPlayer(), Button.Crouch)) {
     selectedDebugNodes = [];
 }
 
-rule: "Debug Mode - Show Selected Nodes"
-Event.OngoingGlobal if (debugModeEnabled) {
+rule: "Debug Mode - Show Selected Nodes" Event.OngoingGlobal if (debugModeEnabled) {
     for (define i = 0; i < CountOf(selectedDebugNodes); i++) {
         PlayEffect(AllPlayers(), PlayEffect.RingExplosion, Color.White, selectedDebugNodes[i], 1.5);
     }
